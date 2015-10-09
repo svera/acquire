@@ -28,6 +28,7 @@ func TestGetTile(t *testing.T) {
 func TestBuyStock(t *testing.T) {
 	player := NewPlayer("Test")
 	corporation, _ := NewCorporation("Test", 0)
+	corporation.size = 2
 	var buys []Buy
 	var expectedAvailableStock uint = 23
 	var expectedPlayerStock uint = 2
@@ -35,10 +36,10 @@ func TestBuyStock(t *testing.T) {
 	player.BuyStocks(buys)
 
 	if corporation.GetStock() != expectedAvailableStock {
-		t.Errorf("Corporation stock shares has not decreased, must be %d, got %d", expectedAvailableStock, corporation.stock)
+		t.Errorf("Corporation stock shares have not decreased, must be %d, got %d", expectedAvailableStock, corporation.stock)
 	}
 	if player.shares[corporation.getId()] != expectedPlayerStock {
-		t.Errorf("Player stock shares has not increased, must be %d, got %d", expectedPlayerStock, player.shares)
+		t.Errorf("Player stock shares have not increased, must be %d, got %d", expectedPlayerStock, player.shares[corporation.getId()])
 	}
 }
 
@@ -51,6 +52,6 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	buys = append(buys, Buy{corporation: corporation, amount: 2})
 	err := player.BuyStocks(buys)
 	if err == nil {
-		t.Errorf("Trying to buy stock shares withouth enough money must throw error")
+		t.Errorf("Trying to buy stock shares without enough money must throw error")
 	}
 }

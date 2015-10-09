@@ -24,7 +24,7 @@ func NewPlayer(name string) *Player {
 	}
 }
 
-// Placeholder function, pending implementation
+// Buys stock from corporations
 func (p *Player) BuyStocks(buys []Buy) error {
 	err := p.checkBuy(buys)
 
@@ -43,6 +43,9 @@ func (p *Player) BuyStocks(buys []Buy) error {
 func (p *Player) checkBuy(buys []Buy) error {
 	var totalStock, totalPrice uint = 0, 0
 	for _, buy := range buys {
+		if buy.corporation.size == 0 {
+			return errors.New("Player cannot buy shares of a corporation not on board")
+		}
 		if buy.amount > buy.corporation.stock {
 			return errors.New("Player cannot buy more shares than the available stock")
 		}
