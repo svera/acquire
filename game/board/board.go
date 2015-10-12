@@ -1,4 +1,8 @@
-package game
+package board
+
+import (
+	"github.com/svera/acquire/game/tileset"
+)
 
 const boardCellEmpty = 0
 const boardCellUsed = 9
@@ -7,7 +11,7 @@ type Board struct {
 	grid *[13]map[string]byte
 }
 
-func NewBoard() *Board {
+func New() *Board {
 	board := Board{
 		grid: new([13]map[string]byte),
 	}
@@ -37,6 +41,6 @@ func (b *Board) isTilePlayable() bool {
 	return true
 }
 
-func (b *Board) PutTile(tile Tile) {
-	b.grid[tile.number][tile.letter] = boardCellUsed
+func (b *Board) PutTile(t tileset.Tile) {
+	b.grid[t.Number][t.Letter] = boardCellUsed
 }

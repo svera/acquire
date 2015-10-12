@@ -1,22 +1,24 @@
-package game
+package player
 
 import (
 	"errors"
+	c "github.com/svera/acquire/game/corporation"
+	"github.com/svera/acquire/game/tileset"
 )
 
 type Buy struct {
-	corporation *Corporation
+	corporation *c.Corporation
 	amount      uint
 }
 
 type Player struct {
 	name   string
 	cash   uint
-	tiles  []Tile
+	tiles  []tileset.Tile
 	shares [7]uint
 }
 
-func NewPlayer(name string) *Player {
+func New(name string) *Player {
 	return &Player{
 		name:   name,
 		cash:   6000,
@@ -33,8 +35,8 @@ func (p *Player) BuyStocks(buys []Buy) error {
 	}
 
 	for _, buy := range buys {
-		buy.corporation.stock -= buy.amount
-		p.shares[buy.corporation.getId()] = buy.amount
+		buy.corporation.SetStock(buy.corporation.Stock() - buy.amount)
+		p.shares[buy.corporation.Id()] = buy.amount
 		p.cash -= buy.corporation.GetStockPrice() * buy.amount
 	}
 	return nil
@@ -43,10 +45,10 @@ func (p *Player) BuyStocks(buys []Buy) error {
 func (p *Player) checkBuy(buys []Buy) error {
 	var totalStock, totalPrice uint = 0, 0
 	for _, buy := range buys {
-		if buy.corporation.size == 0 {
+		if buy.corporation.Size() == 0 {
 			return errors.New("Player cannot buy shares of a corporation not on board")
 		}
-		if buy.amount > buy.corporation.stock {
+		if buy.amount > buy.corporation.Stock() {
 			return errors.New("Player cannot buy more shares than the available stock")
 		}
 		totalStock += buy.amount
@@ -63,10 +65,14 @@ func (p *Player) checkBuy(buys []Buy) error {
 }
 
 // Adds a new tile to the players' tileset
-func (p *Player) GetTile(tile Tile) error {
+func (p *Player) GetTile(t tileset.Tile) error {
 	if len(p.tiles) >= 6 {
 		return errors.New("Player cannot have more than 6 tiles")
 	}
-	p.tiles = append(p.tiles, tile)
+	p.tiles = append(p.tiles, t)
 	return nil
+}
+
+func (p *Player) Tiles() []tileset.Tile {
+	return p.tiles
 }

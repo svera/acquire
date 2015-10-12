@@ -1,21 +1,21 @@
-package game
+package tileset
 
 import "testing"
 
 func TestNewTileSet(t *testing.T) {
-	tileset := NewTileset()
+	tileset := New()
 	if len(tileset.tiles) != 108 {
 		t.Errorf("Tileset must have exactly 108 tiles, got %d", len(tileset.tiles))
 	}
 }
 
 func TestDraw(t *testing.T) {
-	tileset := NewTileset()
+	tileset := New()
 	tile := tileset.Draw()
-	if tile.number < 1 || tile.number > 13 {
+	if tile.Number < 1 || tile.Number > 13 {
 		t.Errorf("Drawn tile value is not valid")
 	}
-	if tile.letter < "A" || tile.letter > "I" {
+	if tile.Letter < "A" || tile.Letter > "I" {
 		t.Errorf("Drawn tile letter is not valid")
 	}
 	if len(tileset.tiles) != 107 {

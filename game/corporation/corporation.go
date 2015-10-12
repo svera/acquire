@@ -1,4 +1,4 @@
-package game
+package corporation
 
 import "errors"
 
@@ -16,7 +16,7 @@ type Corporation struct {
 	size        uint
 }
 
-func NewCorporation(name string, class uint) (*Corporation, error) {
+func New(name string, class uint) (*Corporation, error) {
 	if class < 0 || class > 2 {
 		return nil, errors.New("Corporation can only be of class 0, 1 or 2")
 	}
@@ -27,12 +27,20 @@ func NewCorporation(name string, class uint) (*Corporation, error) {
 	}, nil
 }
 
-func (c *Corporation) setId(id uint) {
+func (c *Corporation) SetId(id uint) {
 	c.id = id
 }
 
-func (c *Corporation) getId() uint {
+func (c *Corporation) Id() uint {
 	return c.id
+}
+
+func (c *Corporation) Size() uint {
+	return c.size
+}
+
+func (c *Corporation) SetSize(size uint) {
+	c.size = size
 }
 
 //Fill the prices chart array with the amounts corresponding to the corporation
@@ -65,8 +73,12 @@ func initPricesChart(class uint) map[uint]prices {
 	return pricesChart
 }
 
-func (c *Corporation) GetStock() uint {
+func (c *Corporation) Stock() uint {
 	return c.stock
+}
+
+func (c *Corporation) SetStock(stock uint) {
+	c.stock = stock
 }
 
 // Returns company's current value per stock share

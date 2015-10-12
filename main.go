@@ -3,26 +3,30 @@ package main
 import (
 	"fmt"
 	"github.com/svera/acquire/game"
+	"github.com/svera/acquire/game/board"
+	"github.com/svera/acquire/game/corporation"
+	"github.com/svera/acquire/game/player"
+	"github.com/svera/acquire/game/tileset"
 )
 
 func main() {
-	var players []*game.Player
-	players = append(players, game.NewPlayer("Fulanito"))
-	players = append(players, game.NewPlayer("Menganito"))
-	players = append(players, game.NewPlayer("Zutanito"))
+	var players []*player.Player
+	players = append(players, player.New("Fulanito"))
+	players = append(players, player.New("Menganito"))
+	players = append(players, player.New("Zutanito"))
 
-	var corporations [7]*game.Corporation
-	corporations[0], _ = game.NewCorporation("A", 0)
-	corporations[1], _ = game.NewCorporation("B", 0)
-	corporations[2], _ = game.NewCorporation("C", 1)
-	corporations[3], _ = game.NewCorporation("D", 1)
-	corporations[4], _ = game.NewCorporation("E", 1)
-	corporations[5], _ = game.NewCorporation("F", 2)
-	corporations[6], _ = game.NewCorporation("G", 2)
+	var corporations [7]*corporation.Corporation
+	corporations[0], _ = corporation.New("A", 0)
+	corporations[1], _ = corporation.New("B", 0)
+	corporations[2], _ = corporation.New("C", 1)
+	corporations[3], _ = corporation.New("D", 1)
+	corporations[4], _ = corporation.New("E", 1)
+	corporations[5], _ = corporation.New("F", 2)
+	corporations[6], _ = corporation.New("G", 2)
 
-	board := game.NewBoard()
-	tileset := game.NewTileset()
+	board := board.New()
+	tileset := tileset.New()
 
-	game, _ := game.NewGame(board, players, corporations, tileset)
+	game, _ := game.New(board, players, corporations, tileset)
 	fmt.Print(game)
 }
