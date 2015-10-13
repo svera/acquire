@@ -46,15 +46,30 @@ func (g *Game) giveInitialTileset(player *player.Player) {
 
 // Check if game end conditions are reached
 func (g *Game) AreEndConditionsReached() bool {
-	for _, corporation := range g.corporations {
+	active := g.getActiveCorporations()
+	if len(active) == 0 {
+		return false
+	}
+	for _, corporation := range active {
 		if corporation.Size() >= 41 {
 			return true
 		}
-		if corporation.IsSafe() == false {
+		if !corporation.IsSafe() {
 			return false
 		}
 	}
 	return true
+}
+
+// Return all corporations on the board
+func (g *Game) getActiveCorporations() []*corporation.Corporation {
+	active := []*corporation.Corporation{}
+	for _, corporation := range g.corporations {
+		if corporation.IsActive() {
+			active = append(active, corporation)
+		}
+	}
+	return active
 }
 
 // Placeholder function, pending implementation

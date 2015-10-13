@@ -100,6 +100,12 @@ func (c *Corporation) GetStockPrice() uint {
 	return c.pricesChart[c.Size()].price
 }
 
+// Returns true if the corporation is considered safe, false otherwise
 func (c *Corporation) IsSafe() bool {
 	return c.Size() >= 11
+}
+
+// Returns true if the corporation is on the board, false otherwise
+func (c *Corporation) IsActive() bool {
+	return c.Size() > 0
 }
