@@ -10,7 +10,7 @@ const boardCellUsed = 9
 var letters [9]string
 
 type Board struct {
-	grid *[13]map[string]byte
+	grid *[13]map[string]int
 }
 
 func init() {
@@ -19,11 +19,11 @@ func init() {
 
 func New() *Board {
 	board := Board{
-		grid: new([13]map[string]byte),
+		grid: new([13]map[string]int),
 	}
 
 	for number := 1; number < 13; number++ {
-		board.grid[number] = make(map[string]byte)
+		board.grid[number] = make(map[string]int)
 		for _, letter := range letters {
 			board.grid[number][letter] = boardCellEmpty
 		}
@@ -34,7 +34,7 @@ func New() *Board {
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) CorporationFounded(t tileset.Tile) []tileset.Tile {
+func (b *Board) CorporationFound(t tileset.Tile) []tileset.Tile {
 	var newCorporationTiles []tileset.Tile
 	adjacent := b.adjacentTiles(t)
 	for _, tile := range adjacent {
@@ -47,8 +47,8 @@ func (b *Board) CorporationFounded(t tileset.Tile) []tileset.Tile {
 
 // Checks if the passed tile merges two or more corporations, returns a slice of
 // corporation ids to be merged
-func (b *Board) CorporationsMerged(t tileset.Tile) []byte {
-	var mergedCorporations []byte
+func (b *Board) CorporationsMerge(t tileset.Tile) []int {
+	var mergedCorporations []int
 	adjacent := b.adjacentTiles(t)
 	for _, tile := range adjacent {
 		if boardCellEmpty < b.grid[tile.Number][tile.Letter] && b.grid[tile.Number][tile.Letter] < 8 {

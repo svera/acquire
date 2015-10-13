@@ -17,7 +17,8 @@ type Game struct {
 	currentPlayer uint
 }
 
-func New(board *board.Board, players []*player.Player, corporations [7]*corporation.Corporation, tileset *tileset.Tileset) (*Game, error) {
+func New(
+	board *board.Board, players []*player.Player, corporations [7]*corporation.Corporation, tileset *tileset.Tileset) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New("Number of players must be between 3 and 6")
 	}
