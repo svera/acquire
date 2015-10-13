@@ -1,6 +1,9 @@
 package corporation
 
-import "errors"
+import (
+	"errors"
+	"github.com/svera/acquire/game/tileset"
+)
 
 type prices struct {
 	price         uint
@@ -13,18 +16,30 @@ type Corporation struct {
 	name        string
 	stock       uint
 	pricesChart map[uint]prices
-	size        uint
+	tiles       []tileset.Tile
+	Size        func() uint
 }
 
 func New(name string, class uint) (*Corporation, error) {
 	if class < 0 || class > 2 {
 		return nil, errors.New("Corporation can only be of class 0, 1 or 2")
 	}
-	return &Corporation{
+	corporation := &Corporation{
 		name:        name,
 		stock:       25,
 		pricesChart: initPricesChart(class),
-	}, nil
+	}
+
+	corporation.Size = makeSize(corporation)
+	return corporation, nil
+}
+
+// In order to make testing easier, we implement Size() with a closure
+// that can be later overwritten by tests
+func makeSize(corporation *Corporation) func() uint {
+	return func() uint {
+		return uint(len(corporation.tiles))
+	}
 }
 
 func (c *Corporation) SetId(id uint) {
@@ -35,12 +50,8 @@ func (c *Corporation) Id() uint {
 	return c.id
 }
 
-func (c *Corporation) Size() uint {
-	return c.size
-}
-
-func (c *Corporation) SetSize(size uint) {
-	c.size = size
+func (c *Corporation) AddTiles(tiles []tileset.Tile) {
+	c.tiles = append(c.tiles, tiles...)
 }
 
 //Fill the prices chart array with the amounts corresponding to the corporation
@@ -83,11 +94,12 @@ func (c *Corporation) SetStock(stock uint) {
 
 // Returns company's current value per stock share
 func (c *Corporation) GetStockPrice() uint {
-	if c.size == 0 {
-		return 0
-	}
-	if c.size > 41 {
+	if c.Size() > 41 {
 		return c.pricesChart[41].price
 	}
-	return c.pricesChart[c.size].price
+	return c.pricesChart[c.Size()].price
+}
+
+func (c *Corporation) IsSafe() bool {
+	return c.Size() >= 11
 }

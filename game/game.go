@@ -33,7 +33,7 @@ func New(board *board.Board, players []*player.Player, corporations [7]*corporat
 		game.giveInitialTileset(player)
 	}
 	for i, corporation := range game.corporations {
-		corporation.SetId(uint(i))
+		corporation.SetId(uint(i) + 1)
 	}
 	return &game, nil
 }
@@ -44,12 +44,25 @@ func (g *Game) giveInitialTileset(player *player.Player) {
 	}
 }
 
-// Placeholder function, pending implementation
+// Check if game end conditions are reached
 func (g *Game) AreEndConditionsReached() bool {
+	for _, corporation := range g.corporations {
+		if corporation.Size() >= 41 {
+			return true
+		}
+		if corporation.IsSafe() == false {
+			return false
+		}
+	}
 	return true
 }
 
 // Placeholder function, pending implementation
 func (g *Game) GetMainStockHolders() bool {
+	return true
+}
+
+// Placeholder function, pending implementation
+func (g *Game) isTilePlayable() bool {
 	return true
 }

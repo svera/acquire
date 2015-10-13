@@ -32,7 +32,8 @@ func New() *Board {
 	return &board
 }
 
-// Checks of the passed tile founds a new corporation, returns a slice of tiles composing this corporation
+// Checks if the passed tile founds a new corporation, returns a slice of tiles
+// composing this corporation
 func (b *Board) CorporationFounded(t tileset.Tile) []tileset.Tile {
 	var newCorporationTiles []tileset.Tile
 	adjacent := b.adjacentTiles(t)
@@ -44,14 +45,17 @@ func (b *Board) CorporationFounded(t tileset.Tile) []tileset.Tile {
 	return newCorporationTiles
 }
 
-// Placeholder function, pending implementation
-func (b *Board) areCorporationsMerged() bool {
-	return true
-}
-
-// Placeholder function, pending implementation
-func (b *Board) isTilePlayable() bool {
-	return true
+// Checks if the passed tile merges two or more corporations, returns a slice of
+// corporation ids to be merged
+func (b *Board) CorporationsMerged(t tileset.Tile) []byte {
+	var mergedCorporations []byte
+	adjacent := b.adjacentTiles(t)
+	for _, tile := range adjacent {
+		if boardCellEmpty < b.grid[tile.Number][tile.Letter] && b.grid[tile.Number][tile.Letter] < 8 {
+			mergedCorporations = append(mergedCorporations, b.grid[tile.Number][tile.Letter])
+		}
+	}
+	return mergedCorporations
 }
 
 func (b *Board) PutTile(t tileset.Tile) {
@@ -76,7 +80,7 @@ func (b *Board) adjacentTiles(t tileset.Tile) []tileset.Tile {
 	return adjacent
 }
 
-func getLetterByDelta(letter string, delta int) string {
+func getAdjacentLetter(letter string, delta int) string {
 	for i, currentLetter := range letters {
 		if currentLetter == letter {
 			return letters[i+delta]
@@ -86,9 +90,9 @@ func getLetterByDelta(letter string, delta int) string {
 }
 
 func previousLetter(letter string) string {
-	return getLetterByDelta(letter, -1)
+	return getAdjacentLetter(letter, -1)
 }
 
 func nextLetter(letter string) string {
-	return getLetterByDelta(letter, +1)
+	return getAdjacentLetter(letter, +1)
 }
