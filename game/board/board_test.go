@@ -16,13 +16,13 @@ func TestPutTile(t *testing.T) {
 	}
 }
 
-func TestCorporationFound(t *testing.T) {
+func TestTileFoundCorporation(t *testing.T) {
 	board := New()
 	board.grid[5]["D"] = boardCellUsed
 	board.grid[6]["C"] = boardCellUsed
 	board.grid[6]["E"] = boardCellUsed
 	board.grid[7]["D"] = boardCellUsed
-	corporationTiles := board.CorporationFound(tileset.Tile{Number: 6, Letter: "D"})
+	corporationTiles := board.TileFoundCorporation(tileset.Tile{Number: 6, Letter: "D"})
 	expectedCorporationTiles := []tileset.Tile{
 		tileset.Tile{Number: 6, Letter: "D"},
 		tileset.Tile{Number: 5, Letter: "D"},
@@ -35,9 +35,9 @@ func TestCorporationFound(t *testing.T) {
 	}
 }
 
-func TestCorporationNotFound(t *testing.T) {
+func TestTileNotFoundCorporation(t *testing.T) {
 	board := New()
-	corporationTiles := board.CorporationFound(tileset.Tile{Number: 6, Letter: "D"})
+	corporationTiles := board.TileFoundCorporation(tileset.Tile{Number: 6, Letter: "D"})
 	expectedCorporationTiles := []tileset.Tile{}
 	if reflect.DeepEqual(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Tile %d%s must not found a corporation, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
@@ -52,7 +52,7 @@ func TestCorporationNotFound(t *testing.T) {
 // E [][][][]><[][][][][]
 // F         []
 // G         []
-func TestCorporationsMerge(t *testing.T) {
+func TestTileMergeCorporations(t *testing.T) {
 	board := New()
 	board.grid[2]["E"] = 1
 	board.grid[3]["E"] = 1
@@ -70,7 +70,7 @@ func TestCorporationsMerge(t *testing.T) {
 	board.grid[6]["G"] = 4
 
 	expectedCorporationsMerged := []int{1, 2, 3, 4}
-	corporationsMerged := board.CorporationsMerge(tileset.Tile{Number: 6, Letter: "E"})
+	corporationsMerged := board.TileMergeCorporations(tileset.Tile{Number: 6, Letter: "E"})
 	sort.Ints(corporationsMerged)
 	if !reflect.DeepEqual(corporationsMerged, expectedCorporationsMerged) {
 		t.Errorf("Tile %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporationsMerged, corporationsMerged)

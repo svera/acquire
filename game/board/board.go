@@ -34,7 +34,7 @@ func New() *Board {
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) CorporationFound(t tileset.Tile) []tileset.Tile {
+func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 	var newCorporationTiles []tileset.Tile
 	adjacent := b.adjacentTiles(t)
 	for _, tile := range adjacent {
@@ -47,7 +47,7 @@ func (b *Board) CorporationFound(t tileset.Tile) []tileset.Tile {
 
 // Checks if the passed tile merges two or more corporations, returns a slice of
 // corporation ids to be merged
-func (b *Board) CorporationsMerge(t tileset.Tile) []int {
+func (b *Board) TileMergeCorporations(t tileset.Tile) []int {
 	var mergedCorporations []int
 	adjacent := b.adjacentTiles(t)
 	for _, tile := range adjacent {
