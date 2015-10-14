@@ -30,7 +30,7 @@ func TestTileFoundCorporation(t *testing.T) {
 		tileset.Tile{Number: 6, Letter: "E"},
 		tileset.Tile{Number: 7, Letter: "D"},
 	}
-	if reflect.DeepEqual(corporationTiles, expectedCorporationTiles) {
+	if !reflect.DeepEqual(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Tile %d%s must found a corporation with tiles %v, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
 	}
 }
@@ -38,9 +38,8 @@ func TestTileFoundCorporation(t *testing.T) {
 func TestTileNotFoundCorporation(t *testing.T) {
 	board := New()
 	corporationTiles := board.TileFoundCorporation(tileset.Tile{Number: 6, Letter: "D"})
-	expectedCorporationTiles := []tileset.Tile{}
-	if reflect.DeepEqual(corporationTiles, expectedCorporationTiles) {
-		t.Errorf("Tile %d%s must not found a corporation, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
+	if len(corporationTiles) != 0 {
+		t.Errorf("Tile %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
 	}
 }
 

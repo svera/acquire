@@ -37,10 +37,13 @@ func New() *Board {
 func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 	var newCorporationTiles []tileset.Tile
 	adjacent := b.adjacentTiles(t)
-	for _, tile := range adjacent {
-		if b.grid[tile.Number][tile.Letter] == boardCellEmpty {
-			newCorporationTiles = append(newCorporationTiles, tile)
+	for _, adjacentTile := range adjacent {
+		if b.grid[adjacentTile.Number][adjacentTile.Letter] == boardCellUsed {
+			newCorporationTiles = append(newCorporationTiles, adjacentTile)
 		}
+	}
+	if len(newCorporationTiles) > 0 {
+		newCorporationTiles = append(newCorporationTiles, t)
 	}
 	return newCorporationTiles
 }
