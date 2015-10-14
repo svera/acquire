@@ -30,7 +30,7 @@ func TestTileFoundCorporation(t *testing.T) {
 		tileset.Tile{Number: 6, Letter: "E"},
 		tileset.Tile{Number: 7, Letter: "D"},
 	}
-	if !reflect.DeepEqual(corporationTiles, expectedCorporationTiles) {
+	if !sliceEquals(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Tile %d%s must found a corporation with tiles %v, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
 	}
 }
@@ -74,4 +74,24 @@ func TestTileMergeCorporations(t *testing.T) {
 	if !reflect.DeepEqual(corporationsMerged, expectedCorporationsMerged) {
 		t.Errorf("Tile %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporationsMerged, corporationsMerged)
 	}
+}
+
+func sliceEquals(slice1 []tileset.Tile, slice2 []tileset.Tile) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+	var inSlice bool
+	for _, val1 := range slice1 {
+		inSlice = false
+		for _, val2 := range slice2 {
+			if val1 == val2 {
+				inSlice = true
+				break
+			}
+		}
+		if !inSlice {
+			return false
+		}
+	}
+	return true
 }
