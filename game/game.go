@@ -34,7 +34,7 @@ func New(
 		game.giveInitialTileset(player)
 	}
 	for i, corporation := range game.corporations {
-		corporation.SetId(uint(i) + 1)
+		corporation.SetId(uint(i))
 	}
 	return &game, nil
 }
@@ -78,7 +78,21 @@ func (g *Game) GetMainStockHolders() bool {
 	return true
 }
 
-// Placeholder function, pending implementation
-func (g *Game) isTilePlayable() bool {
-	return true
+// Returns true if a tile is permanently unplayable, that is,
+// that putting it on the board would merge two or more safe corporations
+func (g *Game) isTileUnplayable(tile tileset.Tile) bool {
+	adjacents := g.board.AdjacentTiles(tile)
+	for _, adjacent := range adjacents {
+		safeNeighbours := 0
+		boardCell := g.board.Cell(adjacent)
+		if boardCell != board.CellEmpty && boardCell != board.CellUsed {
+			if g.corporations[boardCell].IsSafe() {
+				safeNeighbours++
+			}
+		}
+		if safeNeighbours == 2 {
+			return true
+		}
+	}
+	return false
 }

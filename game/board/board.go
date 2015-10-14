@@ -4,8 +4,8 @@ import (
 	"github.com/svera/acquire/game/tileset"
 )
 
-const boardCellEmpty = 0
-const boardCellUsed = 9
+const CellEmpty = -1
+const CellUsed = 8
 
 var letters [9]string
 
@@ -25,20 +25,24 @@ func New() *Board {
 	for number := 1; number < 13; number++ {
 		board.grid[number] = make(map[string]int)
 		for _, letter := range letters {
-			board.grid[number][letter] = boardCellEmpty
+			board.grid[number][letter] = CellEmpty
 		}
 	}
 
 	return &board
 }
 
+func (b *Board) Cell(t tileset.Tile) int {
+	return b.grid[t.Number][t.Letter]
+}
+
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
 func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 	var newCorporationTiles []tileset.Tile
-	adjacent := b.adjacentTiles(t)
+	adjacent := b.AdjacentTiles(t)
 	for _, adjacentTile := range adjacent {
-		if b.grid[adjacentTile.Number][adjacentTile.Letter] == boardCellUsed {
+		if b.grid[adjacentTile.Number][adjacentTile.Letter] == CellUsed {
 			newCorporationTiles = append(newCorporationTiles, adjacentTile)
 		}
 	}
@@ -52,9 +56,9 @@ func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 // corporation ids to be merged
 func (b *Board) TileMergeCorporations(t tileset.Tile) []int {
 	var mergedCorporations []int
-	adjacent := b.adjacentTiles(t)
+	adjacent := b.AdjacentTiles(t)
 	for _, tile := range adjacent {
-		if boardCellEmpty < b.grid[tile.Number][tile.Letter] && b.grid[tile.Number][tile.Letter] < 8 {
+		if CellEmpty < b.grid[tile.Number][tile.Letter] && b.grid[tile.Number][tile.Letter] < 8 {
 			mergedCorporations = append(mergedCorporations, b.grid[tile.Number][tile.Letter])
 		}
 	}
@@ -62,10 +66,10 @@ func (b *Board) TileMergeCorporations(t tileset.Tile) []int {
 }
 
 func (b *Board) PutTile(t tileset.Tile) {
-	b.grid[t.Number][t.Letter] = boardCellUsed
+	b.grid[t.Number][t.Letter] = CellUsed
 }
 
-func (b *Board) adjacentTiles(t tileset.Tile) []tileset.Tile {
+func (b *Board) AdjacentTiles(t tileset.Tile) []tileset.Tile {
 	var adjacent []tileset.Tile
 
 	if t.Letter > "A" {

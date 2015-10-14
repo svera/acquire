@@ -11,17 +11,17 @@ func TestPutTile(t *testing.T) {
 	board := New()
 	tile := tileset.Tile{Number: 5, Letter: "B"}
 	board.PutTile(tile)
-	if board.grid[5]["B"] != boardCellUsed {
+	if board.grid[5]["B"] != CellUsed {
 		t.Errorf("Tile %d%s was not put on the board", 5, "B")
 	}
 }
 
 func TestTileFoundCorporation(t *testing.T) {
 	board := New()
-	board.grid[5]["D"] = boardCellUsed
-	board.grid[6]["C"] = boardCellUsed
-	board.grid[6]["E"] = boardCellUsed
-	board.grid[7]["D"] = boardCellUsed
+	board.grid[5]["D"] = CellUsed
+	board.grid[6]["C"] = CellUsed
+	board.grid[6]["E"] = CellUsed
+	board.grid[7]["D"] = CellUsed
 	corporationTiles := board.TileFoundCorporation(tileset.Tile{Number: 6, Letter: "D"})
 	expectedCorporationTiles := []tileset.Tile{
 		tileset.Tile{Number: 6, Letter: "D"},
@@ -30,7 +30,7 @@ func TestTileFoundCorporation(t *testing.T) {
 		tileset.Tile{Number: 6, Letter: "E"},
 		tileset.Tile{Number: 7, Letter: "D"},
 	}
-	if !sliceEquals(corporationTiles, expectedCorporationTiles) {
+	if !slicesContentEquals(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Tile %d%s must found a corporation with tiles %v, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
 	}
 }
@@ -76,7 +76,7 @@ func TestTileMergeCorporations(t *testing.T) {
 	}
 }
 
-func sliceEquals(slice1 []tileset.Tile, slice2 []tileset.Tile) bool {
+func slicesContentEquals(slice1 []tileset.Tile, slice2 []tileset.Tile) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}
