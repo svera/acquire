@@ -30,7 +30,7 @@ func TestTileFoundCorporation(t *testing.T) {
 		tileset.Tile{Number: 6, Letter: "E"},
 		tileset.Tile{Number: 7, Letter: "D"},
 	}
-	if !slicesContentEquals(corporationTiles, expectedCorporationTiles) {
+	if !slicesSameContent(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Tile %d%s must found a corporation with tiles %v, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
 	}
 }
@@ -76,7 +76,40 @@ func TestTileMergeCorporations(t *testing.T) {
 	}
 }
 
-func slicesContentEquals(slice1 []tileset.Tile, slice2 []tileset.Tile) bool {
+// Testing growing corporation as this:
+//   5 6 7 8
+// D   []
+// E []><[][]
+// F   []
+func TestTileGrowCorporation(t *testing.T) {
+	board := New()
+	board.grid[5]["E"] = CellUsed
+	board.grid[7]["E"] = 2
+	board.grid[8]["E"] = 2
+	board.grid[6]["D"] = CellUsed
+	board.grid[6]["F"] = CellUsed
+
+	expectedTilesToAppend := []tileset.Tile{
+		tileset.Tile{Number: 5, Letter: "E"},
+		tileset.Tile{Number: 6, Letter: "D"},
+		tileset.Tile{Number: 6, Letter: "E"},
+		tileset.Tile{Number: 6, Letter: "F"},
+	}
+	expectedCorporationToGrow := 2
+	tilesToAppend, corporationToGrow := board.TileGrowCorporation(tileset.Tile{Number: 6, Letter: "E"})
+	if !slicesSameContent(tilesToAppend, expectedTilesToAppend) {
+		t.Errorf(
+			"Tile %d%s must grow corporation %d by %v, got %v in corporation %d instead",
+			6,
+			"E",
+			expectedCorporationToGrow,
+			expectedTilesToAppend,
+			tilesToAppend,
+			corporationToGrow,
+		)
+	}
+}
+func slicesSameContent(slice1 []tileset.Tile, slice2 []tileset.Tile) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}

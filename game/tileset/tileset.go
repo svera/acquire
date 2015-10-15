@@ -1,6 +1,7 @@
 package tileset
 
 import (
+	"errors"
 	"math/rand"
 )
 
@@ -26,9 +27,13 @@ func New() *Tileset {
 }
 
 // Extracts a random tile from the tileset and returns it
-func (t *Tileset) Draw() Tile {
-	pos := rand.Intn(len(t.tiles) - 1)
-	tile := t.tiles[pos]
-	t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
-	return tile
+func (t *Tileset) Draw() (Tile, error) {
+	remainingTiles := len(t.tiles)
+	if remainingTiles > 0 {
+		pos := rand.Intn(remainingTiles - 1)
+		tile := t.tiles[pos]
+		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
+		return tile, nil
+	}
+	return Tile{}, errors.New("No more tiles available")
 }

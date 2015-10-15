@@ -5,7 +5,7 @@ import (
 )
 
 const CellEmpty = -1
-const CellUsed = 8
+const CellUsed = 9
 
 var letters [9]string
 
@@ -42,7 +42,7 @@ func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 	var newCorporationTiles []tileset.Tile
 	adjacent := b.AdjacentTiles(t)
 	for _, adjacentTile := range adjacent {
-		if b.grid[adjacentTile.Number][adjacentTile.Letter] == CellUsed {
+		if b.Cell(adjacentTile) == CellUsed {
 			newCorporationTiles = append(newCorporationTiles, adjacentTile)
 		}
 	}
@@ -57,12 +57,37 @@ func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 func (b *Board) TileMergeCorporations(t tileset.Tile) []int {
 	var mergedCorporations []int
 	adjacent := b.AdjacentTiles(t)
-	for _, tile := range adjacent {
-		if CellEmpty < b.grid[tile.Number][tile.Letter] && b.grid[tile.Number][tile.Letter] < 8 {
-			mergedCorporations = append(mergedCorporations, b.grid[tile.Number][tile.Letter])
+	for _, adjacentTile := range adjacent {
+		if b.Cell(adjacentTile) != CellEmpty && b.Cell(adjacentTile) != CellUsed {
+			mergedCorporations = append(mergedCorporations, b.Cell(adjacentTile))
 		}
 	}
 	return mergedCorporations
+}
+
+// Check if the passed tile grows a corporation
+func (b *Board) TileGrowCorporation(t tileset.Tile) ([]tileset.Tile, int) {
+	var tilesToAppend []tileset.Tile
+	var corporationToGrow int = -1
+	adjacentCorporations := 0
+	adjacent := b.AdjacentTiles(t)
+	for _, adjacentTile := range adjacent {
+		if b.Cell(adjacentTile) != CellEmpty && b.Cell(adjacentTile) != CellUsed {
+			adjacentCorporations++
+			if adjacentCorporations == 2 {
+				return []tileset.Tile{}, -1
+			}
+			corporationToGrow = b.Cell(adjacentTile)
+		}
+		if b.Cell(adjacentTile) == CellUsed {
+			tilesToAppend = append(tilesToAppend, adjacentTile)
+		}
+	}
+	if adjacentCorporations == 0 || len(tilesToAppend) == 0 {
+		return []tileset.Tile{}, -1
+	}
+	tilesToAppend = append(tilesToAppend, t)
+	return tilesToAppend, corporationToGrow
 }
 
 func (b *Board) PutTile(t tileset.Tile) {

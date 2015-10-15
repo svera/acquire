@@ -41,7 +41,8 @@ func New(
 
 func (g *Game) giveInitialTileset(player *player.Player) {
 	for i := 0; i < 6; i++ {
-		player.GetTile(g.tileset.Draw())
+		tile, _ := g.tileset.Draw()
+		player.GetTile(tile)
 	}
 }
 
@@ -91,6 +92,22 @@ func (g *Game) isTileUnplayable(tile tileset.Tile) bool {
 			}
 		}
 		if safeNeighbours == 2 {
+			return true
+		}
+	}
+	return false
+}
+
+// Returns true if a tile is temporarily unplayable, that is,
+// that putting it on the board would create an 8th corporation
+func (g *Game) isTileTemporaryUnplayable(tile tileset.Tile) bool {
+	if len(g.getActiveCorporations()) < 7 {
+		return false
+	}
+	adjacents := g.board.AdjacentTiles(tile)
+	for _, adjacent := range adjacents {
+		boardCell := g.board.Cell(adjacent)
+		if boardCell == board.CellUsed {
 			return true
 		}
 	}
