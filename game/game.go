@@ -75,7 +75,7 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 }
 
 // Placeholder function, pending implementation
-func (g *Game) GetMainStockHolders() bool {
+func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) bool {
 	return true
 }
 
@@ -86,7 +86,7 @@ func (g *Game) isTileUnplayable(tile tileset.Position) bool {
 	for _, adjacent := range adjacents {
 		safeNeighbours := 0
 		boardCell := g.board.Cell(adjacent)
-		if boardCell != board.CellEmpty && boardCell != board.CellUsed {
+		if boardCell != board.CellEmpty && boardCell != board.CellOrphanTile {
 			if g.corporations[boardCell].IsSafe() {
 				safeNeighbours++
 			}
@@ -107,7 +107,7 @@ func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 	adjacents := g.board.AdjacentCells(tile)
 	for _, adjacent := range adjacents {
 		boardCell := g.board.Cell(adjacent)
-		if boardCell == board.CellUsed {
+		if boardCell == board.CellOrphanTile {
 			return true
 		}
 	}

@@ -5,7 +5,7 @@ import (
 )
 
 const CellEmpty = -1
-const CellUsed = 9
+const CellOrphanTile = 9
 
 var letters [9]string
 
@@ -32,6 +32,8 @@ func New() *Board {
 	return &board
 }
 
+// Returns a board cell value, which can be -1 if that cell doesn't have
+// any tile, 9 if it has an orphan tile or the ID of a corporation otherwise
 func (b *Board) Cell(t tileset.Position) int {
 	return b.grid[t.Number][t.Letter]
 }
@@ -66,11 +68,11 @@ func (b *Board) TileMergeCorporations(t tileset.Position) []int {
 
 // Check if the passed tile grows a corporation
 func (b *Board) TileGrowCorporation(t tileset.Position) ([]tileset.Position, int) {
-	var tilesToAppend []tileset.Position
-	var corporationToGrow int = -1
+	tilesToAppend := []tileset.Position{{Number: t.Number, Letter: t.Letter}}
+	corporationToGrow := -1
 	adjacent := b.AdjacentTiles(t)
 	for _, adjacentCell := range adjacent {
-		if b.Cell(adjacentCell) != CellUsed {
+		if b.Cell(adjacentCell) != CellOrphanTile {
 			if corporationToGrow != -1 {
 				return []tileset.Position{}, -1
 			}
@@ -82,13 +84,12 @@ func (b *Board) TileGrowCorporation(t tileset.Position) ([]tileset.Position, int
 	if corporationToGrow == -1 {
 		return []tileset.Position{}, -1
 	}
-	tilesToAppend = append(tilesToAppend, t)
 	return tilesToAppend, corporationToGrow
 }
 
 // Puts the passed tile on the board
 func (b *Board) PutTile(t tileset.Position) {
-	b.grid[t.Number][t.Letter] = CellUsed
+	b.grid[t.Number][t.Letter] = CellOrphanTile
 }
 
 // Returns all cells adjacent to the passed one
@@ -138,7 +139,7 @@ func (b *Board) AdjacentCorporationTiles(t tileset.Position) []tileset.Position 
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tileset.Position) bool {
-			if b.Cell(t) != CellEmpty && b.Cell(t) != CellUsed {
+			if b.Cell(t) != CellEmpty && b.Cell(t) != CellOrphanTile {
 				return true
 			}
 			return false
@@ -150,7 +151,7 @@ func (b *Board) AdjacentOrphanTiles(t tileset.Position) []tileset.Position {
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tileset.Position) bool {
-			if b.Cell(t) == CellUsed {
+			if b.Cell(t) == CellOrphanTile {
 				return true
 			}
 			return false

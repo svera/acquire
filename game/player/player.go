@@ -76,3 +76,7 @@ func (p *Player) GetTile(t tileset.Position) error {
 func (p *Player) Tiles() []tileset.Position {
 	return p.tiles
 }
+
+func (p *Player) Shares(corporationId uint) uint {
+	return p.shares[corporationId]
+}

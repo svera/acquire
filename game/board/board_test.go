@@ -11,17 +11,17 @@ func TestPutTile(t *testing.T) {
 	board := New()
 	tile := tileset.Position{Number: 5, Letter: "B"}
 	board.PutTile(tile)
-	if board.grid[5]["B"] != CellUsed {
+	if board.grid[5]["B"] != CellOrphanTile {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")
 	}
 }
 
 func TestTileFoundCorporation(t *testing.T) {
 	board := New()
-	board.grid[5]["D"] = CellUsed
-	board.grid[6]["C"] = CellUsed
-	board.grid[6]["E"] = CellUsed
-	board.grid[7]["D"] = CellUsed
+	board.grid[5]["D"] = CellOrphanTile
+	board.grid[6]["C"] = CellOrphanTile
+	board.grid[6]["E"] = CellOrphanTile
+	board.grid[7]["D"] = CellOrphanTile
 	corporationTiles := board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "D"})
 	expectedCorporationTiles := []tileset.Position{
 		tileset.Position{Number: 6, Letter: "D"},
@@ -76,12 +76,12 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	}
 }
 
-// Testing single merge as this:
+// Testing not a merge as this:
 //   3 4 5 6
 // E []><[][]
 func TestTileDontMerge(t *testing.T) {
 	board := New()
-	board.grid[3]["E"] = CellUsed
+	board.grid[3]["E"] = CellOrphanTile
 	board.grid[5]["E"] = 2
 	board.grid[6]["E"] = 2
 
@@ -100,11 +100,11 @@ func TestTileDontMerge(t *testing.T) {
 // F   []
 func TestTileGrowCorporation(t *testing.T) {
 	board := New()
-	board.grid[5]["E"] = CellUsed
+	board.grid[5]["E"] = CellOrphanTile
 	board.grid[7]["E"] = 2
 	board.grid[8]["E"] = 2
-	board.grid[6]["D"] = CellUsed
-	board.grid[6]["F"] = CellUsed
+	board.grid[6]["D"] = CellOrphanTile
+	board.grid[6]["F"] = CellOrphanTile
 
 	expectedTilesToAppend := []tileset.Position{
 		tileset.Position{Number: 5, Letter: "E"},
