@@ -8,13 +8,13 @@ import (
 
 func TestGetTile(t *testing.T) {
 	player := New("Test")
-	tl := tileset.Tile{Number: 2, Letter: "C"}
+	tl := tileset.Position{Number: 2, Letter: "C"}
 	player.GetTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
 
-	player.tiles = []tileset.Tile{
+	player.tiles = []tileset.Position{
 		{Number: 7, Letter: "C"},
 		{Number: 5, Letter: "A"},
 		{Number: 8, Letter: "E"},
@@ -32,7 +32,7 @@ func TestBuyStock(t *testing.T) {
 	player := New("Test")
 	corporation, _ := corporation.New("Test", 0)
 	corporation.AddTiles(
-		[]tileset.Tile{
+		[]tileset.Position{
 			{Number: 1, Letter: "A"},
 			{Number: 2, Letter: "A"},
 		},
@@ -56,7 +56,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	player.cash = 100
 	corporation, _ := corporation.New("Test", 0)
 	corporation.AddTiles(
-		[]tileset.Tile{
+		[]tileset.Position{
 			{Number: 1, Letter: "A"},
 			{Number: 2, Letter: "A"},
 		},

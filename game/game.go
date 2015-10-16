@@ -81,8 +81,8 @@ func (g *Game) GetMainStockHolders() bool {
 
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
-func (g *Game) isTileUnplayable(tile tileset.Tile) bool {
-	adjacents := g.board.AdjacentTiles(tile)
+func (g *Game) isTileUnplayable(tile tileset.Position) bool {
+	adjacents := g.board.AdjacentCells(tile)
 	for _, adjacent := range adjacents {
 		safeNeighbours := 0
 		boardCell := g.board.Cell(adjacent)
@@ -100,11 +100,11 @@ func (g *Game) isTileUnplayable(tile tileset.Tile) bool {
 
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
-func (g *Game) isTileTemporaryUnplayable(tile tileset.Tile) bool {
+func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 	if len(g.getActiveCorporations()) < 7 {
 		return false
 	}
-	adjacents := g.board.AdjacentTiles(tile)
+	adjacents := g.board.AdjacentCells(tile)
 	for _, adjacent := range adjacents {
 		boardCell := g.board.Cell(adjacent)
 		if boardCell == board.CellUsed {

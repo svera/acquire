@@ -32,19 +32,17 @@ func New() *Board {
 	return &board
 }
 
-func (b *Board) Cell(t tileset.Tile) int {
+func (b *Board) Cell(t tileset.Position) int {
 	return b.grid[t.Number][t.Letter]
 }
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
-	var newCorporationTiles []tileset.Tile
-	adjacent := b.AdjacentTiles(t)
-	for _, adjacentTile := range adjacent {
-		if b.Cell(adjacentTile) == CellUsed {
-			newCorporationTiles = append(newCorporationTiles, adjacentTile)
-		}
+func (b *Board) TileFoundCorporation(t tileset.Position) []tileset.Position {
+	var newCorporationTiles []tileset.Position
+	adjacent := b.AdjacentOrphanTiles(t)
+	for _, adjacentCell := range adjacent {
+		newCorporationTiles = append(newCorporationTiles, adjacentCell)
 	}
 	if len(newCorporationTiles) > 0 {
 		newCorporationTiles = append(newCorporationTiles, t)
@@ -53,63 +51,111 @@ func (b *Board) TileFoundCorporation(t tileset.Tile) []tileset.Tile {
 }
 
 // Checks if the passed tile merges two or more corporations, returns a slice of
-// corporation ids to be merged
-func (b *Board) TileMergeCorporations(t tileset.Tile) []int {
-	var mergedCorporations []int
-	adjacent := b.AdjacentTiles(t)
-	for _, adjacentTile := range adjacent {
-		if b.Cell(adjacentTile) != CellEmpty && b.Cell(adjacentTile) != CellUsed {
-			mergedCorporations = append(mergedCorporations, b.Cell(adjacentTile))
-		}
+// corporation IDs to be merged
+func (b *Board) TileMergeCorporations(t tileset.Position) []int {
+	var corporations []int
+	adjacent := b.AdjacentCorporationTiles(t)
+	for _, adjacentCell := range adjacent {
+		corporations = append(corporations, b.Cell(adjacentCell))
 	}
-	return mergedCorporations
+	if len(corporations) > 1 {
+		return corporations
+	}
+	return []int{}
 }
 
 // Check if the passed tile grows a corporation
-func (b *Board) TileGrowCorporation(t tileset.Tile) ([]tileset.Tile, int) {
-	var tilesToAppend []tileset.Tile
+func (b *Board) TileGrowCorporation(t tileset.Position) ([]tileset.Position, int) {
+	var tilesToAppend []tileset.Position
 	var corporationToGrow int = -1
-	adjacentCorporations := 0
 	adjacent := b.AdjacentTiles(t)
-	for _, adjacentTile := range adjacent {
-		if b.Cell(adjacentTile) != CellEmpty && b.Cell(adjacentTile) != CellUsed {
-			adjacentCorporations++
-			if adjacentCorporations == 2 {
-				return []tileset.Tile{}, -1
+	for _, adjacentCell := range adjacent {
+		if b.Cell(adjacentCell) != CellUsed {
+			if corporationToGrow != -1 {
+				return []tileset.Position{}, -1
 			}
-			corporationToGrow = b.Cell(adjacentTile)
-		}
-		if b.Cell(adjacentTile) == CellUsed {
-			tilesToAppend = append(tilesToAppend, adjacentTile)
+			corporationToGrow = b.Cell(adjacentCell)
+		} else {
+			tilesToAppend = append(tilesToAppend, adjacentCell)
 		}
 	}
-	if adjacentCorporations == 0 || len(tilesToAppend) == 0 {
-		return []tileset.Tile{}, -1
+	if corporationToGrow == -1 {
+		return []tileset.Position{}, -1
 	}
 	tilesToAppend = append(tilesToAppend, t)
 	return tilesToAppend, corporationToGrow
 }
 
-func (b *Board) PutTile(t tileset.Tile) {
+// Puts the passed tile on the board
+func (b *Board) PutTile(t tileset.Position) {
 	b.grid[t.Number][t.Letter] = CellUsed
 }
 
-func (b *Board) AdjacentTiles(t tileset.Tile) []tileset.Tile {
-	var adjacent []tileset.Tile
+// Returns all cells adjacent to the passed one
+func (b *Board) AdjacentCells(t tileset.Position) []tileset.Position {
+	var adjacent []tileset.Position
 
 	if t.Letter > "A" {
-		adjacent = append(adjacent, tileset.Tile{Number: t.Number, Letter: previousLetter(t.Letter)})
+		adjacent = append(adjacent, tileset.Position{Number: t.Number, Letter: previousLetter(t.Letter)})
 	}
 	if t.Letter < "I" {
-		adjacent = append(adjacent, tileset.Tile{Number: t.Number, Letter: nextLetter(t.Letter)})
+		adjacent = append(adjacent, tileset.Position{Number: t.Number, Letter: nextLetter(t.Letter)})
 	}
 	if t.Number > 1 {
-		adjacent = append(adjacent, tileset.Tile{Number: t.Number - 1, Letter: t.Letter})
+		adjacent = append(adjacent, tileset.Position{Number: t.Number - 1, Letter: t.Letter})
 	}
 	if t.Number < 13 {
-		adjacent = append(adjacent, tileset.Tile{Number: t.Number + 1, Letter: t.Letter})
+		adjacent = append(adjacent, tileset.Position{Number: t.Number + 1, Letter: t.Letter})
 	}
 	return adjacent
+}
+
+func (b *Board) adjacentCellsWithFilter(t tileset.Position, filter func(tileset.Position) bool) []tileset.Position {
+	var adjacentFilteredCells []tileset.Position
+	adjacent := b.AdjacentCells(t)
+
+	for _, adjacentCell := range adjacent {
+		if filter(adjacentCell) {
+			adjacentFilteredCells = append(adjacentFilteredCells, adjacentCell)
+		}
+	}
+	return adjacentFilteredCells
+}
+
+func (b *Board) AdjacentTiles(t tileset.Position) []tileset.Position {
+	return b.adjacentCellsWithFilter(
+		t,
+		func(t tileset.Position) bool {
+			if b.Cell(t) != CellEmpty {
+				return true
+			}
+			return false
+		},
+	)
+}
+
+func (b *Board) AdjacentCorporationTiles(t tileset.Position) []tileset.Position {
+	return b.adjacentCellsWithFilter(
+		t,
+		func(t tileset.Position) bool {
+			if b.Cell(t) != CellEmpty && b.Cell(t) != CellUsed {
+				return true
+			}
+			return false
+		},
+	)
+}
+
+func (b *Board) AdjacentOrphanTiles(t tileset.Position) []tileset.Position {
+	return b.adjacentCellsWithFilter(
+		t,
+		func(t tileset.Position) bool {
+			if b.Cell(t) == CellUsed {
+				return true
+			}
+			return false
+		},
+	)
 }
 
 func getAdjacentLetter(letter string, delta int) string {

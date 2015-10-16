@@ -14,7 +14,7 @@ type Buy struct {
 type Player struct {
 	name   string
 	cash   uint
-	tiles  []tileset.Tile
+	tiles  []tileset.Position
 	shares [7]uint
 }
 
@@ -65,7 +65,7 @@ func (p *Player) checkBuy(buys []Buy) error {
 }
 
 // Adds a new tile to the players' tileset
-func (p *Player) GetTile(t tileset.Tile) error {
+func (p *Player) GetTile(t tileset.Position) error {
 	if len(p.tiles) >= 6 {
 		return errors.New("Player cannot have more than 6 tiles")
 	}
@@ -73,6 +73,6 @@ func (p *Player) GetTile(t tileset.Tile) error {
 	return nil
 }
 
-func (p *Player) Tiles() []tileset.Tile {
+func (p *Player) Tiles() []tileset.Position {
 	return p.tiles
 }

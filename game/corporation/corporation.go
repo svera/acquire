@@ -16,7 +16,7 @@ type Corporation struct {
 	name        string
 	stock       uint
 	pricesChart map[uint]prices
-	tiles       []tileset.Tile
+	tiles       []tileset.Position
 	Size        func() uint
 }
 
@@ -50,7 +50,7 @@ func (c *Corporation) Id() uint {
 	return c.id
 }
 
-func (c *Corporation) AddTiles(tiles []tileset.Tile) {
+func (c *Corporation) AddTiles(tiles []tileset.Position) {
 	c.tiles = append(c.tiles, tiles...)
 }
 
