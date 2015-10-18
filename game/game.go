@@ -76,7 +76,11 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 	return active
 }
 
-// Placeholder function, pending implementation
+// Taken from the game rules:
+// "If only one player owns stock in the defunct corporation, that player gets both bonuses. If there's
+// a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
+// shareholder gets no bonus. If there's a tie for minority stockholder, split the minority bonus among
+// the tied players"
 func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[string][]*player.Player {
 	mainStockHolders := map[string][]*player.Player{"primary": {}, "secondary": {}}
 	stockHolders := g.getStockHolders(corporation)
@@ -84,32 +88,42 @@ func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[str
 	if len(stockHolders) == 1 {
 		return map[string][]*player.Player{"primary": {stockHolders[0]}, "secondary": {stockHolders[0]}}
 	}
-	sharesDesc := func(p1, p2 *player.Player) bool {
-		return p1.Shares(corporation) > p2.Shares(corporation)
-	}
-	player.By(sharesDesc).Sort(stockHolders)
+
+	mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[0])
 	if stockHolders[0].Shares(corporation) == stockHolders[1].Shares(corporation) {
-		mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[0])
 		mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[1])
 		i := 2
-		for stockHolders[0] == stockHolders[i] && i < len(stockHolders) {
+		for i < len(stockHolders) && stockHolders[0] == stockHolders[i] {
 			mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[i])
 			i++
 		}
 		return mainStockHolders
 	}
+	if stockHolders[1].Shares(corporation) == stockHolders[2].Shares(corporation) {
+		mainStockHolders["secondary"] = append(mainStockHolders["secondary"], stockHolders[2])
+		i := 3
+		for i < len(stockHolders) && stockHolders[1] == stockHolders[i] {
+			mainStockHolders["secondary"] = append(mainStockHolders["secondary"], stockHolders[i])
+			i++
+		}
+	}
 	return mainStockHolders
 }
 
-// Get players who have stock of the passed corporation
+// Get players who have stock of the passed corporation, ordered descendently by number of stock shares
+// of that corporation
 func (g *Game) getStockHolders(corporation *corporation.Corporation) []*player.Player {
 	var stockHolders []*player.Player
+	sharesDesc := func(p1, p2 *player.Player) bool {
+		return p1.Shares(corporation) > p2.Shares(corporation)
+	}
 
 	for _, player := range g.players {
 		if player.Shares(corporation) > 0 {
 			stockHolders = append(stockHolders, player)
 		}
 	}
+	player.By(sharesDesc).Sort(stockHolders)
 	return stockHolders
 }
 
