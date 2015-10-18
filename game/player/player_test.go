@@ -3,6 +3,7 @@ package player
 import (
 	"github.com/svera/acquire/game/corporation"
 	"github.com/svera/acquire/game/tileset"
+	"reflect"
 	"testing"
 )
 
@@ -66,5 +67,35 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	err := player.BuyStocks(buys)
 	if err == nil {
 		t.Errorf("Trying to buy stock shares without enough money must throw error")
+	}
+}
+
+func TestSort(t *testing.T) {
+	players := []*Player{
+		New("Test1"),
+		New("Test2"),
+		New("Test3"),
+		New("Test4"),
+	}
+
+	corporation, _ := corporation.New("Test", 0)
+
+	players[0].shares[0] = 3
+	players[1].shares[0] = 1
+	players[2].shares[0] = 0
+	players[3].shares[0] = 2
+
+	shares := func(p1, p2 *Player) bool {
+		return p1.Shares(corporation) < p2.Shares(corporation)
+	}
+	expectedSort := []*Player{
+		players[2],
+		players[1],
+		players[3],
+		players[0],
+	}
+	By(shares).Sort(players)
+	if !reflect.DeepEqual(players, expectedSort) {
+		t.Errorf("Players not sorted by corporation %s's shares amount", corporation.Name())
 	}
 }

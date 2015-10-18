@@ -77,6 +77,6 @@ func (p *Player) Tiles() []tileset.Position {
 	return p.tiles
 }
 
-func (p *Player) Shares(corporationId uint) uint {
-	return p.shares[corporationId]
+func (p *Player) Shares(corporation *c.Corporation) uint {
+	return p.shares[corporation.Id()]
 }

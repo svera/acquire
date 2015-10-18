@@ -8,6 +8,8 @@ import (
 	"github.com/svera/acquire/game/tileset"
 )
 
+const totalCorporations = 7
+
 type Game struct {
 	board         *board.Board
 	status        []string
@@ -75,8 +77,23 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 }
 
 // Placeholder function, pending implementation
-func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) bool {
-	return true
+func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) [2][]*player.Player {
+	mainStockHolders := [2][]*player.Player{{}, {}}
+	var stockHolders []*player.Player
+
+	for _, player := range g.players {
+		if player.Shares(corporation) > 0 {
+			stockHolders = append(stockHolders, player)
+		}
+	}
+	if len(stockHolders) == 1 {
+		return [2][]*player.Player{{stockHolders[0]}, {stockHolders[0]}}
+	}
+	shares := func(p1, p2 *player.Player) bool {
+		return p1.Shares(corporation) < p2.Shares(corporation)
+	}
+	player.By(shares).Sort(stockHolders)
+	return mainStockHolders
 }
 
 // Returns true if a tile is permanently unplayable, that is,
@@ -101,7 +118,7 @@ func (g *Game) isTileUnplayable(tile tileset.Position) bool {
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
 func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
-	if len(g.getActiveCorporations()) < 7 {
+	if len(g.getActiveCorporations()) < totalCorporations {
 		return false
 	}
 	adjacents := g.board.AdjacentCells(tile)

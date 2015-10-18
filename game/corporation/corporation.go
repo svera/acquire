@@ -109,3 +109,7 @@ func (c *Corporation) IsSafe() bool {
 func (c *Corporation) IsActive() bool {
 	return c.Size() > 0
 }
+
+func (c *Corporation) Name() string {
+	return c.name
+}
