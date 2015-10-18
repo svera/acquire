@@ -77,17 +77,27 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 }
 
 // Placeholder function, pending implementation
-func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) [2][]*player.Player {
-	mainStockHolders := [2][]*player.Player{{}, {}}
+func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[string][]*player.Player {
+	mainStockHolders := map[string][]*player.Player{"primary": {}, "secondary": {}}
 	stockHolders := g.getStockHolders(corporation)
 
 	if len(stockHolders) == 1 {
-		return [2][]*player.Player{{stockHolders[0]}, {stockHolders[0]}}
+		return map[string][]*player.Player{"primary": {stockHolders[0]}, "secondary": {stockHolders[0]}}
 	}
 	sharesDesc := func(p1, p2 *player.Player) bool {
 		return p1.Shares(corporation) > p2.Shares(corporation)
 	}
 	player.By(sharesDesc).Sort(stockHolders)
+	if stockHolders[0].Shares(corporation) == stockHolders[1].Shares(corporation) {
+		mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[0])
+		mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[1])
+		i := 2
+		for stockHolders[0] == stockHolders[i] && i < len(stockHolders) {
+			mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[i])
+			i++
+		}
+		return mainStockHolders
+	}
 	return mainStockHolders
 }
 
