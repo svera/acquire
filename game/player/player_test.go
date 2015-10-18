@@ -86,13 +86,13 @@ func TestSort(t *testing.T) {
 	players[3].shares[0] = 2
 
 	shares := func(p1, p2 *Player) bool {
-		return p1.Shares(corporation) < p2.Shares(corporation)
+		return p1.Shares(corporation) > p2.Shares(corporation)
 	}
 	expectedSort := []*Player{
-		players[2],
-		players[1],
-		players[3],
 		players[0],
+		players[3],
+		players[1],
+		players[2],
 	}
 	By(shares).Sort(players)
 	if !reflect.DeepEqual(players, expectedSort) {

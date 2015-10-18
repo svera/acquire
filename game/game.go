@@ -79,6 +79,20 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 // Placeholder function, pending implementation
 func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) [2][]*player.Player {
 	mainStockHolders := [2][]*player.Player{{}, {}}
+	stockHolders := g.getStockHolders(corporation)
+
+	if len(stockHolders) == 1 {
+		return [2][]*player.Player{{stockHolders[0]}, {stockHolders[0]}}
+	}
+	sharesDesc := func(p1, p2 *player.Player) bool {
+		return p1.Shares(corporation) > p2.Shares(corporation)
+	}
+	player.By(sharesDesc).Sort(stockHolders)
+	return mainStockHolders
+}
+
+// Get players who have stock of the passed corporation
+func (g *Game) getStockHolders(corporation *corporation.Corporation) []*player.Player {
 	var stockHolders []*player.Player
 
 	for _, player := range g.players {
@@ -86,14 +100,7 @@ func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) [2][]*p
 			stockHolders = append(stockHolders, player)
 		}
 	}
-	if len(stockHolders) == 1 {
-		return [2][]*player.Player{{stockHolders[0]}, {stockHolders[0]}}
-	}
-	shares := func(p1, p2 *player.Player) bool {
-		return p1.Shares(corporation) < p2.Shares(corporation)
-	}
-	player.By(shares).Sort(stockHolders)
-	return mainStockHolders
+	return stockHolders
 }
 
 // Returns true if a tile is permanently unplayable, that is,
