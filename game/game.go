@@ -76,37 +76,50 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 	return active
 }
 
+func (g *Game) PayBonusesForDefunctCorporation(c *corporation.Corporation) {
+	stockHolders := g.GetMainStockHolders(c)
+	numberMajorityHolders := len(stockHolders["majority"])
+	numberMinorityHolders := len(stockHolders["minority"])
+
+	for _, majorityStockHolder := range stockHolders["majority"] {
+		majorityStockHolder.ReceiveBonus(c.MajorityBonus() / uint(numberMajorityHolders))
+	}
+	for _, minorityStockHolder := range stockHolders["minority"] {
+		minorityStockHolder.ReceiveBonus(c.MinorityBonus() / uint(numberMinorityHolders))
+	}
+}
+
 // Taken from the game rules:
 // "If only one player owns stock in the defunct corporation, that player gets both bonuses. If there's
 // a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
 // shareholder gets no bonus. If there's a tie for minority stockholder, split the minority bonus among
 // the tied players"
 func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[string][]*player.Player {
-	mainStockHolders := map[string][]*player.Player{"primary": {}, "secondary": {}}
+	mainStockHolders := map[string][]*player.Player{"majority": {}, "minority": {}}
 	stockHolders := g.getStockHolders(corporation)
 
 	if len(stockHolders) == 1 {
 		return map[string][]*player.Player{
-			"primary":   {stockHolders[0]},
-			"secondary": {stockHolders[0]},
+			"majority": {stockHolders[0]},
+			"minority": {stockHolders[0]},
 		}
 	}
 
-	mainStockHolders["primary"] = stockHoldersWithSameAmount(0, stockHolders, corporation)
-	if len(mainStockHolders["primary"]) > 1 {
+	mainStockHolders["majority"] = stockHoldersWithSameAmount(0, stockHolders, corporation)
+	if len(mainStockHolders["majority"]) > 1 {
 		return mainStockHolders
 	}
-	mainStockHolders["secondary"] = stockHoldersWithSameAmount(1, stockHolders, corporation)
+	mainStockHolders["minority"] = stockHoldersWithSameAmount(1, stockHolders, corporation)
 	return mainStockHolders
 }
 
-// Loop stockHolders from groupStart to get all stock holders with the same amount of shares for
+// Loop stockHolders from start to get all stock holders with the same amount of shares for
 // the passed corporation
-func stockHoldersWithSameAmount(groupStart int, stockHolders []*player.Player, corporation *corporation.Corporation) []*player.Player {
-	group := []*player.Player{stockHolders[groupStart]}
+func stockHoldersWithSameAmount(start int, stockHolders []*player.Player, corporation *corporation.Corporation) []*player.Player {
+	group := []*player.Player{stockHolders[start]}
 
-	i := groupStart + 1
-	for i < len(stockHolders) && stockHolders[groupStart].Shares(corporation) == stockHolders[i].Shares(corporation) {
+	i := start + 1
+	for i < len(stockHolders) && stockHolders[start].Shares(corporation) == stockHolders[i].Shares(corporation) {
 		group = append(group, stockHolders[i])
 		i++
 	}

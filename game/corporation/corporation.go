@@ -93,11 +93,27 @@ func (c *Corporation) SetStock(stock uint) {
 }
 
 // Returns company's current value per stock share
-func (c *Corporation) GetStockPrice() uint {
+func (c *Corporation) StockPrice() uint {
 	if c.Size() > 41 {
 		return c.pricesChart[41].price
 	}
 	return c.pricesChart[c.Size()].price
+}
+
+// Returns company's current majority bonus value per stock share
+func (c *Corporation) MajorityBonus() uint {
+	if c.Size() > 41 {
+		return c.pricesChart[41].majorityBonus
+	}
+	return c.pricesChart[c.Size()].majorityBonus
+}
+
+// Returns company's current majority bonus value per stock share
+func (c *Corporation) MinorityBonus() uint {
+	if c.Size() > 41 {
+		return c.pricesChart[41].minorityBonus
+	}
+	return c.pricesChart[c.Size()].minorityBonus
 }
 
 // Returns true if the corporation is considered safe, false otherwise

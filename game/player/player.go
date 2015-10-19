@@ -48,7 +48,7 @@ func (p *Player) BuyStocks(buys []Buy) error {
 	for _, buy := range buys {
 		buy.corporation.SetStock(buy.corporation.Stock() - buy.amount)
 		p.shares[buy.corporation.Id()] = buy.amount
-		p.cash -= buy.corporation.GetStockPrice() * buy.amount
+		p.cash -= buy.corporation.StockPrice() * buy.amount
 	}
 	return nil
 }
@@ -63,7 +63,7 @@ func (p *Player) checkBuy(buys []Buy) error {
 			return errors.New("Player cannot buy more shares than the available stock")
 		}
 		totalStock += buy.amount
-		totalPrice += buy.corporation.GetStockPrice() * buy.amount
+		totalPrice += buy.corporation.StockPrice() * buy.amount
 	}
 	if totalStock > 3 {
 		return errors.New("Player cannot buy more than 3 stock shares per turn")
@@ -86,4 +86,8 @@ func (p *Player) GetTile(t tileset.Position) error {
 
 func (p *Player) Tiles() []tileset.Position {
 	return p.tiles
+}
+
+func (p *Player) ReceiveBonus(amount uint) {
+	p.cash += amount
 }

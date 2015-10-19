@@ -77,13 +77,13 @@ func TestGetMainStockHolders(t *testing.T) {
 	}
 	stockHolders := game.GetMainStockHolders(corporations[0])
 	expectedStockHolders := map[string][]*player.Player{
-		"primary":   {players[0]},
-		"secondary": {players[0]},
+		"majority": {players[0]},
+		"minority": {players[0]},
 	}
 	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
 		t.Errorf(
 			"If there's just one player with stock in a defunct corporation, " +
-				"he/she must get both primary and secondary bonuses",
+				"he/she must get both majority and minority bonuses",
 		)
 	}
 
@@ -92,8 +92,8 @@ func TestGetMainStockHolders(t *testing.T) {
 	}
 	stockHolders = game.GetMainStockHolders(corporations[0])
 	expectedStockHolders = map[string][]*player.Player{
-		"primary":   {players[0]},
-		"secondary": {players[1]},
+		"majority": {players[0]},
+		"minority": {players[1]},
 	}
 	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
 		t.Errorf(
@@ -109,13 +109,13 @@ func TestGetMainStockHolders(t *testing.T) {
 	}
 	stockHolders = game.GetMainStockHolders(corporations[0])
 	expectedStockHolders = map[string][]*player.Player{
-		"primary":   {players[0], players[1]},
-		"secondary": {},
+		"majority": {players[0], players[1]},
+		"minority": {},
 	}
 	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
 		t.Errorf(
-			"If there are two or more primary stock holders in a defunct corporation, " +
-				"the primary bonus must be splitted between them (no secondary bonus given)",
+			"If there are two or more majority stock holders in a defunct corporation, " +
+				"the majority bonus must be splitted between them (no minority bonus given)",
 		)
 	}
 
@@ -127,13 +127,13 @@ func TestGetMainStockHolders(t *testing.T) {
 	}
 	stockHolders = game.GetMainStockHolders(corporations[0])
 	expectedStockHolders = map[string][]*player.Player{
-		"primary":   {players[0]},
-		"secondary": {players[1], players[2]},
+		"majority": {players[0]},
+		"minority": {players[1], players[2]},
 	}
 	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
 		t.Errorf(
-			"If there are two or more secondary stock holders in a defunct corporation, " +
-				"the secondary bonus must be splitted between them",
+			"If there are two or more minority stock holders in a defunct corporation, " +
+				"the minority bonus must be splitted between them",
 		)
 	}
 }

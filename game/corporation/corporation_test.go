@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestGetStockPrice(t *testing.T) {
+func TestStockPrice(t *testing.T) {
 	var corporations = new([3]*Corporation)
 	corporations[0], _ = New("class0", 0)
 	corporations[1], _ = New("class1", 1)
@@ -26,12 +26,12 @@ func TestGetStockPrice(t *testing.T) {
 	expectedStockPrices[2] = 400
 
 	for class, corporation := range corporations {
-		if corporation.GetStockPrice() != expectedStockPrices[class] {
+		if corporation.StockPrice() != expectedStockPrices[class] {
 			t.Errorf(
 				"Class %d corporation with a size of 2 must have a stock price of %d, got %d",
 				class,
 				expectedStockPrices[class],
-				corporation.GetStockPrice(),
+				corporation.StockPrice(),
 			)
 		}
 	}
