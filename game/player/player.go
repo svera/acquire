@@ -2,12 +2,12 @@ package player
 
 import (
 	"errors"
-	c "github.com/svera/acquire/game/corporation"
+	"github.com/svera/acquire/game/corporation"
 	"github.com/svera/acquire/game/tileset"
 )
 
 type Buy struct {
-	corporation *c.Corporation
+	corporation *corporation.Corporation
 	amount      uint
 }
 
@@ -16,13 +16,24 @@ type Player struct {
 	cash   uint
 	tiles  []tileset.Position
 	shares [7]uint
+	Shares func(c *corporation.Corporation) uint
 }
 
 func New(name string) *Player {
-	return &Player{
+	player := &Player{
 		name:   name,
 		cash:   6000,
 		shares: [7]uint{},
+	}
+	player.Shares = makeSharesFunc(player)
+	return player
+}
+
+// In order to make testing easier, we implement Shares() with a closure
+// that can be later overwritten by tests
+func makeSharesFunc(p *Player) func(c *corporation.Corporation) uint {
+	return func(c *corporation.Corporation) uint {
+		return p.shares[c.Id()]
 	}
 }
 
@@ -75,8 +86,4 @@ func (p *Player) GetTile(t tileset.Position) error {
 
 func (p *Player) Tiles() []tileset.Position {
 	return p.tiles
-}
-
-func (p *Player) Shares(corporation *c.Corporation) uint {
-	return p.shares[corporation.Id()]
 }

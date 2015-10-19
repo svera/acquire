@@ -30,13 +30,13 @@ func New(name string, class uint) (*Corporation, error) {
 		pricesChart: initPricesChart(class),
 	}
 
-	corporation.Size = makeSize(corporation)
+	corporation.Size = makeSizeFunc(corporation)
 	return corporation, nil
 }
 
 // In order to make testing easier, we implement Size() with a closure
 // that can be later overwritten by tests
-func makeSize(corporation *Corporation) func() uint {
+func makeSizeFunc(corporation *Corporation) func() uint {
 	return func() uint {
 		return uint(len(corporation.tiles))
 	}

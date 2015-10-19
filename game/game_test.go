@@ -5,6 +5,7 @@ import (
 	"github.com/svera/acquire/game/corporation"
 	"github.com/svera/acquire/game/player"
 	"github.com/svera/acquire/game/tileset"
+	"reflect"
 	"testing"
 )
 
@@ -66,6 +67,61 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions not reached but detected as it were")
 	}
 
+}
+
+func TestGetMainStockHolders(t *testing.T) {
+	players, corporations, board, tileset := setup()
+	game, _ := New(board, players, corporations, tileset)
+	players[0].Shares = func(c *corporation.Corporation) uint {
+		return 8
+	}
+	stockHolders := game.GetMainStockHolders(corporations[0])
+	expectedStockHolders := map[string][]*player.Player{
+		"primary":   {players[0]},
+		"secondary": {players[0]},
+	}
+	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+		t.Errorf(
+			"If there's just one player with stock in a defunct corporation, " +
+				"he/she must get both primary and secondary bonuses",
+		)
+	}
+
+	players[1].Shares = func(c *corporation.Corporation) uint {
+		return 8
+	}
+	players[2].Shares = func(c *corporation.Corporation) uint {
+		return 5
+	}
+	stockHolders = game.GetMainStockHolders(corporations[0])
+	expectedStockHolders = map[string][]*player.Player{
+		"primary":   {players[0], players[1]},
+		"secondary": {},
+	}
+	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+		t.Errorf(
+			"If there are two or more primary stock holders in a defunct corporation, " +
+				"the primary bonus must be splitted between them (no secondary bonus given)",
+		)
+	}
+
+	players[1].Shares = func(c *corporation.Corporation) uint {
+		return 5
+	}
+	players[2].Shares = func(c *corporation.Corporation) uint {
+		return 5
+	}
+	stockHolders = game.GetMainStockHolders(corporations[0])
+	expectedStockHolders = map[string][]*player.Player{
+		"primary":   {players[0]},
+		"secondary": {players[1], players[2]},
+	}
+	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+		t.Errorf(
+			"If there are two or more secondary stock holders in a defunct corporation, " +
+				"the secondary bonus must be splitted between them",
+		)
+	}
 }
 
 func setup() ([]*player.Player, [7]*corporation.Corporation, *board.Board, *tileset.Tileset) {

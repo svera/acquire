@@ -86,28 +86,34 @@ func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[str
 	stockHolders := g.getStockHolders(corporation)
 
 	if len(stockHolders) == 1 {
-		return map[string][]*player.Player{"primary": {stockHolders[0]}, "secondary": {stockHolders[0]}}
+		return map[string][]*player.Player{
+			"primary":   {stockHolders[0]},
+			"secondary": {stockHolders[0]},
+		}
 	}
 
-	mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[0])
-	if stockHolders[0].Shares(corporation) == stockHolders[1].Shares(corporation) {
-		mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[1])
-		i := 2
-		for i < len(stockHolders) && stockHolders[0] == stockHolders[i] {
-			mainStockHolders["primary"] = append(mainStockHolders["primary"], stockHolders[i])
-			i++
-		}
+	mainStockHolders["primary"] = stockHoldersWithSameAmount(0, stockHolders, corporation)
+	if len(mainStockHolders["primary"]) > 1 {
 		return mainStockHolders
 	}
-	if stockHolders[1].Shares(corporation) == stockHolders[2].Shares(corporation) {
-		mainStockHolders["secondary"] = append(mainStockHolders["secondary"], stockHolders[2])
-		i := 3
-		for i < len(stockHolders) && stockHolders[1] == stockHolders[i] {
-			mainStockHolders["secondary"] = append(mainStockHolders["secondary"], stockHolders[i])
+	mainStockHolders["secondary"] = stockHoldersWithSameAmount(1, stockHolders, corporation)
+	return mainStockHolders
+}
+
+// Loop stockHolders from groupStart to get all stock holders with the same amount of shares for
+// the passed corporation
+func stockHoldersWithSameAmount(groupStart int, stockHolders []*player.Player, corporation *corporation.Corporation) []*player.Player {
+	group := []*player.Player{}
+	group = append(group, stockHolders[groupStart])
+	if stockHolders[groupStart].Shares(corporation) == stockHolders[groupStart+1].Shares(corporation) {
+		group = append(group, stockHolders[groupStart+1])
+		i := groupStart + 2
+		for i < len(stockHolders) && stockHolders[groupStart] == stockHolders[i] {
+			group = append(group, stockHolders[i])
 			i++
 		}
 	}
-	return mainStockHolders
+	return group
 }
 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
