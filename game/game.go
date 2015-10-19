@@ -105,7 +105,7 @@ func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[str
 func stockHoldersWithSameAmount(groupStart int, stockHolders []*player.Player, corporation *corporation.Corporation) []*player.Player {
 	group := []*player.Player{}
 	group = append(group, stockHolders[groupStart])
-	if stockHolders[groupStart].Shares(corporation) == stockHolders[groupStart+1].Shares(corporation) {
+	if groupStart+1 < len(stockHolders) && stockHolders[groupStart].Shares(corporation) == stockHolders[groupStart+1].Shares(corporation) {
 		group = append(group, stockHolders[groupStart+1])
 		i := groupStart + 2
 		for i < len(stockHolders) && stockHolders[groupStart] == stockHolders[i] {

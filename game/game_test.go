@@ -88,6 +88,20 @@ func TestGetMainStockHolders(t *testing.T) {
 	}
 
 	players[1].Shares = func(c *corporation.Corporation) uint {
+		return 5
+	}
+	stockHolders = game.GetMainStockHolders(corporations[0])
+	expectedStockHolders = map[string][]*player.Player{
+		"primary":   {players[0]},
+		"secondary": {players[1]},
+	}
+	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+		t.Errorf(
+			"Wrong main stock holders",
+		)
+	}
+
+	players[1].Shares = func(c *corporation.Corporation) uint {
 		return 8
 	}
 	players[2].Shares = func(c *corporation.Corporation) uint {
