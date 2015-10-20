@@ -2,17 +2,17 @@
 
 An implementation of Sid Sackson's board game written in Go. 
 
-# Object of the game
+## Object of the game
 
 Have the most money at the end of the game. You make money by forming corporations, buying
 the right stock at the right time, as well as merging and expanding corporations in which you own stock.
 
-# Components
+## Components
 
 * A 12 x 9 grid gameboard
 * 108 tiles, one for each gameboard cell
 
-# Gameplay terms:
+## Gameplay terms:
 
 **CORPORATION:**
 Two or more connected tiles (not diagonally) identified by a corporation building
@@ -50,7 +50,7 @@ When two or more corporations are joined together via a played tile
 **MERGEMAKER:**
 The player who places a tile that connects two or more corporations
 
-# Game setup
+## Game setup
 
 Each player starts with $6,000.
 
@@ -76,7 +76,7 @@ player has purchased.
 *Note:* At any time during the game, a player may ask how many
 stocks of a company are still unpurchased.
 
-# How to play
+## How to play
 
 Each player does the following three things in order:
 
@@ -90,7 +90,7 @@ of three total per turn.
 
 See the following for a complete explanation of each step:
 
-## 1. Playing a tile
+### 1. Playing a tile
 
 Depending upon where a tile is played, it may form a
 corporation or it may merge two or more corporations.
@@ -192,7 +192,7 @@ Majority and minority stockholder bonuses are paid out as
 described previously, and then the defunct stock is held,
 sold or traded. As usual, the mergemaker goes first.
 
-## 2. Buying stocks
+### 2. Buying stocks
 
 After placing a tile, the player may buy stock in any active
 corporation. This is optional. A player may decide to buy
@@ -221,7 +221,7 @@ after the corporation has gone defunct, and at the end of
 the game. No loans are allowed from other players or the
 stock market bank.
 
-## 3. Drawing a tile
+### 3. Drawing a tile
 
 A player takes a tile from the facedown cluster to replace
 the one he/she played. This is not done until the end of
@@ -234,7 +234,7 @@ drawn, the player must wait until his/her next turn to
 discard them. Tiles that would form an eighth corporation
 cannot be traded in.
 
-# Ending the game
+## Ending the game
 
 The game ends when one player, during his/her turn, announces
 that either all active corporations are safe or that one corporation
@@ -249,7 +249,7 @@ stock market bank at current prices (as shown on the information
 cards). Stock in a corporation that is not on the board is worthless.
 The player with the most money wins!
 
-# Annex: Prices information card
+## Annex: Prices information card
 
  Sackson<br>Zeta | Hydra<br>Fusion<br>America  | Phoenix<br>Quantum  | Price    | Majority bonus  | Minority bonus
 ---------------- | --------------------------- | ------------------- | -------  | --------------  | --------------
