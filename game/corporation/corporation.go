@@ -54,6 +54,10 @@ func (c *Corporation) AddTiles(tiles []tileset.Position) {
 	c.tiles = append(c.tiles, tiles...)
 }
 
+func (c *Corporation) AddTile(tile tileset.Position) {
+	c.tiles = append(c.tiles, tile)
+}
+
 //Fill the prices chart array with the amounts corresponding to the corporation
 //class
 func initPricesChart(class uint) map[uint]prices {

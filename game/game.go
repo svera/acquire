@@ -150,7 +150,7 @@ func (g *Game) isTileUnplayable(tile tileset.Position) bool {
 	for _, adjacent := range adjacents {
 		safeNeighbours := 0
 		boardCell := g.board.Cell(adjacent)
-		if boardCell != board.CellEmpty && boardCell != board.CellOrphanTile {
+		if boardCell != board.Empty && boardCell != board.OrphanTile {
 			if g.corporations[boardCell].IsSafe() {
 				safeNeighbours++
 			}
@@ -171,7 +171,7 @@ func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 	adjacents := g.board.AdjacentCells(tile)
 	for _, adjacent := range adjacents {
 		boardCell := g.board.Cell(adjacent)
-		if boardCell == board.CellOrphanTile {
+		if boardCell == board.OrphanTile {
 			return true
 		}
 	}
@@ -193,13 +193,19 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	if isTileTemporaryUnplayable(tile) {
 		return errors.New("Tile is temporary unplayable")
 	}
-	if tileMergeCorporations, tiles := g.board.TileMergeCorporations(tile); tileMergeCorporations {
+	if merge, tiles := g.board.TileMergeCorporations(tile); merge {
 		// move state machine status
-	} else if g.board.TileFoundCorporation(tile) {
+	} else if found, tiles := g.board.TileFoundCorporation(tile); found {
 
-	} else if g.board.TileGrowCorporation(tile) {
-		corporation.AddTile(CurrentPlayer().UseTile(tile))
+	} else if grow; tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
+		g.growCorporation(corporationId, tiles)
 	}
 	return nil
 }
 */
+
+func (g *Game) growCorporation(corporationId int, tiles []tileset.Position) {
+	g.corporations[corporationId].AddTile(g.CurrentPlayer().UseTile(tile))
+	g.board.SetTiles(corporationId, tiles)
+	g.SetState("buy")
+}
