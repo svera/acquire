@@ -7,10 +7,10 @@ import (
 	"testing"
 )
 
-func TestGetTile(t *testing.T) {
+func TestPickTile(t *testing.T) {
 	player := New("Test")
 	tl := tileset.Position{Number: 2, Letter: "C"}
-	player.GetTile(tl)
+	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
@@ -23,7 +23,7 @@ func TestGetTile(t *testing.T) {
 		{Number: 1, Letter: "B"},
 		{Number: 4, Letter: "I"},
 	}
-	player.GetTile(tl)
+	player.PickTile(tl)
 	if len(player.tiles) > 6 {
 		t.Errorf("Player can not have more than 6 tiles, got %d", len(player.tiles))
 	}
@@ -97,5 +97,26 @@ func TestSort(t *testing.T) {
 	By(shares).Sort(players)
 	if !reflect.DeepEqual(players, expectedSort) {
 		t.Errorf("Players not sorted by corporation %s's shares amount", corporation.Name())
+	}
+}
+
+func TestUseTile(t *testing.T) {
+	player := New("Test")
+
+	player.tiles = []tileset.Position{
+		{Number: 7, Letter: "C"},
+		{Number: 5, Letter: "A"},
+		{Number: 8, Letter: "E"},
+		{Number: 3, Letter: "D"},
+		{Number: 1, Letter: "B"},
+		{Number: 4, Letter: "I"},
+	}
+
+	tile := player.UseTile(tileset.Position{Number: 5, Letter: "A"})
+	if len(player.tiles) != 5 {
+		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
+	}
+	if tile.Number != 5 || tile.Letter != "A" {
+		t.Errorf("UseTile() must return tile 5A")
 	}
 }

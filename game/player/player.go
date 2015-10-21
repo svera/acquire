@@ -76,7 +76,7 @@ func (p *Player) checkBuy(buys []Buy) error {
 }
 
 // Adds a new tile to the players' tileset
-func (p *Player) GetTile(t tileset.Position) error {
+func (p *Player) PickTile(t tileset.Position) error {
 	if len(p.tiles) >= 6 {
 		return errors.New("Player cannot have more than 6 tiles")
 	}
@@ -90,4 +90,14 @@ func (p *Player) Tiles() []tileset.Position {
 
 func (p *Player) ReceiveBonus(amount uint) {
 	p.cash += amount
+}
+
+func (p *Player) UseTile(t tileset.Position) tileset.Position {
+	for i, currentTile := range p.tiles {
+		if currentTile.Number == t.Number && currentTile.Letter == t.Letter {
+			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)
+			return currentTile
+		}
+	}
+	return tileset.Position{}
 }

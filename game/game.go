@@ -44,7 +44,7 @@ func New(
 func (g *Game) giveInitialTileset(player *player.Player) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
-		player.GetTile(tile)
+		player.PickTile(tile)
 	}
 }
 
@@ -177,3 +177,29 @@ func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 	}
 	return false
 }
+
+func (g *Game) CurrentPlayer() *player.Player {
+	return g.players[g.currentPlayer]
+}
+
+/*
+func (g *Game) PlayTile(tile tileset.Position) error {
+	if g.State() != "playttile" {
+		return errors.New("Action not allowed")
+	}
+	if !g.CurrentPlayer().HasTile(tile) {
+		return errors.New("Player doesn't have tile on hand")
+	}
+	if isTileTemporaryUnplayable(tile) {
+		return errors.New("Tile is temporary unplayable")
+	}
+	if tileMergeCorporations, tiles := g.board.TileMergeCorporations(tile); tileMergeCorporations {
+		// move state machine status
+	} else if g.board.TileFoundCorporation(tile) {
+
+	} else if g.board.TileGrowCorporation(tile) {
+		corporation.AddTile(CurrentPlayer().UseTile(tile))
+	}
+	return nil
+}
+*/

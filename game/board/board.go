@@ -40,7 +40,7 @@ func (b *Board) Cell(t tileset.Position) int {
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) TileFoundCorporation(t tileset.Position) []tileset.Position {
+func (b *Board) TileFoundCorporation(t tileset.Position) (bool, []tileset.Position) {
 	var newCorporationTiles []tileset.Position
 	adjacent := b.AdjacentOrphanTiles(t)
 	for _, adjacentCell := range adjacent {
@@ -48,8 +48,9 @@ func (b *Board) TileFoundCorporation(t tileset.Position) []tileset.Position {
 	}
 	if len(newCorporationTiles) > 0 {
 		newCorporationTiles = append(newCorporationTiles, t)
+		return true, newCorporationTiles
 	}
-	return newCorporationTiles
+	return false, newCorporationTiles
 }
 
 // Checks if the passed tile merges two or more corporations, returns a slice of

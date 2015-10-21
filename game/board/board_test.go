@@ -22,13 +22,20 @@ func TestTileFoundCorporation(t *testing.T) {
 	board.grid[6]["C"] = CellOrphanTile
 	board.grid[6]["E"] = CellOrphanTile
 	board.grid[7]["D"] = CellOrphanTile
-	corporationTiles := board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "D"})
+	tileFoundCorporation, corporationTiles := board.TileFoundCorporation(
+		tileset.Position{Number: 6, Letter: "D"},
+	)
+
 	expectedCorporationTiles := []tileset.Position{
 		tileset.Position{Number: 6, Letter: "D"},
 		tileset.Position{Number: 5, Letter: "D"},
 		tileset.Position{Number: 6, Letter: "C"},
 		tileset.Position{Number: 6, Letter: "E"},
 		tileset.Position{Number: 7, Letter: "D"},
+	}
+
+	if !tileFoundCorporation {
+		t.Errorf("TileFoundCorporation() must return true")
 	}
 	if !slicesSameContent(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Position %d%s must found a corporation with tiles %v, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
@@ -37,8 +44,8 @@ func TestTileFoundCorporation(t *testing.T) {
 
 func TestTileNotFoundCorporation(t *testing.T) {
 	board := New()
-	corporationTiles := board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "D"})
-	if len(corporationTiles) != 0 {
+	tileFoundCorporation, corporationTiles := board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "D"})
+	if tileFoundCorporation {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
 	}
 }
