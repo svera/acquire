@@ -1,6 +1,7 @@
 package board
 
 import (
+	"github.com/svera/acquire/game/corporation"
 	"github.com/svera/acquire/game/tileset"
 )
 
@@ -175,4 +176,10 @@ func previousLetter(letter string) string {
 
 func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
+}
+
+func (b *Board) SetCells(cp *corporation.Corporation, cells []tileset.Position) {
+	for _, cell := range cells {
+		b.grid[cell.Number][cell.Letter] = cp.Id()
+	}
 }

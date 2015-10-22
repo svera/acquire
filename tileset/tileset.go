@@ -6,7 +6,7 @@ import (
 )
 
 type Position struct {
-	Number uint
+	Number int
 	Letter string
 }
 
@@ -19,7 +19,7 @@ func New() *Tileset {
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
-			tileset.tiles = append(tileset.tiles, Position{uint(number), letter})
+			tileset.tiles = append(tileset.tiles, Position{int(number), letter})
 		}
 	}
 

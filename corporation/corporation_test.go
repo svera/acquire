@@ -10,17 +10,17 @@ func TestStockPrice(t *testing.T) {
 	corporations[1], _ = New("class1", 1)
 	corporations[2], _ = New("class2", 2)
 
-	corporations[0].Size = func() uint {
+	corporations[0].Size = func() int {
 		return 2
 	}
-	corporations[1].Size = func() uint {
+	corporations[1].Size = func() int {
 		return 2
 	}
-	corporations[2].Size = func() uint {
+	corporations[2].Size = func() int {
 		return 2
 	}
 
-	var expectedStockPrices = new([3]uint)
+	var expectedStockPrices = new([3]int)
 	expectedStockPrices[0] = 200
 	expectedStockPrices[1] = 300
 	expectedStockPrices[2] = 400

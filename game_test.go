@@ -39,7 +39,7 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions not reached (no active corporations) but detected as it were")
 	}
 
-	corporations[0].Size = func() uint {
+	corporations[0].Size = func() int {
 		return 41
 	}
 
@@ -47,7 +47,7 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions reached (a corporation bigger than 40 tiles) but not detected")
 	}
 
-	corporations[0].Size = func() uint {
+	corporations[0].Size = func() int {
 		return 11
 	}
 
@@ -55,11 +55,11 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions reached (all active corporations safe) but not detected")
 	}
 
-	corporations[0].Size = func() uint {
+	corporations[0].Size = func() int {
 		return 11
 	}
 
-	corporations[1].Size = func() uint {
+	corporations[1].Size = func() int {
 		return 2
 	}
 
@@ -72,7 +72,7 @@ func TestAreEndConditionsReached(t *testing.T) {
 func TestGetMainStockHolders(t *testing.T) {
 	players, corporations, board, tileset := setup()
 	game, _ := New(board, players, corporations, tileset)
-	players[0].Shares = func(c *corporation.Corporation) uint {
+	players[0].Shares = func(c *corporation.Corporation) int {
 		return 8
 	}
 	stockHolders := game.GetMainStockHolders(corporations[0])
@@ -87,7 +87,7 @@ func TestGetMainStockHolders(t *testing.T) {
 		)
 	}
 
-	players[1].Shares = func(c *corporation.Corporation) uint {
+	players[1].Shares = func(c *corporation.Corporation) int {
 		return 5
 	}
 	stockHolders = game.GetMainStockHolders(corporations[0])
@@ -101,10 +101,10 @@ func TestGetMainStockHolders(t *testing.T) {
 		)
 	}
 
-	players[1].Shares = func(c *corporation.Corporation) uint {
+	players[1].Shares = func(c *corporation.Corporation) int {
 		return 8
 	}
-	players[2].Shares = func(c *corporation.Corporation) uint {
+	players[2].Shares = func(c *corporation.Corporation) int {
 		return 5
 	}
 	stockHolders = game.GetMainStockHolders(corporations[0])
@@ -119,10 +119,10 @@ func TestGetMainStockHolders(t *testing.T) {
 		)
 	}
 
-	players[1].Shares = func(c *corporation.Corporation) uint {
+	players[1].Shares = func(c *corporation.Corporation) int {
 		return 5
 	}
-	players[2].Shares = func(c *corporation.Corporation) uint {
+	players[2].Shares = func(c *corporation.Corporation) int {
 		return 5
 	}
 	stockHolders = game.GetMainStockHolders(corporations[0])

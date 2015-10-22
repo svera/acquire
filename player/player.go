@@ -8,22 +8,22 @@ import (
 
 type Buy struct {
 	corporation *corporation.Corporation
-	amount      uint
+	amount      int
 }
 
 type Player struct {
 	name   string
-	cash   uint
+	cash   int
 	tiles  []tileset.Position
-	shares [7]uint
-	Shares func(c *corporation.Corporation) uint
+	shares [7]int
+	Shares func(c *corporation.Corporation) int
 }
 
 func New(name string) *Player {
 	player := &Player{
 		name:   name,
 		cash:   6000,
-		shares: [7]uint{},
+		shares: [7]int{},
 	}
 	player.Shares = makeSharesFunc(player)
 	return player
@@ -31,8 +31,8 @@ func New(name string) *Player {
 
 // In order to make testing easier, we implement Shares() with a closure
 // that can be later overwritten by tests
-func makeSharesFunc(p *Player) func(c *corporation.Corporation) uint {
-	return func(c *corporation.Corporation) uint {
+func makeSharesFunc(p *Player) func(c *corporation.Corporation) int {
+	return func(c *corporation.Corporation) int {
 		return p.shares[c.Id()]
 	}
 }
@@ -54,7 +54,7 @@ func (p *Player) BuyStocks(buys []Buy) error {
 }
 
 func (p *Player) checkBuy(buys []Buy) error {
-	var totalStock, totalPrice uint = 0, 0
+	var totalStock, totalPrice int = 0, 0
 	for _, buy := range buys {
 		if buy.corporation.Size() == 0 {
 			return errors.New("Player cannot buy shares of a corporation not on board")
@@ -88,16 +88,16 @@ func (p *Player) Tiles() []tileset.Position {
 	return p.tiles
 }
 
-func (p *Player) ReceiveBonus(amount uint) {
+func (p *Player) ReceiveBonus(amount int) {
 	p.cash += amount
 }
 
-func (p *Player) UseTile(t tileset.Position) tileset.Position {
+func (p *Player) UseTile(t tileset.Position) error {
 	for i, currentTile := range p.tiles {
 		if currentTile.Number == t.Number && currentTile.Letter == t.Letter {
 			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)
-			return currentTile
+			return nil
 		}
 	}
-	return tileset.Position{}
+	return errors.New("Player doesn't have tile on hand")
 }

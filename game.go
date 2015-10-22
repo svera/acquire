@@ -16,7 +16,7 @@ type Game struct {
 	players       []*player.Player
 	corporations  [7]*corporation.Corporation
 	tileset       *tileset.Tileset
-	currentPlayer uint
+	currentPlayer int
 }
 
 func New(
@@ -36,7 +36,7 @@ func New(
 		game.giveInitialTileset(player)
 	}
 	for i, corporation := range game.corporations {
-		corporation.SetId(uint(i))
+		corporation.SetId(int(i))
 	}
 	return &game, nil
 }
@@ -82,10 +82,10 @@ func (g *Game) PayBonusesForDefunctCorporation(c *corporation.Corporation) {
 	numberMinorityHolders := len(stockHolders["minority"])
 
 	for _, majorityStockHolder := range stockHolders["majority"] {
-		majorityStockHolder.ReceiveBonus(c.MajorityBonus() / uint(numberMajorityHolders))
+		majorityStockHolder.ReceiveBonus(c.MajorityBonus() / int(numberMajorityHolders))
 	}
 	for _, minorityStockHolder := range stockHolders["minority"] {
-		minorityStockHolder.ReceiveBonus(c.MinorityBonus() / uint(numberMinorityHolders))
+		minorityStockHolder.ReceiveBonus(c.MinorityBonus() / int(numberMinorityHolders))
 	}
 }
 
@@ -187,25 +187,25 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	if g.State() != "playttile" {
 		return errors.New("Action not allowed")
 	}
-	if !g.CurrentPlayer().HasTile(tile) {
-		return errors.New("Player doesn't have tile on hand")
-	}
-	if isTileTemporaryUnplayable(tile) {
+	if g.isTileTemporaryUnplayable(tile) {
 		return errors.New("Tile is temporary unplayable")
+	}
+	if err := g.CurrentPlayer().UseTile(tile); err != nil {
+		return err
 	}
 	if merge, tiles := g.board.TileMergeCorporations(tile); merge {
 		// move state machine status
 	} else if found, tiles := g.board.TileFoundCorporation(tile); found {
 
-	} else if grow; tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
-		g.growCorporation(corporationId, tiles)
+	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
+		g.growCorporation(g.corporations[corporationId], tiles)
 	}
 	return nil
 }
 */
+func (g *Game) growCorporation(cp *corporation.Corporation, tiles []tileset.Position) {
+	g.board.SetCells(cp, tiles)
+	cp.AddTiles(tiles)
 
-func (g *Game) growCorporation(corporationId int, tiles []tileset.Position) {
-	g.corporations[corporationId].AddTile(g.CurrentPlayer().UseTile(tile))
-	g.board.SetTiles(corporationId, tiles)
-	g.SetState("buy")
+	//g.SetState("buy")
 }

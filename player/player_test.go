@@ -39,8 +39,8 @@ func TestBuyStock(t *testing.T) {
 		},
 	)
 	var buys []Buy
-	var expectedAvailableStock uint = 23
-	var expectedPlayerStock uint = 2
+	var expectedAvailableStock int = 23
+	var expectedPlayerStock int = 2
 	buys = append(buys, Buy{corporation: corporation, amount: 2})
 	player.BuyStocks(buys)
 
@@ -112,7 +112,8 @@ func TestUseTile(t *testing.T) {
 		{Number: 4, Letter: "I"},
 	}
 
-	tile := player.UseTile(tileset.Position{Number: 5, Letter: "A"})
+	tile := tileset.Position{Number: 5, Letter: "A"}
+	player.UseTile(tile)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
 	}

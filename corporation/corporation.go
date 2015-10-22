@@ -6,21 +6,21 @@ import (
 )
 
 type prices struct {
-	price         uint
-	majorityBonus uint
-	minorityBonus uint
+	price         int
+	majorityBonus int
+	minorityBonus int
 }
 
 type Corporation struct {
-	id          uint
+	id          int
 	name        string
-	stock       uint
-	pricesChart map[uint]prices
+	stock       int
+	pricesChart map[int]prices
 	tiles       []tileset.Position
-	Size        func() uint
+	Size        func() int
 }
 
-func New(name string, class uint) (*Corporation, error) {
+func New(name string, class int) (*Corporation, error) {
 	if class < 0 || class > 2 {
 		return nil, errors.New("Corporation can only be of class 0, 1 or 2")
 	}
@@ -36,17 +36,17 @@ func New(name string, class uint) (*Corporation, error) {
 
 // In order to make testing easier, we implement Size() with a closure
 // that can be later overwritten by tests
-func makeSizeFunc(corporation *Corporation) func() uint {
-	return func() uint {
-		return uint(len(corporation.tiles))
+func makeSizeFunc(corporation *Corporation) func() int {
+	return func() int {
+		return int(len(corporation.tiles))
 	}
 }
 
-func (c *Corporation) SetId(id uint) {
+func (c *Corporation) SetId(id int) {
 	c.id = id
 }
 
-func (c *Corporation) Id() uint {
+func (c *Corporation) Id() int {
 	return c.id
 }
 
@@ -60,18 +60,18 @@ func (c *Corporation) AddTile(tile tileset.Position) {
 
 //Fill the prices chart array with the amounts corresponding to the corporation
 //class
-func initPricesChart(class uint) map[uint]prices {
+func initPricesChart(class int) map[int]prices {
 	initialValues := new([3]prices)
 	initialValues[0] = prices{price: 200, majorityBonus: 2000, minorityBonus: 1000}
 	initialValues[1] = prices{price: 300, majorityBonus: 3000, minorityBonus: 1500}
 	initialValues[2] = prices{price: 400, majorityBonus: 4000, minorityBonus: 2000}
-	pricesChart := make(map[uint]prices)
+	pricesChart := make(map[int]prices)
 
 	pricesChart[2] = prices{price: initialValues[class].price, majorityBonus: initialValues[class].majorityBonus, minorityBonus: initialValues[class].minorityBonus}
 	pricesChart[3] = prices{price: initialValues[class].price + 100, majorityBonus: initialValues[class].majorityBonus + 1000, minorityBonus: initialValues[class].minorityBonus + 500}
 	pricesChart[4] = prices{price: initialValues[class].price + 200, majorityBonus: initialValues[class].majorityBonus + 2000, minorityBonus: initialValues[class].minorityBonus + 1000}
 	pricesChart[5] = prices{price: initialValues[class].price + 300, majorityBonus: initialValues[class].majorityBonus + 3000, minorityBonus: initialValues[class].minorityBonus + 1500}
-	var i uint
+	var i int
 	for i = 6; i < 11; i++ {
 		pricesChart[i] = prices{price: initialValues[class].price + 400, majorityBonus: initialValues[class].majorityBonus + 4000, minorityBonus: initialValues[class].minorityBonus + 2000}
 	}
@@ -88,16 +88,16 @@ func initPricesChart(class uint) map[uint]prices {
 	return pricesChart
 }
 
-func (c *Corporation) Stock() uint {
+func (c *Corporation) Stock() int {
 	return c.stock
 }
 
-func (c *Corporation) SetStock(stock uint) {
+func (c *Corporation) SetStock(stock int) {
 	c.stock = stock
 }
 
 // Returns company's current value per stock share
-func (c *Corporation) StockPrice() uint {
+func (c *Corporation) StockPrice() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].price
 	}
@@ -105,7 +105,7 @@ func (c *Corporation) StockPrice() uint {
 }
 
 // Returns company's current majority bonus value per stock share
-func (c *Corporation) MajorityBonus() uint {
+func (c *Corporation) MajorityBonus() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].majorityBonus
 	}
@@ -113,7 +113,7 @@ func (c *Corporation) MajorityBonus() uint {
 }
 
 // Returns company's current majority bonus value per stock share
-func (c *Corporation) MinorityBonus() uint {
+func (c *Corporation) MinorityBonus() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].minorityBonus
 	}
