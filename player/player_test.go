@@ -1,8 +1,8 @@
 package player
 
 import (
-	"github.com/svera/acquire/game/corporation"
-	"github.com/svera/acquire/game/tileset"
+	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/tileset"
 	"reflect"
 	"testing"
 )

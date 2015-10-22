@@ -1,7 +1,7 @@
 package board
 
 import (
-	"github.com/svera/acquire/game/tileset"
+	"github.com/svera/acquire/tileset"
 	"reflect"
 	"sort"
 	"testing"

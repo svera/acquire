@@ -2,10 +2,10 @@ package game
 
 import (
 	"errors"
-	"github.com/svera/acquire/game/board"
-	"github.com/svera/acquire/game/corporation"
-	"github.com/svera/acquire/game/player"
-	"github.com/svera/acquire/game/tileset"
+	"github.com/svera/acquire/board"
+	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/player"
+	"github.com/svera/acquire/tileset"
 )
 
 const totalCorporations = 7

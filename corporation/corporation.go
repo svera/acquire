@@ -2,7 +2,7 @@ package corporation
 
 import (
 	"errors"
-	"github.com/svera/acquire/game/tileset"
+	"github.com/svera/acquire/tileset"
 )
 
 type prices struct {
