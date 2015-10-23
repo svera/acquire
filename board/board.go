@@ -178,7 +178,7 @@ func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
 }
 
-func (b *Board) SetCells(cp *corporation.Corporation, cells []tileset.Position) {
+func (b *Board) SetTiles(cp *corporation.Corporation, cells []tileset.Position) {
 	for _, cell := range cells {
 		b.grid[cell.Number][cell.Letter] = cp.Id()
 	}

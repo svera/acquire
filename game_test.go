@@ -138,6 +138,31 @@ func TestGetMainStockHolders(t *testing.T) {
 	}
 }
 
+func TestPlayTileGrowCorporation(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	tileToPlay := tileset.Position{Number: 6, Letter: "E"}
+	corpTiles := []tileset.Position{{Number: 7, Letter: "E"}, {Number: 8, Letter: "E"}}
+	corporations[0].AddTiles(corpTiles)
+	bd.SetTiles(corporations[0], corpTiles)
+	bd.PutTile(tileset.Position{Number: 5, Letter: "E"})
+
+	game, _ := New(bd, players, corporations, ts)
+	playerTiles := players[0].Tiles()
+	players[0].UseTile(playerTiles[0])
+	players[0].PickTile(tileToPlay)
+	game.PlayTile(tileToPlay)
+
+	expectedState := stateBuyStock
+	expectedCorpSize := 4
+
+	if game.state != expectedState {
+		t.Errorf("Game state must be %d, got %d", expectedState, game.state)
+	}
+	if corporations[0].Size() != expectedCorpSize {
+		t.Errorf("Corporation size must be %d, got %d", expectedCorpSize, corporations[0].Size())
+	}
+}
+
 func setup() ([]*player.Player, [7]*corporation.Corporation, *board.Board, *tileset.Tileset) {
 	var players []*player.Player
 	players = append(players, player.New("Test1"))

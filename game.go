@@ -9,10 +9,15 @@ import (
 )
 
 const totalCorporations = 7
+const statePlayTile = 0
+const stateFoundCorp = 1
+const stateUntieMerge = 2
+const stateSellTrade = 3
+const stateBuyStock = 4
 
 type Game struct {
 	board         *board.Board
-	status        []string
+	state         int
 	players       []*player.Player
 	corporations  [7]*corporation.Corporation
 	tileset       *tileset.Tileset
@@ -31,16 +36,18 @@ func New(
 		corporations:  corporations,
 		tileset:       tileset,
 		currentPlayer: 0,
+		state:         statePlayTile,
 	}
 	for _, player := range game.players {
 		game.giveInitialTileset(player)
 	}
 	for i, corporation := range game.corporations {
-		corporation.SetId(int(i))
+		corporation.SetId(i)
 	}
 	return &game, nil
 }
 
+// Initialises player hand of tiles
 func (g *Game) giveInitialTileset(player *player.Player) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
@@ -65,7 +72,7 @@ func (g *Game) AreEndConditionsReached() bool {
 	return true
 }
 
-// Return all corporations on the board
+// Returns all corporations on the board
 func (g *Game) getActiveCorporations() []*corporation.Corporation {
 	active := []*corporation.Corporation{}
 	for _, corporation := range g.corporations {
@@ -76,6 +83,8 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 	return active
 }
 
+// Calculates and returns bonus amounts to be paid to owners of stock of a
+// defunct corporation
 func (g *Game) PayBonusesForDefunctCorporation(c *corporation.Corporation) {
 	stockHolders := g.GetMainStockHolders(c)
 	numberMajorityHolders := len(stockHolders["majority"])
@@ -178,13 +187,18 @@ func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 	return false
 }
 
+// Returns player currently in turn
 func (g *Game) CurrentPlayer() *player.Player {
 	return g.players[g.currentPlayer]
 }
 
-/*
+// Returns game's current state
+func (g *Game) State() int {
+	return g.state
+}
+
 func (g *Game) PlayTile(tile tileset.Position) error {
-	if g.State() != "playttile" {
+	if g.State() != statePlayTile {
 		return errors.New("Action not allowed")
 	}
 	if g.isTileTemporaryUnplayable(tile) {
@@ -193,19 +207,22 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	if err := g.CurrentPlayer().UseTile(tile); err != nil {
 		return err
 	}
-	if merge, tiles := g.board.TileMergeCorporations(tile); merge {
-		// move state machine status
-	} else if found, tiles := g.board.TileFoundCorporation(tile); found {
+	/*
+		if merge, tiles := g.board.TileMergeCorporations(tile); merge {
+			// move state machine status
+		} else if found, tiles := g.board.TileFoundCorporation(tile); found {
 
-	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
+		} else */if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
 		g.growCorporation(g.corporations[corporationId], tiles)
+	} else {
+		g.board.PutTile(tile)
+		g.state = stateBuyStock
 	}
 	return nil
 }
-*/
-func (g *Game) growCorporation(cp *corporation.Corporation, tiles []tileset.Position) {
-	g.board.SetCells(cp, tiles)
-	cp.AddTiles(tiles)
 
-	//g.SetState("buy")
+func (g *Game) growCorporation(cp *corporation.Corporation, tiles []tileset.Position) {
+	g.board.SetTiles(cp, tiles)
+	cp.AddTiles(tiles)
+	g.state = stateBuyStock
 }
