@@ -24,7 +24,7 @@ func (s *PlayTile) ToFoundCorp() (State, error) {
 }
 
 func (s *PlayTile) ToUntieMerge() (State, error) {
-	return s, nil
+	return &UntieMerge{}, nil
 }
 
 func (s *PlayTile) ToSellTrade() (State, error) {
@@ -32,9 +32,9 @@ func (s *PlayTile) ToSellTrade() (State, error) {
 }
 
 func (s *PlayTile) ToBuyStock() (State, error) {
-	return s, nil
+	return &BuyStock{}, nil
 }
 
 func (s *PlayTile) ToEndGame() (State, error) {
-	return s, nil
+	return &EndGame{}, nil
 }
