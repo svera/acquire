@@ -14,6 +14,7 @@ const stateFoundCorp = 1
 const stateUntieMerge = 2
 const stateSellTrade = 3
 const stateBuyStock = 4
+const stateEndGame = 5
 
 type Game struct {
 	board         *board.Board
