@@ -13,28 +13,28 @@ type State interface {
 	ToEndGame() (State, error)
 }
 
-type PlayTile struct{}
+type BaseState struct{}
 
-func (s *PlayTile) ToPlayTile() (State, error) {
-	return s, errors.New("Already in state PlayTile")
-}
-
-func (s *PlayTile) ToFoundCorp() (State, error) {
-	return &FoundCorp{}, nil
-}
-
-func (s *PlayTile) ToUntieMerge() (State, error) {
-	return &UntieMerge{}, nil
-}
-
-func (s *PlayTile) ToSellTrade() (State, error) {
+func (s *BaseState) ToPlayTile() (State, error) {
 	return s, errors.New("State transition not allowed")
 }
 
-func (s *PlayTile) ToBuyStock() (State, error) {
-	return &BuyStock{}, nil
+func (s *BaseState) ToFoundCorp() (State, error) {
+	return s, errors.New("State transition not allowed")
 }
 
-func (s *PlayTile) ToEndGame() (State, error) {
-	return &EndGame{}, nil
+func (s *BaseState) ToUntieMerge() (State, error) {
+	return s, errors.New("State transition not allowed")
+}
+
+func (s *BaseState) ToSellTrade() (State, error) {
+	return s, errors.New("State transition not allowed")
+}
+
+func (s *BaseState) ToBuyStock() (State, error) {
+	return s, errors.New("State transition not allowed")
+}
+
+func (s *BaseState) ToEndGame() (State, error) {
+	return s, errors.New("State transition not allowed")
 }
