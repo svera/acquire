@@ -29,47 +29,6 @@ func TestPickTile(t *testing.T) {
 	}
 }
 
-func TestBuyStock(t *testing.T) {
-	player := New("Test")
-	corporation, _ := corporation.New("Test", 0)
-	corporation.AddTiles(
-		[]tileset.Position{
-			{Number: 1, Letter: "A"},
-			{Number: 2, Letter: "A"},
-		},
-	)
-	var buys []Buy
-	var expectedAvailableStock int = 23
-	var expectedPlayerStock int = 2
-	buys = append(buys, Buy{corporation: corporation, amount: 2})
-	player.BuyStocks(buys)
-
-	if corporation.Stock() != expectedAvailableStock {
-		t.Errorf("Corporation stock shares have not decreased, must be %d, got %d", expectedAvailableStock, corporation.Stock())
-	}
-	if player.shares[corporation.Id()] != expectedPlayerStock {
-		t.Errorf("Player stock shares have not increased, must be %d, got %d", expectedPlayerStock, player.shares[corporation.Id()])
-	}
-}
-
-func TestBuyStockWithNotEnoughCash(t *testing.T) {
-	player := New("Test")
-	player.cash = 100
-	corporation, _ := corporation.New("Test", 0)
-	corporation.AddTiles(
-		[]tileset.Position{
-			{Number: 1, Letter: "A"},
-			{Number: 2, Letter: "A"},
-		},
-	)
-	var buys []Buy
-	buys = append(buys, Buy{corporation: corporation, amount: 2})
-	err := player.BuyStocks(buys)
-	if err == nil {
-		t.Errorf("Trying to buy stock shares without enough money must throw error")
-	}
-}
-
 func TestSort(t *testing.T) {
 	players := []*Player{
 		New("Test1"),

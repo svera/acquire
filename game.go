@@ -10,12 +10,6 @@ import (
 )
 
 const totalCorporations = 7
-const statePlayTile = 0
-const stateFoundCorp = 1
-const stateUntieMerge = 2
-const stateSellTrade = 3
-const stateBuyStock = 4
-const stateEndGame = 5
 
 type Game struct {
 	board         *board.Board
@@ -195,8 +189,8 @@ func (g *Game) CurrentPlayer() *player.Player {
 }
 
 func (g *Game) PlayTile(tile tileset.Position) error {
-	_, ok := g.state.(*fsm.PlayTile)
-	if !ok {
+
+	if _, ok := g.state.(*fsm.PlayTile); !ok {
 		return errors.New("Action not allowed")
 	}
 	if g.isTileTemporaryUnplayable(tile) {
@@ -223,4 +217,50 @@ func (g *Game) growCorporation(cp *corporation.Corporation, tiles []tileset.Posi
 	g.board.SetTiles(cp, tiles)
 	cp.AddTiles(tiles)
 	g.state.ToBuyStock()
+}
+
+// Increases the number which specifies the current player
+func (g *Game) nextPlayer() {
+	g.currentPlayer++
+	if g.currentPlayer == len(g.players) {
+		g.currentPlayer = 0
+	}
+}
+
+// Buys stock from corporations
+func (g *Game) buyStocks(buys map[int]int) error {
+	err := g.checkBuy(buys)
+
+	if err != nil {
+		return err
+	}
+
+	for corporationId, amount := range buys {
+		corp := g.corporations[corporationId]
+		g.CurrentPlayer().Buy(corp, amount)
+	}
+	return nil
+}
+
+func (g *Game) checkBuy(buys map[int]int) error {
+	var totalStock, totalPrice int = 0, 0
+	for corporationId, amount := range buys {
+		corp := g.corporations[corporationId]
+		if corp.Size() == 0 {
+			return errors.New("Player cannot buy shares of a corporation not on board")
+		}
+		if amount > corp.Stock() {
+			return errors.New("Player cannot buy more shares than the available stock")
+		}
+		totalStock += amount
+		totalPrice += corp.StockPrice() * amount
+	}
+	if totalStock > 3 {
+		return errors.New("Player cannot buy more than 3 stock shares per turn")
+	}
+
+	if totalPrice > g.CurrentPlayer().Cash() {
+		return errors.New("Player doesn't have enough cash to buy those stock shares")
+	}
+	return nil
 }

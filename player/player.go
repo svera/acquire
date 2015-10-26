@@ -6,11 +6,6 @@ import (
 	"github.com/svera/acquire/tileset"
 )
 
-type Buy struct {
-	corporation *corporation.Corporation
-	amount      int
-}
-
 type Player struct {
 	name   string
 	cash   int
@@ -37,42 +32,11 @@ func makeSharesFunc(p *Player) func(c *corporation.Corporation) int {
 	}
 }
 
-// Buys stock from corporations
-func (p *Player) BuyStocks(buys []Buy) error {
-	err := p.checkBuy(buys)
-
-	if err != nil {
-		return err
-	}
-
-	for _, buy := range buys {
-		buy.corporation.SetStock(buy.corporation.Stock() - buy.amount)
-		p.shares[buy.corporation.Id()] = buy.amount
-		p.cash -= buy.corporation.StockPrice() * buy.amount
-	}
-	return nil
-}
-
-func (p *Player) checkBuy(buys []Buy) error {
-	var totalStock, totalPrice int = 0, 0
-	for _, buy := range buys {
-		if buy.corporation.Size() == 0 {
-			return errors.New("Player cannot buy shares of a corporation not on board")
-		}
-		if buy.amount > buy.corporation.Stock() {
-			return errors.New("Player cannot buy more shares than the available stock")
-		}
-		totalStock += buy.amount
-		totalPrice += buy.corporation.StockPrice() * buy.amount
-	}
-	if totalStock > 3 {
-		return errors.New("Player cannot buy more than 3 stock shares per turn")
-	}
-
-	if totalPrice > p.cash {
-		return errors.New("Player doesn't have enough cash to buy those stock shares")
-	}
-	return nil
+// Buys stock from corporation
+func (p *Player) Buy(corp *corporation.Corporation, amount int) {
+	corp.SetStock(corp.Stock() - amount)
+	p.shares[corp.Id()] = amount
+	p.cash -= corp.StockPrice() * amount
 }
 
 // Adds a new tile to the players' tileset
@@ -100,4 +64,8 @@ func (p *Player) UseTile(t tileset.Position) error {
 		}
 	}
 	return errors.New("Player doesn't have tile on hand")
+}
+
+func (p *Player) Cash() int {
+	return p.cash
 }

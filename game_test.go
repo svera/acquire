@@ -163,6 +163,47 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	}
 }
 
+func TestBuyStock(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	corporations[0].AddTiles(
+		[]tileset.Position{
+			{Number: 1, Letter: "A"},
+			{Number: 2, Letter: "A"},
+		},
+	)
+	buys := map[int]int{0: 2}
+	var expectedAvailableStock int = 23
+	var expectedPlayerStock int = 2
+	game, _ := New(bd, players, corporations, ts)
+	game.buyStocks(buys)
+
+	if corporations[0].Stock() != expectedAvailableStock {
+		t.Errorf("Corporation stock shares have not decreased, must be %d, got %d", expectedAvailableStock, corporations[0].Stock())
+	}
+	if players[0].Shares(corporations[0]) != expectedPlayerStock {
+		t.Errorf("Player stock shares have not increased, must be %d, got %d", expectedPlayerStock, players[0].Shares(corporations[0]))
+	}
+}
+
+/*
+func TestBuyStockWithNotEnoughCash(t *testing.T) {
+	player := New("Test")
+	player.cash = 100
+	corporation, _ := corporation.New("Test", 0)
+	corporation.AddTiles(
+		[]tileset.Position{
+			{Number: 1, Letter: "A"},
+			{Number: 2, Letter: "A"},
+		},
+	)
+	var buys []Buy
+	buys = append(buys, Buy{corporation: corporation, amount: 2})
+	err := player.BuyStocks(buys)
+	if err == nil {
+		t.Errorf("Trying to buy stock shares without enough money must throw error")
+	}
+}
+*/
 func setup() ([]*player.Player, [7]*corporation.Corporation, *board.Board, *tileset.Tileset) {
 	var players []*player.Player
 	players = append(players, player.New("Test1"))
