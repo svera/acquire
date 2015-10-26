@@ -3,6 +3,7 @@ package game
 import (
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
 	"github.com/svera/acquire/tileset"
 	"reflect"
@@ -152,11 +153,10 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	players[0].PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
-	expectedState := stateBuyStock
 	expectedCorpSize := 4
 
-	if game.state != expectedState {
-		t.Errorf("Game state must be %d, got %d", expectedState, game.state)
+	if _, ok := game.state.(*fsm.FoundCorp); ok {
+		t.Errorf("Game must be in state FoundCorp")
 	}
 	if corporations[0].Size() != expectedCorpSize {
 		t.Errorf("Corporation size must be %d, got %d", expectedCorpSize, corporations[0].Size())

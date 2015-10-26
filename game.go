@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
 	"github.com/svera/acquire/tileset"
 )
@@ -18,7 +19,7 @@ const stateEndGame = 5
 
 type Game struct {
 	board         *board.Board
-	state         int
+	state         fsm.State
 	players       []*player.Player
 	corporations  [7]*corporation.Corporation
 	tileset       *tileset.Tileset
@@ -37,7 +38,7 @@ func New(
 		corporations:  corporations,
 		tileset:       tileset,
 		currentPlayer: 0,
-		state:         statePlayTile,
+		state:         &fsm.PlayTile{},
 	}
 	for _, player := range game.players {
 		game.giveInitialTileset(player)
@@ -193,13 +194,9 @@ func (g *Game) CurrentPlayer() *player.Player {
 	return g.players[g.currentPlayer]
 }
 
-// Returns game's current state
-func (g *Game) State() int {
-	return g.state
-}
-
 func (g *Game) PlayTile(tile tileset.Position) error {
-	if g.State() != statePlayTile {
+	_, ok := g.state.(*fsm.PlayTile)
+	if !ok {
 		return errors.New("Action not allowed")
 	}
 	if g.isTileTemporaryUnplayable(tile) {
@@ -217,7 +214,7 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 		g.growCorporation(g.corporations[corporationId], tiles)
 	} else {
 		g.board.PutTile(tile)
-		g.state = stateBuyStock
+		g.state.ToBuyStock()
 	}
 	return nil
 }
@@ -225,5 +222,5 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 func (g *Game) growCorporation(cp *corporation.Corporation, tiles []tileset.Position) {
 	g.board.SetTiles(cp, tiles)
 	cp.AddTiles(tiles)
-	g.state = stateBuyStock
+	g.state.ToBuyStock()
 }
