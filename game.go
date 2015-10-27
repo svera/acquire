@@ -14,14 +14,14 @@ const totalCorporations = 7
 type Game struct {
 	board         *board.Board
 	state         fsm.State
-	players       []*player.Player
+	players       []player.Complete
 	corporations  [7]*corporation.Corporation
 	tileset       *tileset.Tileset
 	currentPlayer int
 }
 
 func New(
-	board *board.Board, players []*player.Player, corporations [7]*corporation.Corporation, tileset *tileset.Tileset) (*Game, error) {
+	board *board.Board, players []player.Complete, corporations [7]*corporation.Corporation, tileset *tileset.Tileset) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New("Number of players must be between 3 and 6")
 	}
@@ -44,7 +44,7 @@ func New(
 }
 
 // Initialises player hand of tiles
-func (g *Game) giveInitialTileset(player *player.Player) {
+func (g *Game) giveInitialTileset(player player.Complete) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
 		player.PickTile(tile)
@@ -99,12 +99,12 @@ func (g *Game) PayBonusesForDefunctCorporation(c *corporation.Corporation) {
 // a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
 // shareholder gets no bonus. If there's a tie for minority stockholder, split the minority bonus among
 // the tied players"
-func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[string][]*player.Player {
-	mainStockHolders := map[string][]*player.Player{"majority": {}, "minority": {}}
+func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[string][]player.Sharer {
+	mainStockHolders := map[string][]player.Sharer{"majority": {}, "minority": {}}
 	stockHolders := g.getStockHolders(corporation)
 
 	if len(stockHolders) == 1 {
-		return map[string][]*player.Player{
+		return map[string][]player.Sharer{
 			"majority": {stockHolders[0]},
 			"minority": {stockHolders[0]},
 		}
@@ -120,8 +120,8 @@ func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[str
 
 // Loop stockHolders from start to get all stock holders with the same amount of shares for
 // the passed corporation
-func stockHoldersWithSameAmount(start int, stockHolders []*player.Player, corporation *corporation.Corporation) []*player.Player {
-	group := []*player.Player{stockHolders[start]}
+func stockHoldersWithSameAmount(start int, stockHolders []player.Sharer, corporation *corporation.Corporation) []player.Sharer {
+	group := []player.Sharer{stockHolders[start]}
 
 	i := start + 1
 	for i < len(stockHolders) && stockHolders[start].Shares(corporation) == stockHolders[i].Shares(corporation) {
@@ -133,9 +133,9 @@ func stockHoldersWithSameAmount(start int, stockHolders []*player.Player, corpor
 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
 // of that corporation
-func (g *Game) getStockHolders(corporation *corporation.Corporation) []*player.Player {
-	var stockHolders []*player.Player
-	sharesDesc := func(p1, p2 *player.Player) bool {
+func (g *Game) getStockHolders(corporation *corporation.Corporation) []player.Sharer {
+	var stockHolders []player.Sharer
+	sharesDesc := func(p1, p2 player.Sharer) bool {
 		return p1.Shares(corporation) > p2.Shares(corporation)
 	}
 
@@ -184,7 +184,7 @@ func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 }
 
 // Returns player currently in turn
-func (g *Game) CurrentPlayer() *player.Player {
+func (g *Game) CurrentPlayer() player.Complete {
 	return g.players[g.currentPlayer]
 }
 

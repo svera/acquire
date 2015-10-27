@@ -6,7 +6,6 @@ import (
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
 	"github.com/svera/acquire/tileset"
-	"reflect"
 	"testing"
 )
 
@@ -71,72 +70,74 @@ func TestAreEndConditionsReached(t *testing.T) {
 }
 
 func TestGetMainStockHolders(t *testing.T) {
-	players, corporations, board, tileset := setup()
-	game, _ := New(board, players, corporations, tileset)
-	players[0].Shares = func(c *corporation.Corporation) int {
-		return 8
+	_, corporations, board, tileset := setup()
+	players := []player.Complete{
+		player.NewStub("Test1"),
+		player.NewStub("Test2"),
+		player.NewStub("Test3"),
 	}
+	players[0].(*player.CompleteStub).SetShares(corporations[0], 8)
+
+	game, _ := New(board, players, corporations, tileset)
 	stockHolders := game.GetMainStockHolders(corporations[0])
-	expectedStockHolders := map[string][]*player.Player{
+	expectedStockHolders := map[string][]player.Sharer{
 		"majority": {players[0]},
 		"minority": {players[0]},
 	}
-	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
+		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
 		t.Errorf(
 			"If there's just one player with stock in a defunct corporation, " +
 				"he/she must get both majority and minority bonuses",
 		)
 	}
 
-	players[1].Shares = func(c *corporation.Corporation) int {
-		return 5
-	}
+	players[1].(*player.CompleteStub).SetShares(corporations[0], 5)
+
 	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]*player.Player{
+	expectedStockHolders = map[string][]player.Sharer{
 		"majority": {players[0]},
 		"minority": {players[1]},
 	}
-	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
+		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
 		t.Errorf(
 			"Wrong main stock holders",
 		)
 	}
 
-	players[1].Shares = func(c *corporation.Corporation) int {
-		return 8
-	}
-	players[2].Shares = func(c *corporation.Corporation) int {
-		return 5
-	}
+	players[1].(*player.CompleteStub).SetShares(corporations[0], 8)
+	players[2].(*player.CompleteStub).SetShares(corporations[0], 5)
+
 	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]*player.Player{
+	expectedStockHolders = map[string][]player.Sharer{
 		"majority": {players[0], players[1]},
 		"minority": {},
 	}
-	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
+		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
 		t.Errorf(
 			"If there are two or more majority stock holders in a defunct corporation, " +
 				"the majority bonus must be splitted between them (no minority bonus given)",
 		)
 	}
 
-	players[1].Shares = func(c *corporation.Corporation) int {
-		return 5
-	}
-	players[2].Shares = func(c *corporation.Corporation) int {
-		return 5
-	}
+	players[1].(*player.CompleteStub).SetShares(corporations[0], 5)
+	players[2].(*player.CompleteStub).SetShares(corporations[0], 5)
+
 	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]*player.Player{
+	expectedStockHolders = map[string][]player.Sharer{
 		"majority": {players[0]},
 		"minority": {players[1], players[2]},
 	}
-	if !reflect.DeepEqual(stockHolders, expectedStockHolders) {
+	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
+		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
 		t.Errorf(
 			"If there are two or more minority stock holders in a defunct corporation, " +
 				"the minority bonus must be splitted between them",
 		)
 	}
+
 }
 
 func TestPlayTileGrowCorporation(t *testing.T) {
@@ -204,8 +205,8 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	}
 }
 */
-func setup() ([]*player.Player, [7]*corporation.Corporation, *board.Board, *tileset.Tileset) {
-	var players []*player.Player
+func setup() ([]player.Complete, [7]*corporation.Corporation, *board.Board, *tileset.Tileset) {
+	var players []player.Complete
 	players = append(players, player.New("Test1"))
 	players = append(players, player.New("Test2"))
 	players = append(players, player.New("Test3"))
@@ -222,4 +223,24 @@ func setup() ([]*player.Player, [7]*corporation.Corporation, *board.Board, *tile
 	board := board.New()
 	tileset := tileset.New()
 	return players, corporations, board, tileset
+}
+
+func slicesSameContent(slice1 []player.Sharer, slice2 []player.Sharer) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+	var inSlice bool
+	for _, val1 := range slice1 {
+		inSlice = false
+		for _, val2 := range slice2 {
+			if val1 == val2 {
+				inSlice = true
+				break
+			}
+		}
+		if !inSlice {
+			return false
+		}
+	}
+	return true
 }

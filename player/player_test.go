@@ -30,24 +30,24 @@ func TestPickTile(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
-	players := []*Player{
-		New("Test1"),
-		New("Test2"),
-		New("Test3"),
-		New("Test4"),
+	players := []Sharer{
+		NewSharerStub(),
+		NewSharerStub(),
+		NewSharerStub(),
+		NewSharerStub(),
 	}
 
-	corporation, _ := corporation.New("Test", 0)
+	corp, _ := corporation.New("Test", 0)
 
-	players[0].shares[0] = 3
-	players[1].shares[0] = 1
-	players[2].shares[0] = 0
-	players[3].shares[0] = 2
+	players[0].(*SharerStub).SetShares(corp, 3)
+	players[1].(*SharerStub).SetShares(corp, 1)
+	players[2].(*SharerStub).SetShares(corp, 0)
+	players[3].(*SharerStub).SetShares(corp, 2)
 
-	shares := func(p1, p2 *Player) bool {
-		return p1.Shares(corporation) > p2.Shares(corporation)
+	shares := func(p1, p2 Sharer) bool {
+		return p1.Shares(corp) > p2.Shares(corp)
 	}
-	expectedSort := []*Player{
+	expectedSort := []Sharer{
 		players[0],
 		players[3],
 		players[1],
@@ -55,7 +55,7 @@ func TestSort(t *testing.T) {
 	}
 	By(shares).Sort(players)
 	if !reflect.DeepEqual(players, expectedSort) {
-		t.Errorf("Players not sorted by corporation %s's shares amount", corporation.Name())
+		t.Errorf("Players not sorted by corporation %s's shares amount", corp.Name())
 	}
 }
 

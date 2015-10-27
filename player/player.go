@@ -11,25 +11,74 @@ type Player struct {
 	cash   int
 	tiles  []tileset.Position
 	shares [7]int
-	Shares func(c *corporation.Corporation) int
+}
+
+type Complete interface {
+	Shares(c *corporation.Corporation) int
+	ReceiveBonus(amount int)
+	Buy(corp *corporation.Corporation, amount int)
+	PickTile(t tileset.Position) error
+	Tiles() []tileset.Position
+	UseTile(t tileset.Position) error
+	Cash() int
+}
+
+type Sharer interface {
+	Shares(c *corporation.Corporation) int
+	ReceiveBonus(amount int)
+}
+
+type SharerStub struct {
+	shares [7]int
+	cash   int
+}
+
+type CompleteStub struct {
+	Player
+}
+
+func NewStub(name string) *CompleteStub {
+	return &CompleteStub{
+		Player{
+			name:   name,
+			cash:   6000,
+			shares: [7]int{},
+		},
+	}
+}
+
+func (p *CompleteStub) SetShares(c *corporation.Corporation, amount int) {
+	p.shares[c.Id()] = amount
+}
+func NewSharerStub() *SharerStub {
+	return &SharerStub{
+		cash:   6000,
+		shares: [7]int{},
+	}
+}
+
+func (p *SharerStub) Shares(c *corporation.Corporation) int {
+	return p.shares[c.Id()]
+}
+
+func (p *SharerStub) ReceiveBonus(amount int) {
+	p.cash += amount
+}
+
+func (p *SharerStub) SetShares(c *corporation.Corporation, amount int) {
+	p.shares[c.Id()] = amount
 }
 
 func New(name string) *Player {
-	player := &Player{
+	return &Player{
 		name:   name,
 		cash:   6000,
 		shares: [7]int{},
 	}
-	player.Shares = makeSharesFunc(player)
-	return player
 }
 
-// In order to make testing easier, we implement Shares() with a closure
-// that can be later overwritten by tests
-func makeSharesFunc(p *Player) func(c *corporation.Corporation) int {
-	return func(c *corporation.Corporation) int {
-		return p.shares[c.Id()]
-	}
+func (p *Player) Shares(c *corporation.Corporation) int {
+	return p.shares[c.Id()]
 }
 
 // Buys stock from corporation
