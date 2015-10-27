@@ -13,62 +13,6 @@ type Player struct {
 	shares [7]int
 }
 
-type Complete interface {
-	Shares(c *corporation.Corporation) int
-	ReceiveBonus(amount int)
-	Buy(corp *corporation.Corporation, amount int)
-	PickTile(t tileset.Position) error
-	Tiles() []tileset.Position
-	UseTile(t tileset.Position) error
-	Cash() int
-}
-
-type Sharer interface {
-	Shares(c *corporation.Corporation) int
-	ReceiveBonus(amount int)
-}
-
-type SharerStub struct {
-	shares [7]int
-	cash   int
-}
-
-type CompleteStub struct {
-	Player
-}
-
-func NewStub(name string) *CompleteStub {
-	return &CompleteStub{
-		Player{
-			name:   name,
-			cash:   6000,
-			shares: [7]int{},
-		},
-	}
-}
-
-func (p *CompleteStub) SetShares(c *corporation.Corporation, amount int) {
-	p.shares[c.Id()] = amount
-}
-func NewSharerStub() *SharerStub {
-	return &SharerStub{
-		cash:   6000,
-		shares: [7]int{},
-	}
-}
-
-func (p *SharerStub) Shares(c *corporation.Corporation) int {
-	return p.shares[c.Id()]
-}
-
-func (p *SharerStub) ReceiveBonus(amount int) {
-	p.cash += amount
-}
-
-func (p *SharerStub) SetShares(c *corporation.Corporation, amount int) {
-	p.shares[c.Id()] = amount
-}
-
 func New(name string) *Player {
 	return &Player{
 		name:   name,
