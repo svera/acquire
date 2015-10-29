@@ -21,8 +21,8 @@ func New(name string) *Player {
 	}
 }
 
-func (p *Player) Shares(c corporation.Interface) int {
-	return p.shares[c.Id()]
+func (p *Player) Shares(corp corporation.Interface) int {
+	return p.shares[corp.Id()]
 }
 
 // Buys stock from corporation
@@ -33,11 +33,11 @@ func (p *Player) Buy(corp corporation.Interface, amount int) {
 }
 
 // Adds a new tile to the players' tileset
-func (p *Player) PickTile(t tileset.Position) error {
+func (p *Player) PickTile(tile tileset.Position) error {
 	if len(p.tiles) >= 6 {
 		return errors.New("Player cannot have more than 6 tiles")
 	}
-	p.tiles = append(p.tiles, t)
+	p.tiles = append(p.tiles, tile)
 	return nil
 }
 
@@ -49,9 +49,9 @@ func (p *Player) ReceiveBonus(amount int) {
 	p.cash += amount
 }
 
-func (p *Player) UseTile(t tileset.Position) error {
+func (p *Player) UseTile(tile tileset.Position) error {
 	for i, currentTile := range p.tiles {
-		if currentTile.Number == t.Number && currentTile.Letter == t.Letter {
+		if currentTile.Number == tile.Number && currentTile.Letter == tile.Letter {
 			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)
 			return nil
 		}

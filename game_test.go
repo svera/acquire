@@ -163,7 +163,8 @@ func TestBuyStock(t *testing.T) {
 	var expectedAvailableStock int = 23
 	var expectedPlayerStock int = 2
 	game, _ := New(bd, players, corporations, ts)
-	game.buyStocks(buys)
+	game.state = &fsm.BuyStock{}
+	game.BuyStock(buys)
 
 	if corporations[0].Stock() != expectedAvailableStock {
 		t.Errorf("Corporation stock shares have not decreased, must be %d, got %d", expectedAvailableStock, corporations[0].Stock())
@@ -186,7 +187,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 
 	buys := map[int]int{0: 2}
 	game, _ := New(bd, players, corporations, ts)
-	err := game.buyStocks(buys)
+	err := game.BuyStock(buys)
 	if err == nil {
 		t.Errorf("Trying to buy stock shares without enough money must throw error")
 	}
