@@ -49,7 +49,7 @@ func (p *Player) ReceiveBonus(amount int) {
 	p.cash += amount
 }
 
-func (p *Player) UseTile(tile tileset.Position) error {
+func (p *Player) DiscardTile(tile tileset.Position) error {
 	for i, currentTile := range p.tiles {
 		if currentTile.Number == tile.Number && currentTile.Letter == tile.Letter {
 			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)

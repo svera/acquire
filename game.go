@@ -195,7 +195,7 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	if g.isTileTemporaryUnplayable(tile) {
 		return errors.New("Tile is temporary unplayable")
 	}
-	if err := g.CurrentPlayer().UseTile(tile); err != nil {
+	if err := g.CurrentPlayer().DiscardTile(tile); err != nil {
 		return err
 	}
 	/*
@@ -240,8 +240,8 @@ func (g *Game) BuyStock(buys map[int]int) error {
 		corp := g.corporations[corporationId]
 		g.CurrentPlayer().Buy(corp, amount)
 	}
-	g.state.ToPlayTile()
-	g.nextPlayer()
+
+	g.DrawTile()
 	return nil
 }
 
@@ -265,5 +265,31 @@ func (g *Game) checkBuy(buys map[int]int) error {
 	if totalPrice > g.CurrentPlayer().Cash() {
 		return errors.New("Player doesn't have enough cash to buy those stock shares")
 	}
+	return nil
+}
+
+// A player takes a tile from the facedown cluster to replace
+// the one he/she played. This is not done until the end of
+// the turn. At this time, if a player has any permanently
+// unplayable tiles that player discard the unplayable tiles
+// and draws an equal number of replacement tiles. This can
+// only be done once per turn.
+func (g *Game) DrawTile() error {
+	if tile, err := g.tileset.Draw(); err != nil {
+		return err
+	}
+	g.CurrentPlayer().PickTile(tile)
+	for _, tile := range g.CurrentPlayer().Tiles() {
+		if g.isTileUnplayable(tile) {
+			g.CurrentPlayer().DiscardTile(tile)
+			if tile, err := g.tileset.Draw(); err != nil {
+				return err
+			}
+			g.CurrentPlayer().PickTile(tile)
+		}
+	}
+
+	g.state.ToPlayTile()
+	g.nextPlayer()
 	return nil
 }

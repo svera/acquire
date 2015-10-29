@@ -72,11 +72,11 @@ func TestUseTile(t *testing.T) {
 	}
 
 	tile := tileset.Position{Number: 5, Letter: "A"}
-	player.UseTile(tile)
+	player.DiscardTile(tile)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
 	}
 	if tile.Number != 5 || tile.Letter != "A" {
-		t.Errorf("UseTile() must return tile 5A")
+		t.Errorf("DiscardTile() must return tile 5A")
 	}
 }

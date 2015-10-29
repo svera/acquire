@@ -11,7 +11,7 @@ type Interface interface {
 	Buy(corp corporation.Interface, amount int)
 	PickTile(t tileset.Position) error
 	Tiles() []tileset.Position
-	UseTile(t tileset.Position) error
+	DiscardTile(t tileset.Position) error
 	Cash() int
 }
 

@@ -137,7 +137,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
-	players[0].UseTile(playerTiles[0])
+	players[0].DiscardTile(playerTiles[0])
 	players[0].PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
