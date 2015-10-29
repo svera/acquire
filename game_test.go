@@ -192,7 +192,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	}
 }
 
-func setup() ([]player.Interface, [7]corporation.Interface, *board.Board, *tileset.Tileset) {
+func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, tileset.Interface) {
 	var players []player.Interface
 	players = append(players, player.NewStub("Test1"))
 	players = append(players, player.NewStub("Test2"))

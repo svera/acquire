@@ -13,16 +13,16 @@ import (
 const totalCorporations = 7
 
 type Game struct {
-	board         *board.Board
+	board         board.Interface
 	state         fsm.State
 	players       []player.Interface
 	corporations  [7]corporation.Interface
-	tileset       *tileset.Tileset
+	tileset       tileset.Interface
 	currentPlayer int
 }
 
 func New(
-	board *board.Board, players []player.Interface, corporations [7]corporation.Interface, tileset *tileset.Tileset) (*Game, error) {
+	board board.Interface, players []player.Interface, corporations [7]corporation.Interface, tileset tileset.Interface) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New("Number of players must be between 3 and 6")
 	}
