@@ -9,5 +9,5 @@ func (s *UntieMerge) ToSellTrade() (State, error) {
 }
 
 func (s *UntieMerge) ToEndGame() (State, error) {
-	return s, nil
+	return &EndGame{}, nil
 }

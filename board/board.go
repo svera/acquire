@@ -1,3 +1,5 @@
+// Model for the game board, storing its state and implementing related
+// actions.
 package board
 
 import (

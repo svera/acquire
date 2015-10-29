@@ -240,6 +240,8 @@ func (g *Game) BuyStock(buys map[int]int) error {
 		corp := g.corporations[corporationId]
 		g.CurrentPlayer().Buy(corp, amount)
 	}
+	g.state.ToPlayTile()
+	g.nextPlayer()
 	return nil
 }
 
