@@ -241,8 +241,7 @@ func (g *Game) BuyStock(buys map[int]int) error {
 		g.CurrentPlayer().Buy(corp, amount)
 	}
 
-	g.DrawTile()
-	return nil
+	return g.drawTile()
 }
 
 func (g *Game) checkBuy(buys map[int]int) error {
@@ -274,7 +273,7 @@ func (g *Game) checkBuy(buys map[int]int) error {
 // unplayable tiles that player discard the unplayable tiles
 // and draws an equal number of replacement tiles. This can
 // only be done once per turn.
-func (g *Game) DrawTile() error {
+func (g *Game) drawTile() error {
 	if tile, err := g.tileset.Draw(); err != nil {
 		return err
 	}
