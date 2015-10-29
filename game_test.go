@@ -39,29 +39,20 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions not reached (no active corporations) but detected as it were")
 	}
 
-	corporations[0].Size = func() int {
-		return 41
-	}
+	corporations[0].(*corporation.Stub).SetSize(41)
 
 	if !game.AreEndConditionsReached() {
 		t.Errorf("End game conditions reached (a corporation bigger than 40 tiles) but not detected")
 	}
 
-	corporations[0].Size = func() int {
-		return 11
-	}
+	corporations[0].(*corporation.Stub).SetSize(11)
 
 	if !game.AreEndConditionsReached() {
 		t.Errorf("End game conditions reached (all active corporations safe) but not detected")
 	}
 
-	corporations[0].Size = func() int {
-		return 11
-	}
-
-	corporations[1].Size = func() int {
-		return 2
-	}
+	corporations[0].(*corporation.Stub).SetSize(11)
+	corporations[1].(*corporation.Stub).SetSize(2)
 
 	if game.AreEndConditionsReached() {
 		t.Errorf("End game conditions not reached but detected as it were")
@@ -70,17 +61,13 @@ func TestAreEndConditionsReached(t *testing.T) {
 }
 
 func TestGetMainStockHolders(t *testing.T) {
-	_, corporations, board, tileset := setup()
-	players := []player.Interface{
-		player.NewStub("Test1"),
-		player.NewStub("Test2"),
-		player.NewStub("Test3"),
-	}
+	players, corporations, board, tileset := setup()
+
 	players[0].(*player.Stub).SetShares(corporations[0], 8)
 
 	game, _ := New(board, players, corporations, tileset)
 	stockHolders := game.GetMainStockHolders(corporations[0])
-	expectedStockHolders := map[string][]player.Interface{
+	expectedStockHolders := map[string][]player.ShareInterface{
 		"majority": {players[0]},
 		"minority": {players[0]},
 	}
@@ -95,7 +82,7 @@ func TestGetMainStockHolders(t *testing.T) {
 	players[1].(*player.Stub).SetShares(corporations[0], 5)
 
 	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]player.Interface{
+	expectedStockHolders = map[string][]player.ShareInterface{
 		"majority": {players[0]},
 		"minority": {players[1]},
 	}
@@ -110,7 +97,7 @@ func TestGetMainStockHolders(t *testing.T) {
 	players[2].(*player.Stub).SetShares(corporations[0], 5)
 
 	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]player.Interface{
+	expectedStockHolders = map[string][]player.ShareInterface{
 		"majority": {players[0], players[1]},
 		"minority": {},
 	}
@@ -126,7 +113,7 @@ func TestGetMainStockHolders(t *testing.T) {
 	players[2].(*player.Stub).SetShares(corporations[0], 5)
 
 	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]player.Interface{
+	expectedStockHolders = map[string][]player.ShareInterface{
 		"majority": {players[0]},
 		"minority": {players[1], players[2]},
 	}
@@ -186,46 +173,46 @@ func TestBuyStock(t *testing.T) {
 	}
 }
 
-/*
 func TestBuyStockWithNotEnoughCash(t *testing.T) {
-	player := New("Test")
-	player.cash = 100
-	corporation, _ := corporation.New("Test", 0)
-	corporation.AddTiles(
+	players, corporations, bd, ts := setup()
+	players[0].(*player.Stub).SetCash(100)
+
+	corporations[0].AddTiles(
 		[]tileset.Position{
 			{Number: 1, Letter: "A"},
 			{Number: 2, Letter: "A"},
 		},
 	)
-	var buys []Buy
-	buys = append(buys, Buy{corporation: corporation, amount: 2})
-	err := player.BuyStocks(buys)
+
+	buys := map[int]int{0: 2}
+	game, _ := New(bd, players, corporations, ts)
+	err := game.buyStocks(buys)
 	if err == nil {
 		t.Errorf("Trying to buy stock shares without enough money must throw error")
 	}
 }
-*/
-func setup() ([]player.Interface, [7]*corporation.Corporation, *board.Board, *tileset.Tileset) {
-	var players []player.Interface
-	players = append(players, player.New("Test1"))
-	players = append(players, player.New("Test2"))
-	players = append(players, player.New("Test3"))
 
-	var corporations [7]*corporation.Corporation
-	corporations[0], _ = corporation.New("A", 0)
-	corporations[1], _ = corporation.New("B", 0)
-	corporations[2], _ = corporation.New("C", 1)
-	corporations[3], _ = corporation.New("D", 1)
-	corporations[4], _ = corporation.New("E", 1)
-	corporations[5], _ = corporation.New("F", 2)
-	corporations[6], _ = corporation.New("G", 2)
+func setup() ([]player.Interface, [7]corporation.Interface, *board.Board, *tileset.Tileset) {
+	var players []player.Interface
+	players = append(players, player.NewStub("Test1"))
+	players = append(players, player.NewStub("Test2"))
+	players = append(players, player.NewStub("Test3"))
+
+	var corporations [7]corporation.Interface
+	corporations[0] = corporation.NewStub("A", 0)
+	corporations[1] = corporation.NewStub("B", 0)
+	corporations[2] = corporation.NewStub("C", 1)
+	corporations[3] = corporation.NewStub("D", 1)
+	corporations[4] = corporation.NewStub("E", 1)
+	corporations[5] = corporation.NewStub("F", 2)
+	corporations[6] = corporation.NewStub("G", 2)
 
 	board := board.New()
 	tileset := tileset.New()
 	return players, corporations, board, tileset
 }
 
-func slicesSameContent(slice1 []player.Interface, slice2 []player.Interface) bool {
+func slicesSameContent(slice1 []player.ShareInterface, slice2 []player.ShareInterface) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}

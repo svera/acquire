@@ -5,10 +5,10 @@ import (
 )
 
 // By is the type of a "less" function that defines the ordering of its Player arguments.
-type By func(p1, p2 Interface) bool
+type By func(p1, p2 ShareInterface) bool
 
 // Sort is a method on the function type, By, that sorts the argument slice according to the function.
-func (by By) Sort(players []Interface) {
+func (by By) Sort(players []ShareInterface) {
 	ps := &playerSorter{
 		players: players,
 		by:      by, // The Sort method's receiver is the function (closure) that defines the sort order.
@@ -18,8 +18,8 @@ func (by By) Sort(players []Interface) {
 
 // planetSorter joins a By function and a slice of Players to be sorted.
 type playerSorter struct {
-	players []Interface
-	by      func(p1, p2 Interface) bool // Closure used in the Less method.
+	players []ShareInterface
+	by      func(p1, p2 ShareInterface) bool // Closure used in the Less method.
 }
 
 // Len is part of sort.Interface.

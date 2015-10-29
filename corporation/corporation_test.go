@@ -1,6 +1,7 @@
 package corporation
 
 import (
+	"github.com/svera/acquire/tileset"
 	"testing"
 )
 
@@ -10,14 +11,17 @@ func TestStockPrice(t *testing.T) {
 	corporations[1], _ = New("class1", 1)
 	corporations[2], _ = New("class2", 2)
 
-	corporations[0].Size = func() int {
-		return 2
+	corporations[0].tiles = []tileset.Position{
+		{Number: 1, Letter: "A"},
+		{Number: 2, Letter: "A"},
 	}
-	corporations[1].Size = func() int {
-		return 2
+	corporations[1].tiles = []tileset.Position{
+		{Number: 1, Letter: "B"},
+		{Number: 2, Letter: "B"},
 	}
-	corporations[2].Size = func() int {
-		return 2
+	corporations[2].tiles = []tileset.Position{
+		{Number: 1, Letter: "C"},
+		{Number: 2, Letter: "C"},
 	}
 
 	var expectedStockPrices = new([3]int)

@@ -21,12 +21,12 @@ func New(name string) *Player {
 	}
 }
 
-func (p *Player) Shares(c *corporation.Corporation) int {
+func (p *Player) Shares(c corporation.Interface) int {
 	return p.shares[c.Id()]
 }
 
 // Buys stock from corporation
-func (p *Player) Buy(corp *corporation.Corporation, amount int) {
+func (p *Player) Buy(corp corporation.Interface, amount int) {
 	corp.SetStock(corp.Stock() - amount)
 	p.shares[corp.Id()] = amount
 	p.cash -= corp.StockPrice() * amount

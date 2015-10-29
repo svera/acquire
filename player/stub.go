@@ -18,6 +18,10 @@ func NewStub(name string) *Stub {
 	}
 }
 
-func (p *Stub) SetShares(c *corporation.Corporation, amount int) {
+func (p *Stub) SetShares(c corporation.Interface, amount int) {
 	p.shares[c.Id()] = amount
+}
+
+func (p *Stub) SetCash(amount int) {
+	p.cash = amount
 }

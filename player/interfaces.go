@@ -6,11 +6,16 @@ import (
 )
 
 type Interface interface {
-	Shares(c *corporation.Corporation) int
+	Shares(c corporation.Interface) int
 	ReceiveBonus(amount int)
-	Buy(corp *corporation.Corporation, amount int)
+	Buy(corp corporation.Interface, amount int)
 	PickTile(t tileset.Position) error
 	Tiles() []tileset.Position
 	UseTile(t tileset.Position) error
 	Cash() int
+}
+
+type ShareInterface interface {
+	Shares(c corporation.Interface) int
+	ReceiveBonus(amount int)
 }

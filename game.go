@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
@@ -15,13 +16,13 @@ type Game struct {
 	board         *board.Board
 	state         fsm.State
 	players       []player.Interface
-	corporations  [7]*corporation.Corporation
+	corporations  [7]corporation.Interface
 	tileset       *tileset.Tileset
 	currentPlayer int
 }
 
 func New(
-	board *board.Board, players []player.Interface, corporations [7]*corporation.Corporation, tileset *tileset.Tileset) (*Game, error) {
+	board *board.Board, players []player.Interface, corporations [7]corporation.Interface, tileset *tileset.Tileset) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New("Number of players must be between 3 and 6")
 	}
@@ -58,6 +59,7 @@ func (g *Game) AreEndConditionsReached() bool {
 		return false
 	}
 	for _, corporation := range active {
+		fmt.Println()
 		if corporation.Size() >= 41 {
 			return true
 		}
@@ -69,8 +71,8 @@ func (g *Game) AreEndConditionsReached() bool {
 }
 
 // Returns all corporations on the board
-func (g *Game) getActiveCorporations() []*corporation.Corporation {
-	active := []*corporation.Corporation{}
+func (g *Game) getActiveCorporations() []corporation.Interface {
+	active := []corporation.Interface{}
 	for _, corporation := range g.corporations {
 		if corporation.IsActive() {
 			active = append(active, corporation)
@@ -81,7 +83,7 @@ func (g *Game) getActiveCorporations() []*corporation.Corporation {
 
 // Calculates and returns bonus amounts to be paid to owners of stock of a
 // defunct corporation
-func (g *Game) PayBonusesForDefunctCorporation(c *corporation.Corporation) {
+func (g *Game) PayBonusesForDefunctCorporation(c corporation.Interface) {
 	stockHolders := g.GetMainStockHolders(c)
 	numberMajorityHolders := len(stockHolders["majority"])
 	numberMinorityHolders := len(stockHolders["minority"])
@@ -99,12 +101,12 @@ func (g *Game) PayBonusesForDefunctCorporation(c *corporation.Corporation) {
 // a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
 // shareholder gets no bonus. If there's a tie for minority stockholder, split the minority bonus among
 // the tied players"
-func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[string][]player.Interface {
-	mainStockHolders := map[string][]player.Interface{"majority": {}, "minority": {}}
+func (g *Game) GetMainStockHolders(corporation corporation.Interface) map[string][]player.ShareInterface {
+	mainStockHolders := map[string][]player.ShareInterface{"majority": {}, "minority": {}}
 	stockHolders := g.getStockHolders(corporation)
 
 	if len(stockHolders) == 1 {
-		return map[string][]player.Interface{
+		return map[string][]player.ShareInterface{
 			"majority": {stockHolders[0]},
 			"minority": {stockHolders[0]},
 		}
@@ -120,8 +122,8 @@ func (g *Game) GetMainStockHolders(corporation *corporation.Corporation) map[str
 
 // Loop stockHolders from start to get all stock holders with the same amount of shares for
 // the passed corporation
-func stockHoldersWithSameAmount(start int, stockHolders []player.Interface, corporation *corporation.Corporation) []player.Interface {
-	group := []player.Interface{stockHolders[start]}
+func stockHoldersWithSameAmount(start int, stockHolders []player.ShareInterface, corporation corporation.Interface) []player.ShareInterface {
+	group := []player.ShareInterface{stockHolders[start]}
 
 	i := start + 1
 	for i < len(stockHolders) && stockHolders[start].Shares(corporation) == stockHolders[i].Shares(corporation) {
@@ -133,9 +135,9 @@ func stockHoldersWithSameAmount(start int, stockHolders []player.Interface, corp
 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
 // of that corporation
-func (g *Game) getStockHolders(corporation *corporation.Corporation) []player.Interface {
-	var stockHolders []player.Interface
-	sharesDesc := func(p1, p2 player.Interface) bool {
+func (g *Game) getStockHolders(corporation corporation.Interface) []player.ShareInterface {
+	var stockHolders []player.ShareInterface
+	sharesDesc := func(p1, p2 player.ShareInterface) bool {
 		return p1.Shares(corporation) > p2.Shares(corporation)
 	}
 
@@ -213,7 +215,7 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	return nil
 }
 
-func (g *Game) growCorporation(cp *corporation.Corporation, tiles []tileset.Position) {
+func (g *Game) growCorporation(cp corporation.Interface, tiles []tileset.Position) {
 	g.board.SetTiles(cp, tiles)
 	cp.AddTiles(tiles)
 	g.state.ToBuyStock()

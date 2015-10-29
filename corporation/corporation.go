@@ -17,7 +17,6 @@ type Corporation struct {
 	stock       int
 	pricesChart map[int]prices
 	tiles       []tileset.Position
-	Size        func() int
 }
 
 func New(name string, class int) (*Corporation, error) {
@@ -30,16 +29,11 @@ func New(name string, class int) (*Corporation, error) {
 		pricesChart: initPricesChart(class),
 	}
 
-	corporation.Size = makeSizeFunc(corporation)
 	return corporation, nil
 }
 
-// In order to make testing easier, we implement Size() with a closure
-// that can be later overwritten by tests
-func makeSizeFunc(corporation *Corporation) func() int {
-	return func() int {
-		return int(len(corporation.tiles))
-	}
+func (c *Corporation) Size() int {
+	return len(c.tiles)
 }
 
 func (c *Corporation) SetId(id int) {
