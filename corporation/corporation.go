@@ -11,6 +11,10 @@ type prices struct {
 	minorityBonus int
 }
 
+const (
+	WrongCorporationClass = "wrong_corporation_class"
+)
+
 type Corporation struct {
 	id          int
 	name        string
@@ -21,7 +25,7 @@ type Corporation struct {
 
 func New(name string, class int) (*Corporation, error) {
 	if class < 0 || class > 2 {
-		return nil, errors.New("Corporation can only be of class 0, 1 or 2")
+		return nil, errors.New(WrongCorporationClass)
 	}
 	corporation := &Corporation{
 		name:        name,

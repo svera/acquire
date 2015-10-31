@@ -5,6 +5,10 @@ import (
 	"math/rand"
 )
 
+const (
+	NoTilesAvailable = "no_tiles_available"
+)
+
 type Position struct {
 	Number int
 	Letter string
@@ -35,5 +39,5 @@ func (t *Tileset) Draw() (Position, error) {
 		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
 		return tile, nil
 	}
-	return Position{}, errors.New("No more tiles available")
+	return Position{}, errors.New(NoTilesAvailable)
 }

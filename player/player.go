@@ -6,6 +6,11 @@ import (
 	"github.com/svera/acquire/tileset"
 )
 
+const (
+	TileNotOnHand = "tile_not_on_hand"
+	TooManyTiles  = "too_many_tiles"
+)
+
 type Player struct {
 	name   string
 	cash   int
@@ -35,7 +40,7 @@ func (p *Player) Buy(corp corporation.Interface, amount int) {
 // Adds a new tile to the players' tileset
 func (p *Player) PickTile(tile tileset.Position) error {
 	if len(p.tiles) >= 6 {
-		return errors.New("Player cannot have more than 6 tiles")
+		return errors.New(TooManyTiles)
 	}
 	p.tiles = append(p.tiles, tile)
 	return nil
@@ -56,7 +61,7 @@ func (p *Player) DiscardTile(tile tileset.Position) error {
 			return nil
 		}
 	}
-	return errors.New("Player doesn't have tile on hand")
+	return errors.New(TileNotOnHand)
 }
 
 func (p *Player) Cash() int {

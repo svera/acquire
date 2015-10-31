@@ -10,14 +10,10 @@ import (
 const Empty = -1
 const OrphanTile = 9
 
-var letters [9]string
+var letters [9]string = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 
 type Board struct {
 	grid *[13]map[string]int
-}
-
-func init() {
-	letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 }
 
 func New() *Board {
@@ -109,7 +105,7 @@ func (b *Board) AdjacentCells(t tileset.Position) []tileset.Position {
 	if t.Number > 1 {
 		adjacent = append(adjacent, tileset.Position{Number: t.Number - 1, Letter: t.Letter})
 	}
-	if t.Number < 13 {
+	if t.Number < 12 {
 		adjacent = append(adjacent, tileset.Position{Number: t.Number + 1, Letter: t.Letter})
 	}
 	return adjacent

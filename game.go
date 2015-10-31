@@ -10,6 +10,16 @@ import (
 )
 
 const totalCorporations = 7
+const (
+	ActionNotAllowed          = "action_not_allowed"
+	WrongNumberPlayers        = "wrong_number_players"
+	StockSharesNotBuyable     = "stock_shares_not_buyable"
+	NotEnoughStockShares      = "not_enough_stock_shares"
+	TileTemporaryUnplayable   = "tile_temporary_unplayable"
+	TilePermanentlyUnplayable = "tile_permanently_unplayable"
+	NotEnoughCash             = "not_enough_cash"
+	TooManyStockSharesToBuy   = "too_many_stock_shares_to_buy"
+)
 
 type Game struct {
 	board         board.Interface
@@ -23,7 +33,7 @@ type Game struct {
 func New(
 	board board.Interface, players []player.Interface, corporations [7]corporation.Interface, tileset tileset.Interface) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
-		return nil, errors.New("Number of players must be between 3 and 6")
+		return nil, errors.New(WrongNumberPlayers)
 	}
 
 	gm := Game{
@@ -190,10 +200,10 @@ func (g *Game) CurrentPlayer() player.Interface {
 
 func (g *Game) PlayTile(tile tileset.Position) error {
 	if _, ok := g.state.(*fsm.PlayTile); !ok {
-		return errors.New("Action not allowed")
+		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tile) {
-		return errors.New("Tile is temporary unplayable")
+		return errors.New(TileTemporaryUnplayable)
 	}
 	if err := g.CurrentPlayer().DiscardTile(tile); err != nil {
 		return err
@@ -229,7 +239,7 @@ func (g *Game) nextPlayer() {
 // Buys stock from corporations
 func (g *Game) BuyStock(buys map[int]int) error {
 	if _, ok := g.state.(*fsm.BuyStock); !ok {
-		return errors.New("Action not allowed")
+		return errors.New(ActionNotAllowed)
 	}
 
 	if err := g.checkBuy(buys); err != nil {
@@ -249,20 +259,20 @@ func (g *Game) checkBuy(buys map[int]int) error {
 	for corporationId, amount := range buys {
 		corp := g.corporations[corporationId]
 		if corp.Size() == 0 {
-			return errors.New("Player cannot buy shares of a corporation not on board")
+			return errors.New(StockSharesNotBuyable)
 		}
 		if amount > corp.Stock() {
-			return errors.New("Player cannot buy more shares than the available stock")
+			return errors.New(NotEnoughStockShares)
 		}
 		totalStock += amount
 		totalPrice += corp.StockPrice() * amount
 	}
 	if totalStock > 3 {
-		return errors.New("Player cannot buy more than 3 stock shares per turn")
+		return errors.New(TooManyStockSharesToBuy)
 	}
 
 	if totalPrice > g.CurrentPlayer().Cash() {
-		return errors.New("Player doesn't have enough cash to buy those stock shares")
+		return errors.New(NotEnoughCash)
 	}
 	return nil
 }
@@ -274,14 +284,16 @@ func (g *Game) checkBuy(buys map[int]int) error {
 // and draws an equal number of replacement tiles. This can
 // only be done once per turn.
 func (g *Game) drawTile() error {
-	if tile, err := g.tileset.Draw(); err != nil {
+	var tile tileset.Position
+	var err error
+	if tile, err = g.tileset.Draw(); err != nil {
 		return err
 	}
 	g.CurrentPlayer().PickTile(tile)
 	for _, tile := range g.CurrentPlayer().Tiles() {
 		if g.isTileUnplayable(tile) {
 			g.CurrentPlayer().DiscardTile(tile)
-			if tile, err := g.tileset.Draw(); err != nil {
+			if tile, err = g.tileset.Draw(); err == nil {
 				return err
 			}
 			g.CurrentPlayer().PickTile(tile)
