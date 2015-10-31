@@ -110,7 +110,7 @@ func (c *Corporation) MajorityBonus() int {
 	return c.pricesChart[c.Size()].majorityBonus
 }
 
-// Returns company's current majority bonus value per stock share
+// Returns company's current minority bonus value per stock share
 func (c *Corporation) MinorityBonus() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].minorityBonus

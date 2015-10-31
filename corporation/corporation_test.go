@@ -6,28 +6,22 @@ import (
 )
 
 func TestStockPrice(t *testing.T) {
-	var corporations = new([3]*Corporation)
+	var corporations = new([4]*Corporation)
 	corporations[0], _ = New("class0", 0)
 	corporations[1], _ = New("class1", 1)
 	corporations[2], _ = New("class2", 2)
+	corporations[3], _ = New("class0 big", 0)
 
-	corporations[0].tiles = []tileset.Position{
-		{Number: 1, Letter: "A"},
-		{Number: 2, Letter: "A"},
-	}
-	corporations[1].tiles = []tileset.Position{
-		{Number: 1, Letter: "B"},
-		{Number: 2, Letter: "B"},
-	}
-	corporations[2].tiles = []tileset.Position{
-		{Number: 1, Letter: "C"},
-		{Number: 2, Letter: "C"},
-	}
+	corporations[0].tiles = make([]tileset.Position, 2)
+	corporations[1].tiles = make([]tileset.Position, 2)
+	corporations[2].tiles = make([]tileset.Position, 2)
+	corporations[3].tiles = make([]tileset.Position, 42)
 
-	var expectedStockPrices = new([3]int)
+	var expectedStockPrices = new([4]int)
 	expectedStockPrices[0] = 200
 	expectedStockPrices[1] = 300
 	expectedStockPrices[2] = 400
+	expectedStockPrices[3] = 1000
 
 	for class, corporation := range corporations {
 		if corporation.StockPrice() != expectedStockPrices[class] {
@@ -114,5 +108,56 @@ func TestMajorityBonus(t *testing.T) {
 	expectedMajorityBonus := 2000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
 		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
+	}
+
+	corp.tiles = make([]tileset.Position, 42)
+	expectedMajorityBonus = 10000
+	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
+		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
+	}
+}
+
+func TestMinorityBonus(t *testing.T) {
+	corp, _ := New("Test", 0)
+	corp.tiles = make([]tileset.Position, 2)
+	expectedMinorityBonus := 1000
+	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
+		t.Errorf("Expected minority bonus of %d, got %d", expectedMinorityBonus, bonus)
+	}
+
+	corp.tiles = make([]tileset.Position, 42)
+	expectedMinorityBonus = 5000
+	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
+		t.Errorf("Expected minority bonus of %d, got %d", expectedMinorityBonus, bonus)
+	}
+}
+
+func TestIsSafe(t *testing.T) {
+	corp, _ := New("Test", 0)
+	corp.tiles = make([]tileset.Position, 2)
+	if corp.IsSafe() {
+		t.Errorf("Unsafe corporation regarded as safe")
+	}
+	corp.tiles = make([]tileset.Position, 11)
+	if !corp.IsSafe() {
+		t.Errorf("Safe corporation regarded as unsafe")
+	}
+}
+
+func TestIsActive(t *testing.T) {
+	corp, _ := New("Test", 0)
+	if corp.IsActive() {
+		t.Errorf("Inactive corporation regarded as active")
+	}
+	corp.tiles = make([]tileset.Position, 2)
+	if !corp.IsActive() {
+		t.Errorf("Active corporation regarded as inactive")
+	}
+}
+
+func TestName(t *testing.T) {
+	corp, _ := New("Test", 0)
+	if corp.Name() != "Test" {
+		t.Errorf("Expected corporation name 'Test'")
 	}
 }
