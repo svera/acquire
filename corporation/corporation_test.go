@@ -40,3 +40,79 @@ func TestStockPrice(t *testing.T) {
 		}
 	}
 }
+
+func TestSize(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedSize := 8
+	corp.tiles = make([]tileset.Position, expectedSize)
+	if size := corp.Size(); size != expectedSize {
+		t.Errorf("Expected a corporation size of %d, got %d", expectedSize, size)
+	}
+}
+
+func TestAddTiles(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedTiles := []tileset.Position{
+		{Number: 1, Letter: "A"},
+		{Number: 2, Letter: "A"},
+	}
+	corp.AddTiles(expectedTiles)
+	if corp.tiles[0] != expectedTiles[0] || corp.tiles[1] != expectedTiles[1] {
+		t.Errorf("Tiles not added to corporation")
+	}
+}
+
+func TestAddTile(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedTile := tileset.Position{Number: 1, Letter: "A"}
+
+	corp.AddTile(expectedTile)
+	if corp.tiles[0] != expectedTile {
+		t.Errorf("Tile not added to corporation")
+	}
+}
+
+func TestSetId(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedId := 5
+	corp.SetId(expectedId)
+	if corp.id != expectedId {
+		t.Errorf("Corporation ID not set")
+	}
+}
+
+func TestId(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedId := 5
+	corp.id = expectedId
+	if corp.Id() != expectedId {
+		t.Errorf("Corporation ID not got")
+	}
+}
+
+func TestStock(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedStock := 20
+	corp.stock = expectedStock
+	if corp.Stock() != expectedStock {
+		t.Errorf("Corporation stock not got")
+	}
+}
+
+func TestSetStock(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedStock := 20
+	corp.SetStock(expectedStock)
+	if corp.stock != expectedStock {
+		t.Errorf("Corporation stock not set")
+	}
+}
+
+func TestMajorityBonus(t *testing.T) {
+	corp, _ := New("Test", 0)
+	corp.tiles = make([]tileset.Position, 2)
+	expectedMajorityBonus := 2000
+	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
+		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
+	}
+}

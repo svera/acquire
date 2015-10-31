@@ -1,6 +1,7 @@
 package board
 
 import (
+	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/tileset"
 	"reflect"
 	"sort"
@@ -140,6 +141,55 @@ func TestTileGrowCorporation(t *testing.T) {
 	}
 	if !grow {
 		t.Errorf("TileGrowCorporation() must return true")
+	}
+}
+
+func TestTileDontGrowCorporation(t *testing.T) {
+	board := New()
+
+	board.grid[7]["E"] = 2
+	board.grid[8]["E"] = 2
+
+	grow, _, _ := board.TileGrowCorporation(tileset.Position{Number: 6, Letter: "C"})
+	if grow {
+		t.Errorf(
+			"Position %d%s must not grow any corporation, but got true",
+			6,
+			"C",
+		)
+	}
+}
+
+func TestAdjacentCells(t *testing.T) {
+	brd := New()
+	position := tileset.Position{Number: 1, Letter: "A"}
+	expectedAdjacentCells := []tileset.Position{
+		{Number: 2, Letter: "A"},
+		{Number: 1, Letter: "B"},
+	}
+
+	adjacentCells := brd.AdjacentCells(position)
+	if !slicesSameContent(adjacentCells, expectedAdjacentCells) {
+		t.Errorf(
+			"Position %d%s expected to have adjacent tiles %v, got %v",
+			position.Number, position.Letter, expectedAdjacentCells, adjacentCells,
+		)
+	}
+}
+
+func TestSetTiles(t *testing.T) {
+	brd := New()
+	corp, _ := corporation.New("Test", 1)
+	corp.SetId(5)
+	cell1 := tileset.Position{Number: 1, Letter: "A"}
+	cell2 := tileset.Position{Number: 1, Letter: "B"}
+	cells := []tileset.Position{cell1, cell2}
+	brd.SetTiles(corp, cells)
+	if brd.Cell(cell1) != 5 || brd.Cell(cell2) != 5 {
+		t.Errorf(
+			"Cells %d%s and %d%s expected to belong to corporation %d",
+			cell1.Number, cell1.Letter, cell2.Number, cell2.Letter, corp.Id(),
+		)
 	}
 }
 
