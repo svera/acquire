@@ -9,9 +9,10 @@ type Stub struct {
 	size int
 }
 
-func NewStub(name string, class int) *Stub {
+func NewStub(name string, class int, id int) *Stub {
 	return &Stub{
 		Corporation: Corporation{
+			id:          id,
 			name:        name,
 			stock:       25,
 			pricesChart: initPricesChart(class),

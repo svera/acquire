@@ -179,8 +179,7 @@ func TestAdjacentCells(t *testing.T) {
 
 func TestSetTiles(t *testing.T) {
 	brd := New()
-	corp, _ := corporation.New("Test", 1)
-	corp.SetId(5)
+	corp, _ := corporation.New("Test", 1, 5)
 	cell1 := tileset.Position{Number: 1, Letter: "A"}
 	cell2 := tileset.Position{Number: 1, Letter: "B"}
 	cells := []tileset.Position{cell1, cell2}

@@ -19,6 +19,7 @@ const (
 	TilePermanentlyUnplayable = "tile_permanently_unplayable"
 	NotEnoughCash             = "not_enough_cash"
 	TooManyStockSharesToBuy   = "too_many_stock_shares_to_buy"
+	CorpIdNotUnique           = "corp_id_not_unique"
 )
 
 type Game struct {
@@ -35,7 +36,9 @@ func New(
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
 	}
-
+	if !areIdsUnique(corporations) {
+		return nil, errors.New(CorpIdNotUnique)
+	}
 	gm := Game{
 		board:         board,
 		players:       players,
@@ -47,10 +50,22 @@ func New(
 	for _, plyr := range gm.players {
 		gm.giveInitialTileset(plyr)
 	}
-	for i, corp := range gm.corporations {
-		corp.SetId(i)
-	}
+
 	return &gm, nil
+}
+
+// Check that the passed corporations have unique IDs
+func areIdsUnique(corporations [7]corporation.Interface) bool {
+	for i, corp1 := range corporations {
+		if i < len(corporations)-1 {
+			for _, corp2 := range corporations[i+1:] {
+				if corp1.Id() == corp2.Id() {
+					return false
+				}
+			}
+		}
+	}
+	return true
 }
 
 // Initialises player hand of tiles

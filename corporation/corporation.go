@@ -13,6 +13,7 @@ type prices struct {
 
 const (
 	WrongCorporationClass = "wrong_corporation_class"
+	WrongCorporationId    = "wrong_corporation_id"
 )
 
 type Corporation struct {
@@ -23,11 +24,15 @@ type Corporation struct {
 	tiles       []tileset.Position
 }
 
-func New(name string, class int) (*Corporation, error) {
+func New(name string, class int, id int) (*Corporation, error) {
 	if class < 0 || class > 2 {
 		return nil, errors.New(WrongCorporationClass)
 	}
+	if id < 0 || id > 6 {
+		return nil, errors.New(WrongCorporationId)
+	}
 	corporation := &Corporation{
+		id:          id,
 		name:        name,
 		stock:       25,
 		pricesChart: initPricesChart(class),
@@ -38,10 +43,6 @@ func New(name string, class int) (*Corporation, error) {
 
 func (c *Corporation) Size() int {
 	return len(c.tiles)
-}
-
-func (c *Corporation) SetId(id int) {
-	c.id = id
 }
 
 func (c *Corporation) Id() int {

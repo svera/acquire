@@ -9,14 +9,23 @@ import (
 	"testing"
 )
 
-func TestNewGame(t *testing.T) {
+func TestNewGameWrongNumberPlayers(t *testing.T) {
 	players, corporations, board, tileset := setup()
 	players = players[:1]
 
-	_, err := New(board, players, corporations, tileset)
-
-	if err == nil {
+	if _, err := New(board, players, corporations, tileset); err.Error() != WrongNumberPlayers {
 		t.Errorf("Game must not be created with less than 3 players, got %d", len(players))
+	}
+}
+
+func TestNewGameNotUniqueCorpIds(t *testing.T) {
+	players, corporations, board, tileset := setup()
+
+	corporations[0] = corporation.NewStub("A", 0, 0)
+	corporations[1] = corporation.NewStub("B", 0, 0)
+
+	if _, err := New(board, players, corporations, tileset); err.Error() != CorpIdNotUnique {
+		t.Errorf("Corporations must have unique values, expecting %s error, got %s", CorpIdNotUnique, err.Error())
 	}
 }
 
@@ -206,6 +215,7 @@ func TestDrawTile(t *testing.T) {
 	unplayableTile := tileset.Position{Number: 6, Letter: "D"}
 	bd.SetTiles(corporations[0], []tileset.Position{{Number: 5, Letter: "D"}})
 	bd.SetTiles(corporations[1], []tileset.Position{{Number: 7, Letter: "D"}})
+
 	game, _ := New(bd, players, corporations, ts)
 	players[0].(*player.Stub).SetTiles([]tileset.Position{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
@@ -225,20 +235,13 @@ func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, til
 	players = append(players, player.NewStub("Test3"))
 
 	var corporations [7]corporation.Interface
-	corporations[0] = corporation.NewStub("A", 0)
-	corporations[0].SetId(0)
-	corporations[1] = corporation.NewStub("B", 0)
-	corporations[1].SetId(1)
-	corporations[2] = corporation.NewStub("C", 1)
-	corporations[2].SetId(2)
-	corporations[3] = corporation.NewStub("D", 1)
-	corporations[3].SetId(3)
-	corporations[4] = corporation.NewStub("E", 1)
-	corporations[4].SetId(4)
-	corporations[5] = corporation.NewStub("F", 2)
-	corporations[5].SetId(5)
-	corporations[6] = corporation.NewStub("G", 2)
-	corporations[6].SetId(6)
+	corporations[0] = corporation.NewStub("A", 0, 0)
+	corporations[1] = corporation.NewStub("B", 0, 1)
+	corporations[2] = corporation.NewStub("C", 1, 2)
+	corporations[3] = corporation.NewStub("D", 1, 3)
+	corporations[4] = corporation.NewStub("E", 1, 4)
+	corporations[5] = corporation.NewStub("F", 2, 5)
+	corporations[6] = corporation.NewStub("G", 2, 6)
 
 	board := board.New()
 	tileset := tileset.NewStub()

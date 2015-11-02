@@ -7,10 +7,10 @@ import (
 
 func TestStockPrice(t *testing.T) {
 	var corporations = new([4]*Corporation)
-	corporations[0], _ = New("class0", 0)
-	corporations[1], _ = New("class1", 1)
-	corporations[2], _ = New("class2", 2)
-	corporations[3], _ = New("class0 big", 0)
+	corporations[0], _ = New("class0", 0, 0)
+	corporations[1], _ = New("class1", 1, 1)
+	corporations[2], _ = New("class2", 2, 2)
+	corporations[3], _ = New("class0 big", 0, 3)
 
 	corporations[0].tiles = make([]tileset.Position, 2)
 	corporations[1].tiles = make([]tileset.Position, 2)
@@ -36,7 +36,7 @@ func TestStockPrice(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	expectedSize := 8
 	corp.tiles = make([]tileset.Position, expectedSize)
 	if size := corp.Size(); size != expectedSize {
@@ -45,7 +45,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestAddTiles(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	expectedTiles := []tileset.Position{
 		{Number: 1, Letter: "A"},
 		{Number: 2, Letter: "A"},
@@ -57,7 +57,7 @@ func TestAddTiles(t *testing.T) {
 }
 
 func TestAddTile(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	expectedTile := tileset.Position{Number: 1, Letter: "A"}
 
 	corp.AddTile(expectedTile)
@@ -66,17 +66,8 @@ func TestAddTile(t *testing.T) {
 	}
 }
 
-func TestSetId(t *testing.T) {
-	corp, _ := New("Test", 0)
-	expectedId := 5
-	corp.SetId(expectedId)
-	if corp.id != expectedId {
-		t.Errorf("Corporation ID not set")
-	}
-}
-
 func TestId(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	expectedId := 5
 	corp.id = expectedId
 	if corp.Id() != expectedId {
@@ -85,7 +76,7 @@ func TestId(t *testing.T) {
 }
 
 func TestStock(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	expectedStock := 20
 	corp.stock = expectedStock
 	if corp.Stock() != expectedStock {
@@ -94,7 +85,7 @@ func TestStock(t *testing.T) {
 }
 
 func TestSetStock(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	expectedStock := 20
 	corp.SetStock(expectedStock)
 	if corp.stock != expectedStock {
@@ -103,7 +94,7 @@ func TestSetStock(t *testing.T) {
 }
 
 func TestMajorityBonus(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	corp.tiles = make([]tileset.Position, 2)
 	expectedMajorityBonus := 2000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
@@ -118,7 +109,7 @@ func TestMajorityBonus(t *testing.T) {
 }
 
 func TestMinorityBonus(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	corp.tiles = make([]tileset.Position, 2)
 	expectedMinorityBonus := 1000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
@@ -133,7 +124,7 @@ func TestMinorityBonus(t *testing.T) {
 }
 
 func TestIsSafe(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	corp.tiles = make([]tileset.Position, 2)
 	if corp.IsSafe() {
 		t.Errorf("Unsafe corporation regarded as safe")
@@ -145,7 +136,7 @@ func TestIsSafe(t *testing.T) {
 }
 
 func TestIsActive(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	if corp.IsActive() {
 		t.Errorf("Inactive corporation regarded as active")
 	}
@@ -156,7 +147,7 @@ func TestIsActive(t *testing.T) {
 }
 
 func TestName(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp, _ := New("Test", 0, 0)
 	if corp.Name() != "Test" {
 		t.Errorf("Expected corporation name 'Test'")
 	}

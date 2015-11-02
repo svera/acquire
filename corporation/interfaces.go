@@ -5,7 +5,6 @@ import (
 )
 
 type Interface interface {
-	SetId(id int)
 	Id() int
 	AddTiles(tiles []tileset.Position)
 	AddTile(tile tileset.Position)
