@@ -2,6 +2,7 @@ package player
 
 import (
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/tileset"
 )
 
 type Stub struct {
@@ -24,4 +25,8 @@ func (p *Stub) SetShares(c corporation.Interface, amount int) {
 
 func (p *Stub) SetCash(amount int) {
 	p.cash = amount
+}
+
+func (p *Stub) SetTiles(tiles []tileset.Position) {
+	p.tiles = tiles
 }

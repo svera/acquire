@@ -193,6 +193,31 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	}
 }
 
+// Testing that if player has an permanently unplayable tile, this is exchanged:
+// In the following example, tile 6D is unplayable because it would merge safe
+// corporations 0 and 1
+//
+//    5 6  7 8
+// D [0]><[1]
+func TestDrawTile(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	corporations[0].(*corporation.Stub).SetSize(11)
+	corporations[1].(*corporation.Stub).SetSize(15)
+	unplayableTile := tileset.Position{Number: 6, Letter: "D"}
+	bd.SetTiles(corporations[0], []tileset.Position{{Number: 5, Letter: "D"}})
+	bd.SetTiles(corporations[1], []tileset.Position{{Number: 7, Letter: "D"}})
+	game, _ := New(bd, players, corporations, ts)
+	players[0].(*player.Stub).SetTiles([]tileset.Position{unplayableTile})
+	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
+	game.state = &fsm.BuyStock{}
+	game.drawTile()
+	for _, tile := range players[0].Tiles() {
+		if tile.Number == unplayableTile.Number && tile.Letter == unplayableTile.Letter {
+			t.Errorf("Unplayable tile not discarded after drawing new tile, got %v", players[0].Tiles())
+		}
+	}
+}
+
 func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, tileset.Interface) {
 	var players []player.Interface
 	players = append(players, player.NewStub("Test1"))
@@ -201,15 +226,22 @@ func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, til
 
 	var corporations [7]corporation.Interface
 	corporations[0] = corporation.NewStub("A", 0)
+	corporations[0].SetId(0)
 	corporations[1] = corporation.NewStub("B", 0)
+	corporations[1].SetId(1)
 	corporations[2] = corporation.NewStub("C", 1)
+	corporations[2].SetId(2)
 	corporations[3] = corporation.NewStub("D", 1)
+	corporations[3].SetId(3)
 	corporations[4] = corporation.NewStub("E", 1)
+	corporations[4].SetId(4)
 	corporations[5] = corporation.NewStub("F", 2)
+	corporations[5].SetId(5)
 	corporations[6] = corporation.NewStub("G", 2)
+	corporations[6].SetId(6)
 
 	board := board.New()
-	tileset := tileset.New()
+	tileset := tileset.NewStub()
 	return players, corporations, board, tileset
 }
 

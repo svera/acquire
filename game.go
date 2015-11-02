@@ -162,8 +162,8 @@ func (g *Game) getStockHolders(corp corporation.Interface) []player.ShareInterfa
 // that putting it on the board would merge two or more safe corporations
 func (g *Game) isTileUnplayable(tile tileset.Position) bool {
 	adjacents := g.board.AdjacentCells(tile)
+	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		safeNeighbours := 0
 		boardCell := g.board.Cell(adjacent)
 		if boardCell != board.Empty && boardCell != board.OrphanTile {
 			if g.corporations[boardCell].IsSafe() {
@@ -279,10 +279,7 @@ func (g *Game) checkBuy(buys map[int]int) error {
 
 // A player takes a tile from the facedown cluster to replace
 // the one he/she played. This is not done until the end of
-// the turn. At this time, if a player has any permanently
-// unplayable tiles that player discard the unplayable tiles
-// and draws an equal number of replacement tiles. This can
-// only be done once per turn.
+// the turn.
 func (g *Game) drawTile() error {
 	var tile tileset.Position
 	var err error
@@ -290,17 +287,32 @@ func (g *Game) drawTile() error {
 		return err
 	}
 	g.CurrentPlayer().PickTile(tile)
-	for _, tile := range g.CurrentPlayer().Tiles() {
-		if g.isTileUnplayable(tile) {
-			g.CurrentPlayer().DiscardTile(tile)
-			if tile, err = g.tileset.Draw(); err == nil {
-				return err
-			}
-			g.CurrentPlayer().PickTile(tile)
-		}
+
+	if err = g.replaceUnplayableTiles(); err != nil {
+		return err
 	}
 
 	g.state.ToPlayTile()
 	g.nextPlayer()
+	return nil
+}
+
+// if a player has any permanently
+// unplayable tiles that player discard the unplayable tiles
+// and draws an equal number of replacement tiles. This can
+// only be done once per turn.
+func (g *Game) replaceUnplayableTiles() error {
+	for _, tile := range g.CurrentPlayer().Tiles() {
+		if g.isTileUnplayable(tile) {
+
+			g.CurrentPlayer().DiscardTile(tile)
+			if newTile, err := g.tileset.Draw(); err == nil {
+				g.CurrentPlayer().PickTile(newTile)
+			} else {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
