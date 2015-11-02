@@ -14,6 +14,7 @@ func NewStub(name string, class int, id int) *Stub {
 		Corporation: Corporation{
 			id:          id,
 			name:        name,
+			class:       class,
 			stock:       25,
 			pricesChart: initPricesChart(class),
 		},

@@ -20,6 +20,7 @@ const (
 	NotEnoughCash             = "not_enough_cash"
 	TooManyStockSharesToBuy   = "too_many_stock_shares_to_buy"
 	CorpIdNotUnique           = "corp_id_not_unique"
+	WrongNumberCorpsClass     = "wrong_number_corps_class"
 )
 
 type Game struct {
@@ -38,6 +39,9 @@ func New(
 	}
 	if !areIdsUnique(corporations) {
 		return nil, errors.New(CorpIdNotUnique)
+	}
+	if !isNumberOfCorpsPerClassRight(corporations) {
+		return nil, errors.New(WrongNumberCorpsClass)
 	}
 	gm := Game{
 		board:         board,
@@ -64,6 +68,18 @@ func areIdsUnique(corporations [7]corporation.Interface) bool {
 				}
 			}
 		}
+	}
+	return true
+}
+
+// Check that the number of corporations per class is right
+func isNumberOfCorpsPerClassRight(corporations [7]corporation.Interface) bool {
+	corpsPerClass := [3]int{0, 0, 0}
+	for _, corp := range corporations {
+		corpsPerClass[corp.Class()]++
+	}
+	if corpsPerClass[0] != 2 || corpsPerClass[1] != 3 || corpsPerClass[2] != 2 {
+		return false
 	}
 	return true
 }

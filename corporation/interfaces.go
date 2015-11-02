@@ -17,4 +17,5 @@ type Interface interface {
 	IsActive() bool
 	Name() string
 	Size() int
+	Class() int
 }

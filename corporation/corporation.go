@@ -19,6 +19,7 @@ const (
 type Corporation struct {
 	id          int
 	name        string
+	class       int
 	stock       int
 	pricesChart map[int]prices
 	tiles       []tileset.Position
@@ -35,6 +36,7 @@ func New(name string, class int, id int) (*Corporation, error) {
 		id:          id,
 		name:        name,
 		stock:       25,
+		class:       class,
 		pricesChart: initPricesChart(class),
 	}
 
@@ -131,4 +133,8 @@ func (c *Corporation) IsActive() bool {
 
 func (c *Corporation) Name() string {
 	return c.name
+}
+
+func (c *Corporation) Class() int {
+	return c.class
 }

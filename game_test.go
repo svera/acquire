@@ -29,6 +29,16 @@ func TestNewGameNotUniqueCorpIds(t *testing.T) {
 	}
 }
 
+func TestNewGameWrongNumberOfCorpsPerClass(t *testing.T) {
+	players, corporations, board, tileset := setup()
+
+	corporations[2] = corporation.NewStub("C", 0, 2)
+
+	if _, err := New(board, players, corporations, tileset); err.Error() != WrongNumberCorpsClass {
+		t.Errorf("Game must catch wrong number of corporations per class")
+	}
+}
+
 func TestNewGameInitsPlayersTilesets(t *testing.T) {
 	players, corporations, board, tileset := setup()
 	New(board, players, corporations, tileset)
