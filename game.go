@@ -242,9 +242,9 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	/*
 		if merge, tiles := g.board.TileMergeCorporations(tile); merge {
 			// move state machine status
-		} else if found, tiles := g.board.TileFoundCorporation(tile); found {
-		g.state.ToFoundCorp()
-	} else */if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
+		} else */if found, _ := g.board.TileFoundCorporation(tile); found {
+		g.state, _ = g.state.ToFoundCorp()
+	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
 		g.growCorporation(g.corporations[corporationId], tiles)
 	} else {
 		g.board.PutTile(tile)

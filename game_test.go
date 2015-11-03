@@ -146,7 +146,6 @@ func TestGetMainStockHolders(t *testing.T) {
 
 }
 
-/*
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tileset.Position{Number: 6, Letter: "E"}
@@ -158,14 +157,11 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 	players[0].PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
-	if _, ok := game.state.(*fsm.FoundCorp); ok {
-		t.Errorf("Game must be in state FoundCorp")
-	}
-	if corporations[0].Size() != expectedCorpSize {
-		t.Errorf("Corporation size must be %d, got %d", expectedCorpSize, corporations[0].Size())
+	if game.state.Name() != "FoundCorp" {
+		t.Errorf("Game must be in state FoundCorp, got %s", game.state.Name())
 	}
 }
-*/
+
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tileset.Position{Number: 6, Letter: "E"}
@@ -182,8 +178,8 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 
 	expectedCorpSize := 4
 
-	if game.state.Type() != "BuyStock" {
-		t.Errorf("Game must be in state BuyStock, got %s", game.state.Type())
+	if game.state.Name() != "BuyStock" {
+		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
 	}
 	if corporations[0].Size() != expectedCorpSize {
 		t.Errorf("Corporation size must be %d, got %d", expectedCorpSize, corporations[0].Size())

@@ -5,7 +5,7 @@ import (
 )
 
 type State interface {
-	Type() string
+	Name() string
 	ToPlayTile() (State, error)
 	ToFoundCorp() (State, error)
 	ToUntieMerge() (State, error)
@@ -20,7 +20,7 @@ const (
 
 type BaseState struct{}
 
-func (s *BaseState) Type() string {
+func (s *BaseState) Name() string {
 	return "BaseState"
 }
 

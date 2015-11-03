@@ -4,7 +4,7 @@ type FoundCorp struct {
 	BaseState
 }
 
-func (s *FoundCorp) Type() string {
+func (s *FoundCorp) Name() string {
 	return "FoundCorp"
 }
 

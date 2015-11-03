@@ -41,13 +41,17 @@ func (b *Board) Cell(t tileset.Position) int {
 // composing this corporation
 func (b *Board) TileFoundCorporation(t tileset.Position) (bool, []tileset.Position) {
 	var newCorporationTiles []tileset.Position
-	adjacent := b.adjacentOrphanTiles(t)
-	for _, adjacentCell := range adjacent {
-		newCorporationTiles = append(newCorporationTiles, adjacentCell)
-	}
-	if len(newCorporationTiles) > 0 {
-		newCorporationTiles = append(newCorporationTiles, t)
-		return true, newCorporationTiles
+	adjacent := b.adjacentNonCorporationTiles(t)
+	if len(adjacent) == 4 {
+		for _, adjacentCell := range adjacent {
+			if b.Cell(adjacentCell) == OrphanTile {
+				newCorporationTiles = append(newCorporationTiles, adjacentCell)
+			}
+		}
+		if len(newCorporationTiles) > 0 {
+			newCorporationTiles = append(newCorporationTiles, t)
+			return true, newCorporationTiles
+		}
 	}
 	return false, newCorporationTiles
 }
@@ -147,11 +151,11 @@ func (b *Board) adjacentCorporationTiles(t tileset.Position) []tileset.Position 
 	)
 }
 
-func (b *Board) adjacentOrphanTiles(t tileset.Position) []tileset.Position {
+func (b *Board) adjacentNonCorporationTiles(t tileset.Position) []tileset.Position {
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tileset.Position) bool {
-			if b.Cell(t) == OrphanTile {
+			if b.Cell(t) == OrphanTile || b.Cell(t) == Empty {
 				return true
 			}
 			return false

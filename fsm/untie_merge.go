@@ -4,7 +4,7 @@ type UntieMerge struct {
 	BaseState
 }
 
-func (s *UntieMerge) Type() string {
+func (s *UntieMerge) Name() string {
 	return "UntieMerge"
 }
 

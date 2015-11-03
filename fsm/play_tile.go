@@ -4,7 +4,7 @@ type PlayTile struct {
 	BaseState
 }
 
-func (s *PlayTile) Type() string {
+func (s *PlayTile) Name() string {
 	return "PlayTile"
 }
 

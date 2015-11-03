@@ -4,6 +4,6 @@ type EndGame struct {
 	BaseState
 }
 
-func (s *EndGame) Type() string {
+func (s *EndGame) Name() string {
 	return "EndGame"
 }

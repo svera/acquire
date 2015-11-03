@@ -49,6 +49,16 @@ func TestTileNotFoundCorporation(t *testing.T) {
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
 	}
+
+	board.grid[5]["E"] = OrphanTile
+	board.grid[7]["E"] = 2
+	board.grid[6]["D"] = OrphanTile
+	board.grid[6]["F"] = OrphanTile
+
+	found, corporationTiles = board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "E"})
+	if found {
+		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "E", corporationTiles)
+	}
 }
 
 // Testing quadruple merge as this:

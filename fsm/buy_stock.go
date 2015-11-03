@@ -4,7 +4,7 @@ type BuyStock struct {
 	BaseState
 }
 
-func (s *BuyStock) Type() string {
+func (s *BuyStock) Name() string {
 	return "BuyStock"
 }
 
