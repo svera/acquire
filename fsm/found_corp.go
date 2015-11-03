@@ -4,6 +4,10 @@ type FoundCorp struct {
 	BaseState
 }
 
+func (s *FoundCorp) Type() string {
+	return "FoundCorp"
+}
+
 func (s *FoundCorp) ToBuyStock() (State, error) {
 	return &BuyStock{}, nil
 }

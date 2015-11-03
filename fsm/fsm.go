@@ -5,6 +5,7 @@ import (
 )
 
 type State interface {
+	Type() string
 	ToPlayTile() (State, error)
 	ToFoundCorp() (State, error)
 	ToUntieMerge() (State, error)
@@ -18,6 +19,10 @@ const (
 )
 
 type BaseState struct{}
+
+func (s *BaseState) Type() string {
+	return "BaseState"
+}
 
 func (s *BaseState) ToPlayTile() (State, error) {
 	return s, errors.New(StateTransitionNotAllowed)

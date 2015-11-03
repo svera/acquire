@@ -4,6 +4,10 @@ type BuyStock struct {
 	BaseState
 }
 
+func (s *BuyStock) Type() string {
+	return "BuyStock"
+}
+
 func (s *BuyStock) ToPlayTile() (State, error) {
 	return &PlayTile{}, nil
 }

@@ -4,6 +4,10 @@ type PlayTile struct {
 	BaseState
 }
 
+func (s *PlayTile) Type() string {
+	return "PlayTile"
+}
+
 func (s *PlayTile) ToFoundCorp() (State, error) {
 	return &FoundCorp{}, nil
 }

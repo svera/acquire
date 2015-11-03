@@ -243,12 +243,12 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 		if merge, tiles := g.board.TileMergeCorporations(tile); merge {
 			// move state machine status
 		} else if found, tiles := g.board.TileFoundCorporation(tile); found {
-
-		} else */if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
+		g.state.ToFoundCorp()
+	} else */if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
 		g.growCorporation(g.corporations[corporationId], tiles)
 	} else {
 		g.board.PutTile(tile)
-		g.state.ToBuyStock()
+		g.state, _ = g.state.ToBuyStock()
 	}
 	return nil
 }
@@ -256,7 +256,7 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 func (g *Game) growCorporation(corp corporation.Interface, tiles []tileset.Position) {
 	g.board.SetTiles(corp, tiles)
 	corp.AddTiles(tiles)
-	g.state.ToBuyStock()
+	g.state, _ = g.state.ToBuyStock()
 }
 
 // Increases the number which specifies the current player

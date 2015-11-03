@@ -4,6 +4,10 @@ type UntieMerge struct {
 	BaseState
 }
 
+func (s *UntieMerge) Type() string {
+	return "UntieMerge"
+}
+
 func (s *UntieMerge) ToSellTrade() (State, error) {
 	return &SellTrade{}, nil
 }
