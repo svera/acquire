@@ -246,6 +246,7 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 		g.state, _ = g.state.ToFoundCorp()
 	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
 		g.growCorporation(g.corporations[corporationId], tiles)
+		g.state, _ = g.state.ToBuyStock()
 	} else {
 		g.board.PutTile(tile)
 		g.state, _ = g.state.ToBuyStock()
@@ -256,7 +257,6 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 func (g *Game) growCorporation(corp corporation.Interface, tiles []tileset.Position) {
 	g.board.SetTiles(corp, tiles)
 	corp.AddTiles(tiles)
-	g.state, _ = g.state.ToBuyStock()
 }
 
 // Increases the number which specifies the current player
