@@ -37,6 +37,15 @@ func (p *Player) Buy(corp corporation.Interface, amount int) {
 	p.cash -= corp.StockPrice() * amount
 }
 
+// Receive a free stock share from a rencently found corporation, if it has
+// remaining shares available
+func (p *Player) GetFounderStockShare(corp corporation.Interface) {
+	if corp.Stock() > 0 {
+		corp.SetStock(corp.Stock() - 1)
+		p.shares[corp.Id()] += 1
+	}
+}
+
 // Adds a new tile to the players' tileset
 func (p *Player) PickTile(tile tileset.Position) error {
 	if len(p.tiles) >= 6 {

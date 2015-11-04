@@ -13,6 +13,7 @@ type Interface interface {
 	Tiles() []tileset.Position
 	DiscardTile(t tileset.Position) error
 	Cash() int
+	GetFounderStockShare(corp corporation.Interface)
 }
 
 type ShareInterface interface {

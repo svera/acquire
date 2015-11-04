@@ -21,6 +21,7 @@ const (
 	TooManyStockSharesToBuy   = "too_many_stock_shares_to_buy"
 	CorpIdNotUnique           = "corp_id_not_unique"
 	WrongNumberCorpsClass     = "wrong_number_corps_class"
+	CorporationAlreadyOnBoard = "corporation_already_on_board"
 )
 
 type Game struct {
@@ -30,6 +31,7 @@ type Game struct {
 	corporations  [7]corporation.Interface
 	tileset       tileset.Interface
 	currentPlayer int
+	newCorpTiles  []tileset.Position
 }
 
 func New(
@@ -230,7 +232,7 @@ func (g *Game) CurrentPlayer() player.Interface {
 }
 
 func (g *Game) PlayTile(tile tileset.Position) error {
-	if _, ok := g.state.(*fsm.PlayTile); !ok {
+	if g.state.Name() != "PlayTile" {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tile) {
@@ -242,8 +244,9 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 	/*
 		if merge, tiles := g.board.TileMergeCorporations(tile); merge {
 			// move state machine status
-		} else */if found, _ := g.board.TileFoundCorporation(tile); found {
+		} else */if found, tiles := g.board.TileFoundCorporation(tile); found {
 		g.state, _ = g.state.ToFoundCorp()
+		g.newCorpTiles = tiles
 	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
 		g.growCorporation(g.corporations[corporationId], tiles)
 		g.state, _ = g.state.ToBuyStock()
@@ -251,6 +254,21 @@ func (g *Game) PlayTile(tile tileset.Position) error {
 		g.board.PutTile(tile)
 		g.state, _ = g.state.ToBuyStock()
 	}
+	return nil
+}
+
+func (g *Game) FoundCorporation(corp corporation.Interface) error {
+	if g.state.Name() != "FoundCorp" {
+		return errors.New(ActionNotAllowed)
+	}
+	if corp.IsActive() {
+		return errors.New(CorporationAlreadyOnBoard)
+	}
+	g.board.SetTiles(corp, g.newCorpTiles)
+	corp.AddTiles(g.newCorpTiles)
+	g.newCorpTiles = []tileset.Position{}
+	g.CurrentPlayer().GetFounderStockShare(corp)
+	g.state, _ = g.state.ToBuyStock()
 	return nil
 }
 
@@ -265,85 +283,4 @@ func (g *Game) nextPlayer() {
 	if g.currentPlayer == len(g.players) {
 		g.currentPlayer = 0
 	}
-}
-
-// Buys stock from corporations
-func (g *Game) BuyStock(buys map[int]int) error {
-	if _, ok := g.state.(*fsm.BuyStock); !ok {
-		return errors.New(ActionNotAllowed)
-	}
-
-	if err := g.checkBuy(buys); err != nil {
-		return err
-	}
-
-	for corporationId, amount := range buys {
-		corp := g.corporations[corporationId]
-		g.CurrentPlayer().Buy(corp, amount)
-	}
-
-	return g.drawTile()
-}
-
-func (g *Game) checkBuy(buys map[int]int) error {
-	var totalStock, totalPrice int = 0, 0
-	for corporationId, amount := range buys {
-		corp := g.corporations[corporationId]
-		if corp.Size() == 0 {
-			return errors.New(StockSharesNotBuyable)
-		}
-		if amount > corp.Stock() {
-			return errors.New(NotEnoughStockShares)
-		}
-		totalStock += amount
-		totalPrice += corp.StockPrice() * amount
-	}
-	if totalStock > 3 {
-		return errors.New(TooManyStockSharesToBuy)
-	}
-
-	if totalPrice > g.CurrentPlayer().Cash() {
-		return errors.New(NotEnoughCash)
-	}
-	return nil
-}
-
-// A player takes a tile from the facedown cluster to replace
-// the one he/she played. This is not done until the end of
-// the turn.
-func (g *Game) drawTile() error {
-	var tile tileset.Position
-	var err error
-	if tile, err = g.tileset.Draw(); err != nil {
-		return err
-	}
-	g.CurrentPlayer().PickTile(tile)
-
-	if err = g.replaceUnplayableTiles(); err != nil {
-		return err
-	}
-
-	g.state.ToPlayTile()
-	g.nextPlayer()
-	return nil
-}
-
-// if a player has any permanently
-// unplayable tiles that player discard the unplayable tiles
-// and draws an equal number of replacement tiles. This can
-// only be done once per turn.
-func (g *Game) replaceUnplayableTiles() error {
-	for _, tile := range g.CurrentPlayer().Tiles() {
-		if g.isTileUnplayable(tile) {
-
-			g.CurrentPlayer().DiscardTile(tile)
-			if newTile, err := g.tileset.Draw(); err == nil {
-				g.CurrentPlayer().PickTile(newTile)
-			} else {
-				return err
-			}
-		}
-	}
-
-	return nil
 }
