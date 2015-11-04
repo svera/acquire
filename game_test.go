@@ -162,6 +162,33 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 	}
 }
 
+func TestFoundCorporation(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	game, _ := New(bd, players, corporations, ts)
+	if err := game.FoundCorporation(corporations[0]); err == nil {
+		t.Errorf("Game in a state different than FoundCorp must not execute FoundCorporation()")
+	}
+	game.state = &fsm.FoundCorp{}
+	newCorpTiles := []tileset.Position{
+		{Number: 5, Letter: "E"},
+		{Number: 6, Letter: "E"},
+	}
+	game.newCorpTiles = newCorpTiles
+	game.FoundCorporation(corporations[0])
+	if game.state.Name() != "BuyStock" {
+		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
+	}
+	if players[0].Shares(corporations[0]) != 1 {
+		t.Errorf("Player must have 1 share of corporation stock, got %d", players[0].Shares(corporations[0]))
+	}
+	if corporations[0].Size() != 2 {
+		t.Errorf("Corporation must have 2 tiles, got %d", corporations[0].Size())
+	}
+	if game.board.Cell(newCorpTiles[0]) != 0 || game.board.Cell(newCorpTiles[1]) != 0 {
+		t.Errorf("Corporation tiles are not set on board")
+	}
+}
+
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tileset.Position{Number: 6, Letter: "E"}
