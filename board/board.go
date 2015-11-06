@@ -71,6 +71,8 @@ func (b *Board) TileMergeCorporations(t tileset.Position) (bool, []int) {
 }
 
 // Check if the passed tile grows a corporation
+// Returns true if that's the case, the tiles to append to the corporation and
+// the ID of the corporation which grows
 func (b *Board) TileGrowCorporation(t tileset.Position) (bool, []tileset.Position, int) {
 	tilesToAppend := []tileset.Position{{Number: t.Number, Letter: t.Letter}}
 	corporationToGrow := -1

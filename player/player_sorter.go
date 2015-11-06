@@ -16,7 +16,7 @@ func (by By) Sort(players []ShareInterface) {
 	sort.Sort(ps)
 }
 
-// planetSorter joins a By function and a slice of Players to be sorted.
+// playerSorter joins a By function and a slice of Players to be sorted.
 type playerSorter struct {
 	players []ShareInterface
 	by      func(p1, p2 ShareInterface) bool // Closure used in the Less method.
