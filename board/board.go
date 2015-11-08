@@ -7,13 +7,16 @@ import (
 	"github.com/svera/acquire/tileset"
 )
 
-const Empty = -1
-const OrphanTile = 9
-
 var letters [9]string = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 
 type Board struct {
 	grid *[13]map[string]Container
+}
+
+type Empty struct{}
+
+func (e *Empty) ContentType() string {
+	return "empty"
 }
 
 func New() *Board {
