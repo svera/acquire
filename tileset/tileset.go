@@ -18,12 +18,20 @@ type Tileset struct {
 	tiles []Position
 }
 
+type OrphanTile struct {
+	Position
+}
+
+func (t *OrphanTile) ContentType() string {
+	return "orphan"
+}
+
 func New() *Tileset {
 	tileset := Tileset{}
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
-			tileset.tiles = append(tileset.tiles, Position{int(number), letter})
+			tileset.tiles = append(tileset.tiles, &OrphanTile{int(number), letter})
 		}
 	}
 

@@ -138,3 +138,7 @@ func (c *Corporation) Name() string {
 func (c *Corporation) Class() int {
 	return c.class
 }
+
+func (c *Corporation) ContentType() string {
+	return "corporation"
+}
