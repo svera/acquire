@@ -13,12 +13,6 @@ type Board struct {
 	grid *[13]map[string]Container
 }
 
-type Empty struct{}
-
-func (e *Empty) ContentType() string {
-	return "empty"
-}
-
 func New() *Board {
 	board := Board{
 		grid: new([13]map[string]Container),
@@ -26,7 +20,7 @@ func New() *Board {
 
 	emptyCell := &Empty{}
 	for number := 1; number < 13; number++ {
-		board.grid[number] = make(map[string]int)
+		board.grid[number] = make(map[string]Container)
 		for _, letter := range letters {
 			board.grid[number][letter] = emptyCell
 		}

@@ -198,7 +198,7 @@ func (g *Game) isTileUnplayable(tile tileset.Position) bool {
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
 		boardCell := g.board.Cell(adjacent)
-		if boardCell != board.Empty && boardCell != board.OrphanTile {
+		if boardCell != board.Empty && boardCell != board.Tile {
 			if g.corporations[boardCell].IsSafe() {
 				safeNeighbours++
 			}
@@ -219,7 +219,7 @@ func (g *Game) isTileTemporaryUnplayable(tile tileset.Position) bool {
 	adjacents := g.board.AdjacentCells(tile)
 	for _, adjacent := range adjacents {
 		boardCell := g.board.Cell(adjacent)
-		if boardCell == board.OrphanTile {
+		if boardCell == board.Tile {
 			return true
 		}
 	}
