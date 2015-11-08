@@ -13,18 +13,19 @@ const OrphanTile = 9
 var letters [9]string = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 
 type Board struct {
-	grid *[13]map[string]int
+	grid *[13]map[string]Container
 }
 
 func New() *Board {
 	board := Board{
-		grid: new([13]map[string]int),
+		grid: new([13]map[string]Container),
 	}
 
+	emptyCell := &Empty{}
 	for number := 1; number < 13; number++ {
 		board.grid[number] = make(map[string]int)
 		for _, letter := range letters {
-			board.grid[number][letter] = Empty
+			board.grid[number][letter] = emptyCell
 		}
 	}
 

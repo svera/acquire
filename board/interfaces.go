@@ -14,3 +14,7 @@ type Interface interface {
 	AdjacentCells(t tileset.Position) []tileset.Position
 	SetTiles(cp corporation.Interface, cells []tileset.Position)
 }
+
+type Container interface {
+	ContentType() string
+}
