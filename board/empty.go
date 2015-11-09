@@ -1,4 +1,4 @@
-package Board
+package board
 
 type Empty struct{}
 

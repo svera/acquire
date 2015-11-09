@@ -10,7 +10,7 @@ import (
 
 func TestPutTile(t *testing.T) {
 	board := New()
-	tile := tileset.Position{Number: 5, Letter: "B"}
+	tile := &tileset.OrphanTile{{Number: 5, Letter: "B"}}
 	board.PutTile(tile)
 	if board.grid[5]["B"] != OrphanTile {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")

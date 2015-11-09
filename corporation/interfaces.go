@@ -18,4 +18,5 @@ type Interface interface {
 	Name() string
 	Size() int
 	Class() int
+	ContentType() string
 }

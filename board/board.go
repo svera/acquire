@@ -13,12 +13,6 @@ type Board struct {
 	grid *[13]map[string]Container
 }
 
-type Empty struct{}
-
-func (e *Empty) ContentType() string {
-	return "empty"
-}
-
 func New() *Board {
 	board := Board{
 		grid: new([13]map[string]Container),
@@ -26,7 +20,7 @@ func New() *Board {
 
 	emptyCell := &Empty{}
 	for number := 1; number < 13; number++ {
-		board.grid[number] = make(map[string]int)
+		board.grid[number] = make(map[string]Container)
 		for _, letter := range letters {
 			board.grid[number][letter] = emptyCell
 		}
@@ -65,7 +59,7 @@ func (b *Board) TileMergeCorporations(t tileset.Position) (bool, []corporation.I
 	var corporations []corporation.Interface
 	adjacent := b.adjacentCorporationTiles(t)
 	for _, adjacentCell := range adjacent {
-		corporations = append(corporations, b.Cell(adjacentCell))
+		corporations = append(corporations, b.Cell(adjacentCell).(corporation.Interface))
 	}
 	if len(corporations) > 1 {
 		return true, corporations
@@ -78,7 +72,7 @@ func (b *Board) TileMergeCorporations(t tileset.Position) (bool, []corporation.I
 // the ID of the corporation which grows
 func (b *Board) TileGrowCorporation(t tileset.Position) (bool, []tileset.Position, corporation.Interface) {
 	tilesToAppend := []tileset.Position{{Number: t.Number, Letter: t.Letter}}
-	nullCorporation := corporation.Interface{}
+	var nullCorporation corporation.Interface
 	corporationToGrow := nullCorporation
 	adjacent := b.adjacentTiles(t)
 	for _, adjacentCell := range adjacent {
@@ -86,7 +80,7 @@ func (b *Board) TileGrowCorporation(t tileset.Position) (bool, []tileset.Positio
 			if corporationToGrow != nullCorporation {
 				return false, []tileset.Position{}, nullCorporation
 			}
-			corporationToGrow = b.Cell(adjacentCell)
+			corporationToGrow = b.Cell(adjacentCell).(corporation.Interface)
 		} else {
 			tilesToAppend = append(tilesToAppend, adjacentCell)
 		}
@@ -98,7 +92,7 @@ func (b *Board) TileGrowCorporation(t tileset.Position) (bool, []tileset.Positio
 }
 
 // Puts the passed tile on the board
-func (b *Board) PutTile(t board.Container) {
+func (b *Board) PutTile(t *tileset.OrphanTile) {
 	b.grid[t.Number][t.Letter] = t
 }
 
@@ -188,6 +182,6 @@ func nextLetter(letter string) string {
 
 func (b *Board) SetTiles(cp corporation.Interface, cells []tileset.Position) {
 	for _, cell := range cells {
-		b.grid[cell.Number][cell.Letter] = cp.Id()
+		b.grid[cell.Number][cell.Letter] = cp
 	}
 }

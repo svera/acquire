@@ -14,12 +14,12 @@ type Position struct {
 	Letter string
 }
 
-type Tileset struct {
-	tiles []Position
-}
-
 type OrphanTile struct {
 	Position
+}
+
+type Tileset struct {
+	tiles []*OrphanTile
 }
 
 func (t *OrphanTile) ContentType() string {
@@ -31,7 +31,7 @@ func New() *Tileset {
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
-			tileset.tiles = append(tileset.tiles, &OrphanTile{int(number), letter})
+			tileset.tiles = append(tileset.tiles, &OrphanTile{Position{number, letter}})
 		}
 	}
 
@@ -39,7 +39,7 @@ func New() *Tileset {
 }
 
 // Extracts a random tile from the tileset and returns it
-func (t *Tileset) Draw() (Position, error) {
+func (t *Tileset) Draw() (*OrphanTile, error) {
 	remainingTiles := len(t.tiles)
 	if remainingTiles > 0 {
 		pos := rand.Intn(remainingTiles - 1)
@@ -47,5 +47,5 @@ func (t *Tileset) Draw() (Position, error) {
 		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
 		return tile, nil
 	}
-	return Position{}, errors.New(NoTilesAvailable)
+	return &OrphanTile{}, errors.New(NoTilesAvailable)
 }
