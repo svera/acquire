@@ -148,8 +148,8 @@ func TestGetMainStockHolders(t *testing.T) {
 
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tileset.Position{Number: 6, Letter: "E"}
-	bd.PutTile(tileset.Position{Number: 5, Letter: "E"})
+	tileToPlay := board.Coordinates{Number: 6, Letter: "E"}
+	bd.PutTile(board.Coordinates{Number: 5, Letter: "E"})
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -169,7 +169,7 @@ func TestFoundCorporation(t *testing.T) {
 		t.Errorf("Game in a state different than FoundCorp must not execute FoundCorporation()")
 	}
 	game.state = &fsm.FoundCorp{}
-	newCorpTiles := []tileset.Position{
+	newCorpTiles := []board.Coordinates{
 		{Number: 5, Letter: "E"},
 		{Number: 6, Letter: "E"},
 	}
@@ -191,11 +191,11 @@ func TestFoundCorporation(t *testing.T) {
 
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tileset.Position{Number: 6, Letter: "E"}
-	corpTiles := []tileset.Position{{Number: 7, Letter: "E"}, {Number: 8, Letter: "E"}}
+	tileToPlay := board.Coordinates{Number: 6, Letter: "E"}
+	corpTiles := []board.Coordinates{{Number: 7, Letter: "E"}, {Number: 8, Letter: "E"}}
 	corporations[0].AddTiles(corpTiles)
 	bd.SetTiles(corporations[0], corpTiles)
-	bd.PutTile(tileset.Position{Number: 5, Letter: "E"})
+	bd.PutTile(board.Coordinates{Number: 5, Letter: "E"})
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -216,7 +216,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 func TestBuyStock(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].AddTiles(
-		[]tileset.Position{
+		[]board.Coordinates{
 			{Number: 1, Letter: "A"},
 			{Number: 2, Letter: "A"},
 		},
@@ -241,7 +241,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	players[0].(*player.Stub).SetCash(100)
 
 	corporations[0].AddTiles(
-		[]tileset.Position{
+		[]board.Coordinates{
 			{Number: 1, Letter: "A"},
 			{Number: 2, Letter: "A"},
 		},
@@ -265,12 +265,12 @@ func TestDrawTile(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].(*corporation.Stub).SetSize(11)
 	corporations[1].(*corporation.Stub).SetSize(15)
-	unplayableTile := tileset.Position{Number: 6, Letter: "D"}
-	bd.SetTiles(corporations[0], []tileset.Position{{Number: 5, Letter: "D"}})
-	bd.SetTiles(corporations[1], []tileset.Position{{Number: 7, Letter: "D"}})
+	unplayableTile := board.Coordinates{Number: 6, Letter: "D"}
+	bd.SetTiles(corporations[0], []board.Coordinates{{Number: 5, Letter: "D"}})
+	bd.SetTiles(corporations[1], []board.Coordinates{{Number: 7, Letter: "D"}})
 
 	game, _ := New(bd, players, corporations, ts)
-	players[0].(*player.Stub).SetTiles([]tileset.Position{unplayableTile})
+	players[0].(*player.Stub).SetTiles([]board.Coordinates{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
 	game.drawTile()

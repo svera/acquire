@@ -22,7 +22,7 @@ type Corporation struct {
 	class       int
 	stock       int
 	pricesChart map[int]prices
-	tiles       []tileset.Position
+	tiles       []board.Coordinates
 }
 
 func New(name string, class int, id int) (*Corporation, error) {
@@ -51,11 +51,11 @@ func (c *Corporation) Id() int {
 	return c.id
 }
 
-func (c *Corporation) AddTiles(tiles []tileset.Position) {
+func (c *Corporation) AddTiles(tiles []board.Coordinates) {
 	c.tiles = append(c.tiles, tiles...)
 }
 
-func (c *Corporation) AddTile(tile tileset.Position) {
+func (c *Corporation) AddTile(tile board.Coordinates) {
 	c.tiles = append(c.tiles, tile)
 }
 

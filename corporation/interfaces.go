@@ -6,8 +6,8 @@ import (
 
 type Interface interface {
 	Id() int
-	AddTiles(tiles []tileset.Position)
-	AddTile(tile tileset.Position)
+	AddTiles(tiles []board.Coordinates)
+	AddTile(tile board.Coordinates)
 	Stock() int
 	SetStock(stock int)
 	StockPrice() int

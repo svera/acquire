@@ -9,9 +9,9 @@ type Interface interface {
 	Shares(c corporation.Interface) int
 	ReceiveBonus(amount int)
 	Buy(corp corporation.Interface, amount int)
-	PickTile(t tileset.Position) error
-	Tiles() []tileset.Position
-	DiscardTile(t tileset.Position) error
+	PickTile(t board.Coordinates) error
+	Tiles() []board.Coordinates
+	DiscardTile(t board.Coordinates) error
 	Cash() int
 	GetFounderStockShare(corp corporation.Interface)
 }

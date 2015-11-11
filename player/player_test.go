@@ -9,13 +9,13 @@ import (
 
 func TestPickTile(t *testing.T) {
 	player := New("Test")
-	tl := tileset.Position{Number: 2, Letter: "C"}
+	tl := board.Coordinates{Number: 2, Letter: "C"}
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
 
-	player.tiles = []tileset.Position{
+	player.tiles = []board.Coordinates{
 		{Number: 7, Letter: "C"},
 		{Number: 5, Letter: "A"},
 		{Number: 8, Letter: "E"},
@@ -62,7 +62,7 @@ func TestSort(t *testing.T) {
 func TestUseTile(t *testing.T) {
 	player := New("Test")
 
-	player.tiles = []tileset.Position{
+	player.tiles = []board.Coordinates{
 		{Number: 7, Letter: "C"},
 		{Number: 5, Letter: "A"},
 		{Number: 8, Letter: "E"},
@@ -71,7 +71,7 @@ func TestUseTile(t *testing.T) {
 		{Number: 4, Letter: "I"},
 	}
 
-	tile := tileset.Position{Number: 5, Letter: "A"}
+	tile := board.Coordinates{Number: 5, Letter: "A"}
 	player.DiscardTile(tile)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))

@@ -4,13 +4,14 @@ import (
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/tileset"
 	"reflect"
-	"sort"
+	//"sort"
+	"github.com/svera/acquire/tile"
 	"testing"
 )
 
 func TestPutTile(t *testing.T) {
 	board := New()
-	tile := &tileset.OrphanTile{{Number: 5, Letter: "B"}}
+	tile := &tileset.Tile{{Number: 5, Letter: "B"}}
 	board.PutTile(tile)
 	if board.grid[5]["B"].ContentType() != "orphan" {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")
@@ -19,20 +20,20 @@ func TestPutTile(t *testing.T) {
 
 func TestTileFoundCorporation(t *testing.T) {
 	board := New()
-	board.grid[5]["D"] = &tileset.Tile{5, "D"}
-	board.grid[6]["C"] = &tileset.Tile{6, "C"}
-	board.grid[6]["E"] = &tileset.Tile{6, "E"}
-	board.grid[7]["D"] = &tileset.Tile{7, "D"}
+	board.grid[5]["D"] = tile.New(5, "D")
+	board.grid[6]["C"] = tile.New(6, "C")
+	board.grid[6]["E"] = tile.New(6, "E")
+	board.grid[7]["D"] = tile.New(7, "D")
 	found, corporationTiles := board.TileFoundCorporation(
-		tileset.Position{Number: 6, Letter: "D"},
+		board.Coordinates{Number: 6, Letter: "D"},
 	)
 
-	expectedCorporationTiles := []tileset.Position{
-		tileset.Position{Number: 6, Letter: "D"},
-		tileset.Position{Number: 5, Letter: "D"},
-		tileset.Position{Number: 6, Letter: "C"},
-		tileset.Position{Number: 6, Letter: "E"},
-		tileset.Position{Number: 7, Letter: "D"},
+	expectedCorporationTiles := []board.Coordinates{
+		board.Coordinates{Number: 6, Letter: "D"},
+		board.Coordinates{Number: 5, Letter: "D"},
+		board.Coordinates{Number: 6, Letter: "C"},
+		board.Coordinates{Number: 6, Letter: "E"},
+		board.Coordinates{Number: 7, Letter: "D"},
 	}
 
 	if !found {
@@ -45,17 +46,17 @@ func TestTileFoundCorporation(t *testing.T) {
 
 func TestTileNotFoundCorporation(t *testing.T) {
 	board := New()
-	found, corporationTiles := board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "D"})
+	found, corporationTiles := board.TileFoundCorporation(board.Coordinates{Number: 6, Letter: "D"})
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
 	}
 
-	board.grid[5]["E"] = &tileset.Tile{5, "E"}
+	board.grid[5]["E"] = tile.New(5, "E")
 	board.grid[7]["E"] = 2
-	board.grid[6]["D"] = &tileset.Tile{6, "D"}
-	board.grid[6]["F"] = &tileset.Tile{6, "F"}
+	board.grid[6]["D"] = tile.New(6, "D")
+	board.grid[6]["F"] = tile.New(6, "F")
 
-	found, corporationTiles = board.TileFoundCorporation(tileset.Position{Number: 6, Letter: "E"})
+	found, corporationTiles = board.TileFoundCorporation(board.Coordinates{Number: 6, Letter: "E"})
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "E", corporationTiles)
 	}
@@ -90,7 +91,7 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	board.grid[6]["G"] = corp4
 
 	expectedCorporations := []corporation.Interface{corp1, corp2, corp3, corp4}
-	merge, corporations := board.TileMergeCorporations(tileset.Position{Number: 6, Letter: "E"})
+	merge, corporations := board.TileMergeCorporations(board.Coordinates{Number: 6, Letter: "E"})
 	//sort.Ints(corporationIds)
 	if !reflect.DeepEqual(corporations, expectedCorporations) {
 		t.Errorf("Position %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporations, corporations)
@@ -106,12 +107,12 @@ func TestTileQuadrupleMerge(t *testing.T) {
 func TestTileDontMerge(t *testing.T) {
 	board := New()
 	corp2 := corporation.New("Test 2", 1, 2)
-	board.grid[3]["E"] = &tileset.Tile{3, "E"}
+	board.grid[3]["E"] = tile.New(3, "E")
 	board.grid[5]["E"] = corp2
 	board.grid[6]["E"] = corp2
 
 	expectedCorporationsMerged := []corporation.Interface{}
-	merge, corporations := board.TileMergeCorporations(tileset.Position{Number: 4, Letter: "E"})
+	merge, corporations := board.TileMergeCorporations(board.Coordinates{Number: 4, Letter: "E"})
 	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
 		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
 	}
@@ -128,20 +129,20 @@ func TestTileDontMerge(t *testing.T) {
 func TestTileGrowCorporation(t *testing.T) {
 	board := New()
 	corp2 := corporation.New("Test 2", 1, 2)
-	board.grid[5]["E"] = &tileset.Tile{5, "E"}
+	board.grid[5]["E"] = tile.New(5, "E")
 	board.grid[7]["E"] = corp2
 	board.grid[8]["E"] = corp2
-	board.grid[6]["D"] = &tileset.Tile{6, "D"}
-	board.grid[6]["F"] = &tileset.Tile{6, "F"}
+	board.grid[6]["D"] = tile.New(6, "D")
+	board.grid[6]["F"] = tile.New(6, "F")
 
-	expectedTilesToAppend := []tileset.Position{
-		tileset.Position{Number: 5, Letter: "E"},
-		tileset.Position{Number: 6, Letter: "D"},
-		tileset.Position{Number: 6, Letter: "E"},
-		tileset.Position{Number: 6, Letter: "F"},
+	expectedTilesToAppend := []board.Coordinates{
+		board.Coordinates{Number: 5, Letter: "E"},
+		board.Coordinates{Number: 6, Letter: "D"},
+		board.Coordinates{Number: 6, Letter: "E"},
+		board.Coordinates{Number: 6, Letter: "F"},
 	}
 	expectedCorporationToGrow := corp2
-	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(tileset.Position{Number: 6, Letter: "E"})
+	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(board.Coordinates{Number: 6, Letter: "E"})
 	if !slicesSameContent(tilesToAppend, expectedTilesToAppend) {
 		t.Errorf(
 			"Position %d%s must grow corporation %d by %v, got %v in corporation %d instead",
@@ -165,7 +166,7 @@ func TestTileDontGrowCorporation(t *testing.T) {
 	board.grid[7]["E"] = corp2
 	board.grid[8]["E"] = corp2
 
-	grow, _, _ := board.TileGrowCorporation(tileset.Position{Number: 6, Letter: "C"})
+	grow, _, _ := board.TileGrowCorporation(board.Coordinates{Number: 6, Letter: "C"})
 	if grow {
 		t.Errorf(
 			"Position %d%s must not grow any corporation, but got true",
@@ -177,8 +178,8 @@ func TestTileDontGrowCorporation(t *testing.T) {
 
 func TestAdjacentCells(t *testing.T) {
 	brd := New()
-	position := tileset.Position{Number: 1, Letter: "A"}
-	expectedAdjacentCells := []tileset.Position{
+	position := board.Coordinates{Number: 1, Letter: "A"}
+	expectedAdjacentCells := []board.Coordinates{
 		{Number: 2, Letter: "A"},
 		{Number: 1, Letter: "B"},
 	}
@@ -195,9 +196,9 @@ func TestAdjacentCells(t *testing.T) {
 func TestSetTiles(t *testing.T) {
 	brd := New()
 	corp, _ := corporation.New("Test", 1, 5)
-	cell1 := tileset.Position{Number: 1, Letter: "A"}
-	cell2 := tileset.Position{Number: 1, Letter: "B"}
-	cells := []tileset.Position{cell1, cell2}
+	cell1 := board.Coordinates{Number: 1, Letter: "A"}
+	cell2 := board.Coordinates{Number: 1, Letter: "B"}
+	cells := []board.Coordinates{cell1, cell2}
 	brd.SetTiles(corp, cells)
 	if brd.Cell(cell1) != 5 || brd.Cell(cell2) != 5 {
 		t.Errorf(
@@ -207,7 +208,7 @@ func TestSetTiles(t *testing.T) {
 	}
 }
 
-func slicesSameContent(slice1 []tileset.Position, slice2 []tileset.Position) bool {
+func slicesSameContent(slice1 []board.Coordinates, slice2 []board.Coordinates) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}

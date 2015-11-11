@@ -27,6 +27,6 @@ func (p *Stub) SetCash(amount int) {
 	p.cash = amount
 }
 
-func (p *Stub) SetTiles(tiles []tileset.Position) {
+func (p *Stub) SetTiles(tiles []board.Coordinates) {
 	p.tiles = tiles
 }

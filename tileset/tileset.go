@@ -2,6 +2,7 @@ package tileset
 
 import (
 	"errors"
+	"github.com/svera/acquire/tile"
 	"math/rand"
 )
 
@@ -9,21 +10,8 @@ const (
 	NoTilesAvailable = "no_tiles_available"
 )
 
-type Position struct {
-	Number int
-	Letter string
-}
-
-type Tile struct {
-	Position
-}
-
 type Tileset struct {
 	tiles []*Tile
-}
-
-func (t *Tile) ContentType() string {
-	return "orphan"
 }
 
 func New() *Tileset {
@@ -31,7 +19,7 @@ func New() *Tileset {
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
-			tileset.tiles = append(tileset.tiles, &Tile{Position{number, letter}})
+			tileset.tiles = append(tileset.tiles, tile.New(number, letter))
 		}
 	}
 

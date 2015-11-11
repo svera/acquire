@@ -12,10 +12,10 @@ func TestStockPrice(t *testing.T) {
 	corporations[2], _ = New("class2", 2, 2)
 	corporations[3], _ = New("class0 big", 0, 3)
 
-	corporations[0].tiles = make([]tileset.Position, 2)
-	corporations[1].tiles = make([]tileset.Position, 2)
-	corporations[2].tiles = make([]tileset.Position, 2)
-	corporations[3].tiles = make([]tileset.Position, 42)
+	corporations[0].tiles = make([]board.Coordinates, 2)
+	corporations[1].tiles = make([]board.Coordinates, 2)
+	corporations[2].tiles = make([]board.Coordinates, 2)
+	corporations[3].tiles = make([]board.Coordinates, 42)
 
 	var expectedStockPrices = new([4]int)
 	expectedStockPrices[0] = 200
@@ -38,7 +38,7 @@ func TestStockPrice(t *testing.T) {
 func TestSize(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
 	expectedSize := 8
-	corp.tiles = make([]tileset.Position, expectedSize)
+	corp.tiles = make([]board.Coordinates, expectedSize)
 	if size := corp.Size(); size != expectedSize {
 		t.Errorf("Expected a corporation size of %d, got %d", expectedSize, size)
 	}
@@ -46,7 +46,7 @@ func TestSize(t *testing.T) {
 
 func TestAddTiles(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	expectedTiles := []tileset.Position{
+	expectedTiles := []board.Coordinates{
 		{Number: 1, Letter: "A"},
 		{Number: 2, Letter: "A"},
 	}
@@ -58,7 +58,7 @@ func TestAddTiles(t *testing.T) {
 
 func TestAddTile(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	expectedTile := tileset.Position{Number: 1, Letter: "A"}
+	expectedTile := board.Coordinates{Number: 1, Letter: "A"}
 
 	corp.AddTile(expectedTile)
 	if corp.tiles[0] != expectedTile {
@@ -95,13 +95,13 @@ func TestSetStock(t *testing.T) {
 
 func TestMajorityBonus(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	corp.tiles = make([]tileset.Position, 2)
+	corp.tiles = make([]board.Coordinates, 2)
 	expectedMajorityBonus := 2000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
 		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
 	}
 
-	corp.tiles = make([]tileset.Position, 42)
+	corp.tiles = make([]board.Coordinates, 42)
 	expectedMajorityBonus = 10000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
 		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
@@ -110,13 +110,13 @@ func TestMajorityBonus(t *testing.T) {
 
 func TestMinorityBonus(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	corp.tiles = make([]tileset.Position, 2)
+	corp.tiles = make([]board.Coordinates, 2)
 	expectedMinorityBonus := 1000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
 		t.Errorf("Expected minority bonus of %d, got %d", expectedMinorityBonus, bonus)
 	}
 
-	corp.tiles = make([]tileset.Position, 42)
+	corp.tiles = make([]board.Coordinates, 42)
 	expectedMinorityBonus = 5000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
 		t.Errorf("Expected minority bonus of %d, got %d", expectedMinorityBonus, bonus)
@@ -125,11 +125,11 @@ func TestMinorityBonus(t *testing.T) {
 
 func TestIsSafe(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	corp.tiles = make([]tileset.Position, 2)
+	corp.tiles = make([]board.Coordinates, 2)
 	if corp.IsSafe() {
 		t.Errorf("Unsafe corporation regarded as safe")
 	}
-	corp.tiles = make([]tileset.Position, 11)
+	corp.tiles = make([]board.Coordinates, 11)
 	if !corp.IsSafe() {
 		t.Errorf("Safe corporation regarded as unsafe")
 	}
@@ -140,7 +140,7 @@ func TestIsActive(t *testing.T) {
 	if corp.IsActive() {
 		t.Errorf("Inactive corporation regarded as active")
 	}
-	corp.tiles = make([]tileset.Position, 2)
+	corp.tiles = make([]board.Coordinates, 2)
 	if !corp.IsActive() {
 		t.Errorf("Active corporation regarded as inactive")
 	}

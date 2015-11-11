@@ -13,6 +13,11 @@ type Board struct {
 	grid *[13]map[string]Container
 }
 
+type Coordinates struct {
+	Number int
+	Letter string
+}
+
 func New() *Board {
 	board := Board{
 		grid: new([13]map[string]Container),
@@ -30,14 +35,14 @@ func New() *Board {
 }
 
 // Returns a board cell content
-func (b *Board) Cell(t tileset.Position) Container {
+func (b *Board) Cell(t board.Coordinates) Container {
 	return b.grid[t.Number][t.Letter]
 }
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) TileFoundCorporation(t tileset.Position) (bool, []tileset.Position) {
-	var newCorporationTiles []tileset.Position
+func (b *Board) TileFoundCorporation(t board.Coordinates) (bool, []board.Coordinates) {
+	var newCorporationTiles []board.Coordinates
 	adjacent := b.adjacentNonCorporationTiles(t)
 	if len(adjacent) == 4 {
 		for _, adjacentCell := range adjacent {
@@ -55,7 +60,7 @@ func (b *Board) TileFoundCorporation(t tileset.Position) (bool, []tileset.Positi
 
 // Checks if the passed tile merges two or more corporations, returns a slice of
 // corporation IDs to be merged
-func (b *Board) TileMergeCorporations(t tileset.Position) (bool, []corporation.Interface) {
+func (b *Board) TileMergeCorporations(t board.Coordinates) (bool, []corporation.Interface) {
 	var corporations []corporation.Interface
 	adjacent := b.adjacentCorporationTiles(t)
 	for _, adjacentCell := range adjacent {
@@ -70,15 +75,15 @@ func (b *Board) TileMergeCorporations(t tileset.Position) (bool, []corporation.I
 // Check if the passed tile grows a corporation
 // Returns true if that's the case, the tiles to append to the corporation and
 // the ID of the corporation which grows
-func (b *Board) TileGrowCorporation(t tileset.Position) (bool, []tileset.Position, corporation.Interface) {
-	tilesToAppend := []tileset.Position{{Number: t.Number, Letter: t.Letter}}
+func (b *Board) TileGrowCorporation(t board.Coordinates) (bool, []board.Coordinates, corporation.Interface) {
+	tilesToAppend := []board.Coordinates{{Number: t.Number, Letter: t.Letter}}
 	var nullCorporation corporation.Interface
 	corporationToGrow := nullCorporation
 	adjacent := b.adjacentTiles(t)
 	for _, adjacentCell := range adjacent {
 		if b.Cell(adjacentCell).ContentType() != "orphan" {
 			if corporationToGrow != nullCorporation {
-				return false, []tileset.Position{}, nullCorporation
+				return false, []board.Coordinates{}, nullCorporation
 			}
 			corporationToGrow = b.Cell(adjacentCell).(corporation.Interface)
 		} else {
@@ -86,37 +91,37 @@ func (b *Board) TileGrowCorporation(t tileset.Position) (bool, []tileset.Positio
 		}
 	}
 	if corporationToGrow == nullCorporation {
-		return false, []tileset.Position{}, nullCorporation
+		return false, []board.Coordinates{}, nullCorporation
 	}
 	return true, tilesToAppend, corporationToGrow
 }
 
 // Puts the passed tile on the board
-func (b *Board) PutTile(t *tileset.OrphanTile) {
+func (b *Board) PutTile(t *tileset.Tile) {
 	b.grid[t.Number][t.Letter] = t
 }
 
 // Returns all cells adjacent to the passed one
-func (b *Board) AdjacentCells(t tileset.Position) []tileset.Position {
-	var adjacent []tileset.Position
+func (b *Board) AdjacentCells(t board.Coordinates) []board.Coordinates {
+	var adjacent []board.Coordinates
 
 	if t.Letter > "A" {
-		adjacent = append(adjacent, tileset.Position{Number: t.Number, Letter: previousLetter(t.Letter)})
+		adjacent = append(adjacent, board.Coordinates{Number: t.Number, Letter: previousLetter(t.Letter)})
 	}
 	if t.Letter < "I" {
-		adjacent = append(adjacent, tileset.Position{Number: t.Number, Letter: nextLetter(t.Letter)})
+		adjacent = append(adjacent, board.Coordinates{Number: t.Number, Letter: nextLetter(t.Letter)})
 	}
 	if t.Number > 1 {
-		adjacent = append(adjacent, tileset.Position{Number: t.Number - 1, Letter: t.Letter})
+		adjacent = append(adjacent, board.Coordinates{Number: t.Number - 1, Letter: t.Letter})
 	}
 	if t.Number < 12 {
-		adjacent = append(adjacent, tileset.Position{Number: t.Number + 1, Letter: t.Letter})
+		adjacent = append(adjacent, board.Coordinates{Number: t.Number + 1, Letter: t.Letter})
 	}
 	return adjacent
 }
 
-func (b *Board) adjacentCellsWithFilter(t tileset.Position, filter func(tileset.Position) bool) []tileset.Position {
-	var adjacentFilteredCells []tileset.Position
+func (b *Board) adjacentCellsWithFilter(t board.Coordinates, filter func(board.Coordinates) bool) []board.Coordinates {
+	var adjacentFilteredCells []board.Coordinates
 	adjacent := b.AdjacentCells(t)
 
 	for _, adjacentCell := range adjacent {
@@ -127,10 +132,10 @@ func (b *Board) adjacentCellsWithFilter(t tileset.Position, filter func(tileset.
 	return adjacentFilteredCells
 }
 
-func (b *Board) adjacentTiles(t tileset.Position) []tileset.Position {
+func (b *Board) adjacentTiles(t board.Coordinates) []board.Coordinates {
 	return b.adjacentCellsWithFilter(
 		t,
-		func(t tileset.Position) bool {
+		func(t board.Coordinates) bool {
 			if b.Cell(t).ContentType() != "empty" {
 				return true
 			}
@@ -139,10 +144,10 @@ func (b *Board) adjacentTiles(t tileset.Position) []tileset.Position {
 	)
 }
 
-func (b *Board) adjacentCorporationTiles(t tileset.Position) []tileset.Position {
+func (b *Board) adjacentCorporationTiles(t board.Coordinates) []board.Coordinates {
 	return b.adjacentCellsWithFilter(
 		t,
-		func(t tileset.Position) bool {
+		func(t board.Coordinates) bool {
 			if b.Cell(t).ContentType() == "corporation" {
 				return true
 			}
@@ -151,10 +156,10 @@ func (b *Board) adjacentCorporationTiles(t tileset.Position) []tileset.Position 
 	)
 }
 
-func (b *Board) adjacentNonCorporationTiles(t tileset.Position) []tileset.Position {
+func (b *Board) adjacentNonCorporationTiles(t board.Coordinates) []board.Coordinates {
 	return b.adjacentCellsWithFilter(
 		t,
-		func(t tileset.Position) bool {
+		func(t board.Coordinates) bool {
 			if b.Cell(t).ContentType() == "orphan" || b.Cell(t).ContentType() == "empty" {
 				return true
 			}
@@ -180,7 +185,7 @@ func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
 }
 
-func (b *Board) SetTiles(cp corporation.Interface, cells []tileset.Position) {
+func (b *Board) SetTiles(cp corporation.Interface, cells []board.Coordinates) {
 	for _, cell := range cells {
 		b.grid[cell.Number][cell.Letter] = cp
 	}

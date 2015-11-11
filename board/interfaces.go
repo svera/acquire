@@ -6,13 +6,13 @@ import (
 )
 
 type Interface interface {
-	Cell(t tileset.Position) int
-	TileFoundCorporation(t tileset.Position) (bool, []tileset.Position)
-	TileMergeCorporations(t tileset.Position) (bool, []int)
-	TileGrowCorporation(t tileset.Position) (bool, []tileset.Position, int)
-	PutTile(t tileset.Position)
-	AdjacentCells(t tileset.Position) []tileset.Position
-	SetTiles(cp corporation.Interface, cells []tileset.Position)
+	Cell(t board.Coordinates) int
+	TileFoundCorporation(t board.Coordinates) (bool, []board.Coordinates)
+	TileMergeCorporations(t board.Coordinates) (bool, []int)
+	TileGrowCorporation(t board.Coordinates) (bool, []board.Coordinates, int)
+	PutTile(t board.Coordinates)
+	AdjacentCells(t board.Coordinates) []board.Coordinates
+	SetTiles(cp corporation.Interface, cells []board.Coordinates)
 }
 
 type Container interface {

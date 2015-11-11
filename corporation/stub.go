@@ -22,5 +22,5 @@ func NewStub(name string, class int, id int) *Stub {
 }
 
 func (c *Stub) SetSize(size int) {
-	c.tiles = make([]tileset.Position, size)
+	c.tiles = make([]board.Coordinates, size)
 }
