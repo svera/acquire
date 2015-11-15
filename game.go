@@ -12,7 +12,6 @@ import (
 const totalCorporations = 7
 const (
 	ActionNotAllowed          = "action_not_allowed"
-	WrongNumberPlayers        = "wrong_number_players"
 	StockSharesNotBuyable     = "stock_shares_not_buyable"
 	NotEnoughStockShares      = "not_enough_stock_shares"
 	TileTemporaryUnplayable   = "tile_temporary_unplayable"
@@ -197,11 +196,8 @@ func (g *Game) isTileUnplayable(tile board.Coordinates) bool {
 	adjacents := g.board.AdjacentCells(tile)
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		boardCell := g.board.Cell(adjacent)
-		if boardCell != board.Empty && boardCell != board.Tile {
-			if g.corporations[boardCell].IsSafe() {
-				safeNeighbours++
-			}
+		if adjacent.ContentType() == "corporation" && adjacent.(corporation.Interface).IsSafe() {
+			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
 			return true
@@ -219,7 +215,7 @@ func (g *Game) isTileTemporaryUnplayable(tile board.Coordinates) bool {
 	adjacents := g.board.AdjacentCells(tile)
 	for _, adjacent := range adjacents {
 		boardCell := g.board.Cell(adjacent)
-		if boardCell == board.Tile {
+		if boardCell.ContentType() == "orphan" {
 			return true
 		}
 	}

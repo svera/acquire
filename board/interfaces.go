@@ -10,7 +10,7 @@ type Interface interface {
 	TileMergeCorporations(t Coordinates) (bool, []int)
 	TileGrowCorporation(t Coordinates) (bool, []Coordinates, int)
 	PutTile(t Coordinates)
-	AdjacentCells(t Coordinates) []Coordinates
+	AdjacentCells(t Coordinates) []Container
 	SetTiles(cp corporation.Interface, cells []Coordinates)
 }
 
