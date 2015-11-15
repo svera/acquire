@@ -11,7 +11,7 @@ const (
 )
 
 type Tileset struct {
-	tiles []*Tile
+	tiles []*tile.Orphan
 }
 
 func New() *Tileset {
@@ -27,7 +27,7 @@ func New() *Tileset {
 }
 
 // Extracts a random tile from the tileset and returns it
-func (t *Tileset) Draw() (*Tile, error) {
+func (t *Tileset) Draw() (*tile.Orphan, error) {
 	remainingTiles := len(t.tiles)
 	if remainingTiles > 0 {
 		pos := rand.Intn(remainingTiles - 1)
@@ -35,5 +35,5 @@ func (t *Tileset) Draw() (*Tile, error) {
 		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
 		return tile, nil
 	}
-	return &Tile{}, errors.New(NoTilesAvailable)
+	return &tile.Orphan{}, errors.New(NoTilesAvailable)
 }

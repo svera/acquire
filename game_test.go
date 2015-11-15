@@ -193,7 +193,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := board.Coordinates{Number: 6, Letter: "E"}
 	corpTiles := []board.Coordinates{{Number: 7, Letter: "E"}, {Number: 8, Letter: "E"}}
-	corporations[0].AddTiles(corpTiles)
+	corporations[0].Grow(len(corpTiles))
 	bd.SetTiles(corporations[0], corpTiles)
 	bd.PutTile(board.Coordinates{Number: 5, Letter: "E"})
 
@@ -215,12 +215,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 
 func TestBuyStock(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	corporations[0].AddTiles(
-		[]board.Coordinates{
-			{Number: 1, Letter: "A"},
-			{Number: 2, Letter: "A"},
-		},
-	)
+	corporations[0].Grow(2)
 	buys := map[int]int{0: 2}
 	var expectedAvailableStock int = 23
 	var expectedPlayerStock int = 2
@@ -240,12 +235,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	players[0].(*player.Stub).SetCash(100)
 
-	corporations[0].AddTiles(
-		[]board.Coordinates{
-			{Number: 1, Letter: "A"},
-			{Number: 2, Letter: "A"},
-		},
-	)
+	corporations[0].Grow(2)
 
 	buys := map[int]int{0: 2}
 	game, _ := New(bd, players, corporations, ts)

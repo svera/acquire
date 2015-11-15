@@ -265,7 +265,7 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 		return errors.New(CorporationAlreadyOnBoard)
 	}
 	g.board.SetTiles(corp, g.newCorpTiles)
-	corp.AddTiles(g.newCorpTiles)
+	corp.Grow(len(g.newCorpTiles))
 	g.newCorpTiles = []board.Coordinates{}
 	g.CurrentPlayer().GetFounderStockShare(corp)
 	g.state, _ = g.state.ToBuyStock()
@@ -274,7 +274,7 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 
 func (g *Game) growCorporation(corp corporation.Interface, tiles []board.Coordinates) {
 	g.board.SetTiles(corp, tiles)
-	corp.AddTiles(tiles)
+	corp.AddTiles(len(tiles))
 }
 
 // Increases the number which specifies the current player

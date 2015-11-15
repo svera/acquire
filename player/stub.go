@@ -2,7 +2,7 @@ package player
 
 import (
 	"github.com/svera/acquire/corporation"
-	"github.com/svera/acquire/tileset"
+	"github.com/svera/acquire/tile"
 )
 
 type Stub struct {
@@ -27,6 +27,6 @@ func (p *Stub) SetCash(amount int) {
 	p.cash = amount
 }
 
-func (p *Stub) SetTiles(tiles []board.Coordinates) {
+func (p *Stub) SetTiles(tiles []tile.Orphan) {
 	p.tiles = tiles
 }

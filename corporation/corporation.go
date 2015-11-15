@@ -2,7 +2,6 @@ package corporation
 
 import (
 	"errors"
-	"github.com/svera/acquire/tileset"
 )
 
 type prices struct {
@@ -22,7 +21,7 @@ type Corporation struct {
 	class       int
 	stock       int
 	pricesChart map[int]prices
-	tiles       []board.Coordinates
+	size        int
 }
 
 func New(name string, class int, id int) (*Corporation, error) {
@@ -44,19 +43,15 @@ func New(name string, class int, id int) (*Corporation, error) {
 }
 
 func (c *Corporation) Size() int {
-	return len(c.tiles)
+	return c.size
 }
 
 func (c *Corporation) Id() int {
 	return c.id
 }
 
-func (c *Corporation) AddTiles(tiles []board.Coordinates) {
-	c.tiles = append(c.tiles, tiles...)
-}
-
-func (c *Corporation) AddTile(tile board.Coordinates) {
-	c.tiles = append(c.tiles, tile)
+func (c *Corporation) Grow(number int) {
+	c.size += number
 }
 
 //Fill the prices chart array with the amounts corresponding to the corporation

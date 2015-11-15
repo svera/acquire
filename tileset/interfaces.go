@@ -1,5 +1,9 @@
 package tileset
 
+import (
+	"github.com/svera/acquire/tile"
+)
+
 type Interface interface {
-	Draw() (Position, error)
+	Draw() (tile.Orphan, error)
 }

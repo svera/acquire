@@ -44,25 +44,12 @@ func TestSize(t *testing.T) {
 	}
 }
 
-func TestAddTiles(t *testing.T) {
+func TestGrow(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	expectedTiles := []board.Coordinates{
-		{Number: 1, Letter: "A"},
-		{Number: 2, Letter: "A"},
-	}
-	corp.AddTiles(expectedTiles)
-	if corp.tiles[0] != expectedTiles[0] || corp.tiles[1] != expectedTiles[1] {
+	expectedSize := 2
+	corp.Grow(2)
+	if corp.size != expectedSize {
 		t.Errorf("Tiles not added to corporation")
-	}
-}
-
-func TestAddTile(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
-	expectedTile := board.Coordinates{Number: 1, Letter: "A"}
-
-	corp.AddTile(expectedTile)
-	if corp.tiles[0] != expectedTile {
-		t.Errorf("Tile not added to corporation")
 	}
 }
 

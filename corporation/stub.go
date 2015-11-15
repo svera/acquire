@@ -1,12 +1,7 @@
 package corporation
 
-import (
-	"github.com/svera/acquire/tileset"
-)
-
 type Stub struct {
 	Corporation
-	size int
 }
 
 func NewStub(name string, class int, id int) *Stub {
@@ -22,5 +17,5 @@ func NewStub(name string, class int, id int) *Stub {
 }
 
 func (c *Stub) SetSize(size int) {
-	c.tiles = make([]board.Coordinates, size)
+	c.size = size
 }

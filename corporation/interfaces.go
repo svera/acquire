@@ -1,13 +1,8 @@
 package corporation
 
-import (
-	"github.com/svera/acquire/tileset"
-)
-
 type Interface interface {
 	Id() int
-	AddTiles(tiles []board.Coordinates)
-	AddTile(tile board.Coordinates)
+	Grow(number int)
 	Stock() int
 	SetStock(stock int)
 	StockPrice() int
