@@ -6,6 +6,7 @@ import (
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
+	"github.com/svera/acquire/tile"
 	"github.com/svera/acquire/tileset"
 )
 
@@ -21,6 +22,7 @@ const (
 	CorpIdNotUnique           = "corp_id_not_unique"
 	WrongNumberCorpsClass     = "wrong_number_corps_class"
 	CorporationAlreadyOnBoard = "corporation_already_on_board"
+	WrongNumberPlayers        = "wrong_number_players"
 )
 
 type Game struct {
@@ -192,8 +194,8 @@ func (g *Game) getStockHolders(corp corporation.Interface) []player.ShareInterfa
 
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
-func (g *Game) isTileUnplayable(tile board.Coordinates) bool {
-	adjacents := g.board.AdjacentCells(tile)
+func (g *Game) isTileUnplayable(tl *tile.Orphan) bool {
+	adjacents := g.board.AdjacentCells(tl)
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
 		if adjacent.ContentType() == "corporation" && adjacent.(corporation.Interface).IsSafe() {
@@ -208,14 +210,13 @@ func (g *Game) isTileUnplayable(tile board.Coordinates) bool {
 
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
-func (g *Game) isTileTemporaryUnplayable(tile board.Coordinates) bool {
+func (g *Game) isTileTemporaryUnplayable(tl *tile.Orphan) bool {
 	if len(g.getActiveCorporations()) < totalCorporations {
 		return false
 	}
-	adjacents := g.board.AdjacentCells(tile)
+	adjacents := g.board.AdjacentCells(tl)
 	for _, adjacent := range adjacents {
-		boardCell := g.board.Cell(adjacent)
-		if boardCell.ContentType() == "orphan" {
+		if adjacent.ContentType() == "orphan" {
 			return true
 		}
 	}
@@ -227,27 +228,27 @@ func (g *Game) CurrentPlayer() player.Interface {
 	return g.players[g.currentPlayer]
 }
 
-func (g *Game) PlayTile(tile board.Coordinates) error {
+func (g *Game) PlayTile(tl *tile.Orphan) error {
 	if g.state.Name() != "PlayTile" {
 		return errors.New(ActionNotAllowed)
 	}
-	if g.isTileTemporaryUnplayable(tile) {
+	if g.isTileTemporaryUnplayable(tl) {
 		return errors.New(TileTemporaryUnplayable)
 	}
-	if err := g.CurrentPlayer().DiscardTile(tile); err != nil {
+	if err := g.CurrentPlayer().DiscardTile(tl); err != nil {
 		return err
 	}
 	/*
 		if merge, tiles := g.board.TileMergeCorporations(tile); merge {
 			// move state machine status
-		} else */if found, tiles := g.board.TileFoundCorporation(tile); found {
+		} else */if found, tiles := g.board.TileFoundCorporation(tl); found {
 		g.state, _ = g.state.ToFoundCorp()
 		g.newCorpTiles = tiles
-	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tile); grow {
+	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tl); grow {
 		g.growCorporation(g.corporations[corporationId], tiles)
 		g.state, _ = g.state.ToBuyStock()
 	} else {
-		g.board.PutTile(tile)
+		g.board.PutTile(tl)
 		g.state, _ = g.state.ToBuyStock()
 	}
 	return nil

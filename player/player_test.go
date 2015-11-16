@@ -2,26 +2,26 @@ package player
 
 import (
 	"github.com/svera/acquire/corporation"
-	"github.com/svera/acquire/tileset"
+	"github.com/svera/acquire/tile"
 	"reflect"
 	"testing"
 )
 
 func TestPickTile(t *testing.T) {
 	player := New("Test")
-	tl := board.Coordinates{Number: 2, Letter: "C"}
+	tl := tile.New(2, "C")
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
 
-	player.tiles = []board.Coordinates{
-		{Number: 7, Letter: "C"},
-		{Number: 5, Letter: "A"},
-		{Number: 8, Letter: "E"},
-		{Number: 3, Letter: "D"},
-		{Number: 1, Letter: "B"},
-		{Number: 4, Letter: "I"},
+	player.tiles = []*tile.Orphan{
+		tile.New(7, "C"),
+		tile.New(5, "A"),
+		tile.New(8, "E"),
+		tile.New(3, "D"),
+		tile.New(1, "B"),
+		tile.New(4, "I"),
 	}
 	player.PickTile(tl)
 	if len(player.tiles) > 6 {
@@ -62,21 +62,21 @@ func TestSort(t *testing.T) {
 func TestUseTile(t *testing.T) {
 	player := New("Test")
 
-	player.tiles = []board.Coordinates{
-		{Number: 7, Letter: "C"},
-		{Number: 5, Letter: "A"},
-		{Number: 8, Letter: "E"},
-		{Number: 3, Letter: "D"},
-		{Number: 1, Letter: "B"},
-		{Number: 4, Letter: "I"},
+	player.tiles = []*tile.Orphan{
+		tile.New(7, "C"),
+		tile.New(5, "A"),
+		tile.New(8, "E"),
+		tile.New(3, "D"),
+		tile.New(1, "B"),
+		tile.New(4, "I"),
 	}
 
-	tile := board.Coordinates{Number: 5, Letter: "A"}
-	player.DiscardTile(tile)
+	tl := tile.New(5, "A")
+	player.DiscardTile(tl)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
 	}
-	if tile.Number != 5 || tile.Letter != "A" {
+	if tl.Number != 5 || tl.Letter != "A" {
 		t.Errorf("DiscardTile() must return tile 5A")
 	}
 }

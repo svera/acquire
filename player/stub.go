@@ -27,6 +27,6 @@ func (p *Stub) SetCash(amount int) {
 	p.cash = amount
 }
 
-func (p *Stub) SetTiles(tiles []tile.Orphan) {
+func (p *Stub) SetTiles(tiles []*tile.Orphan) {
 	p.tiles = tiles
 }

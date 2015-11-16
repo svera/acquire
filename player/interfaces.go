@@ -9,9 +9,9 @@ type Interface interface {
 	Shares(c corporation.Interface) int
 	ReceiveBonus(amount int)
 	Buy(corp corporation.Interface, amount int)
-	PickTile(t tile.Orphan) error
-	Tiles() []tile.Orphan
-	DiscardTile(t tile.Orphan) error
+	PickTile(t *tile.Orphan) error
+	Tiles() []*tile.Orphan
+	DiscardTile(t *tile.Orphan) error
 	Cash() int
 	GetFounderStockShare(corp corporation.Interface)
 }

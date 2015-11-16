@@ -1,7 +1,6 @@
 package corporation
 
 import (
-	"github.com/svera/acquire/tileset"
 	"testing"
 )
 
@@ -12,10 +11,10 @@ func TestStockPrice(t *testing.T) {
 	corporations[2], _ = New("class2", 2, 2)
 	corporations[3], _ = New("class0 big", 0, 3)
 
-	corporations[0].tiles = make([]board.Coordinates, 2)
-	corporations[1].tiles = make([]board.Coordinates, 2)
-	corporations[2].tiles = make([]board.Coordinates, 2)
-	corporations[3].tiles = make([]board.Coordinates, 42)
+	corporations[0].size = 2
+	corporations[1].size = 2
+	corporations[2].size = 2
+	corporations[3].size = 42
 
 	var expectedStockPrices = new([4]int)
 	expectedStockPrices[0] = 200
@@ -38,7 +37,7 @@ func TestStockPrice(t *testing.T) {
 func TestSize(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
 	expectedSize := 8
-	corp.tiles = make([]board.Coordinates, expectedSize)
+	corp.size = expectedSize
 	if size := corp.Size(); size != expectedSize {
 		t.Errorf("Expected a corporation size of %d, got %d", expectedSize, size)
 	}
@@ -82,13 +81,13 @@ func TestSetStock(t *testing.T) {
 
 func TestMajorityBonus(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	corp.tiles = make([]board.Coordinates, 2)
+	corp.size = 2
 	expectedMajorityBonus := 2000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
 		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
 	}
 
-	corp.tiles = make([]board.Coordinates, 42)
+	corp.size = 42
 	expectedMajorityBonus = 10000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
 		t.Errorf("Expected majority bonus of %d, got %d", expectedMajorityBonus, bonus)
@@ -97,13 +96,13 @@ func TestMajorityBonus(t *testing.T) {
 
 func TestMinorityBonus(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	corp.tiles = make([]board.Coordinates, 2)
+	corp.size = 2
 	expectedMinorityBonus := 1000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
 		t.Errorf("Expected minority bonus of %d, got %d", expectedMinorityBonus, bonus)
 	}
 
-	corp.tiles = make([]board.Coordinates, 42)
+	corp.size = 42
 	expectedMinorityBonus = 5000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
 		t.Errorf("Expected minority bonus of %d, got %d", expectedMinorityBonus, bonus)
@@ -112,11 +111,11 @@ func TestMinorityBonus(t *testing.T) {
 
 func TestIsSafe(t *testing.T) {
 	corp, _ := New("Test", 0, 0)
-	corp.tiles = make([]board.Coordinates, 2)
+	corp.size = 2
 	if corp.IsSafe() {
 		t.Errorf("Unsafe corporation regarded as safe")
 	}
-	corp.tiles = make([]board.Coordinates, 11)
+	corp.size = 11
 	if !corp.IsSafe() {
 		t.Errorf("Safe corporation regarded as unsafe")
 	}
@@ -127,7 +126,7 @@ func TestIsActive(t *testing.T) {
 	if corp.IsActive() {
 		t.Errorf("Inactive corporation regarded as active")
 	}
-	corp.tiles = make([]board.Coordinates, 2)
+	corp.size = 2
 	if !corp.IsActive() {
 		t.Errorf("Active corporation regarded as inactive")
 	}
