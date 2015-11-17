@@ -19,7 +19,7 @@ func New() *Tileset {
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
-			tileset.tiles = append(tileset.tiles, tile.NewOrphan(number, letter))
+			tileset.tiles = append(tileset.tiles, tile.New(number, letter, tile.Orphan{}))
 		}
 	}
 
@@ -27,7 +27,7 @@ func New() *Tileset {
 }
 
 // Extracts a random tile from the tileset and returns it
-func (t *Tileset) Draw() (*tile.Orphan, error) {
+func (t *Tileset) Draw() (*tile.Tile, error) {
 	remainingTiles := len(t.tiles)
 	if remainingTiles > 0 {
 		pos := rand.Intn(remainingTiles - 1)
@@ -35,5 +35,5 @@ func (t *Tileset) Draw() (*tile.Orphan, error) {
 		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
 		return tile, nil
 	}
-	return &tile.Orphan{}, errors.New(NoTilesAvailable)
+	return &tile.Tile{}, errors.New(NoTilesAvailable)
 }

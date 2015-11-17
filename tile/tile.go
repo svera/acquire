@@ -4,70 +4,44 @@ import (
 	"github.com/svera/acquire/corporation"
 )
 
-type Empty struct {
-	number int
-	letter string
+type TileContent interface {
+	ContentType() string
 }
 
-func NewEmpty(number int, letter string) *Empty {
-	return &Empty{number, letter}
+type Tile struct {
+	number  int
+	letter  string
+	content TileContent
 }
 
-func (e *Empty) Number() int {
-	return e.number
+func New(number int, letter string, content TileContent) *Tile {
+	return &Tile{number, letter, content}
 }
 
-func (e *Empty) Letter() string {
-	return e.letter
+func (t *Tile) Number() int {
+	return t.number
 }
 
-func (e *Empty) ContentType() string {
+func (t *Tile) Letter() string {
+	return t.letter
+}
+
+func (t *Tile) SetContent(content TileContent) {
+	t.content = content
+}
+
+func (t *Tile) Content() TileContent {
+	return t.content
+}
+
+type Empty struct{}
+
+func (e Empty) ContentType() string {
 	return "empty"
 }
 
-type Orphan struct {
-	number int
-	letter string
-}
+type Orphan struct{}
 
-func NewOrphan(number int, letter string) *Orphan {
-	return &Orphan{number, letter}
-}
-
-func (t *Orphan) Number() int {
-	return t.number
-}
-
-func (t *Orphan) Letter() string {
-	return t.letter
-}
-
-func (t *Orphan) ContentType() string {
+func (o Orphan) ContentType() string {
 	return "orphan"
-}
-
-type Corporation struct {
-	number      int
-	letter      string
-	corporation corporation.Interface
-}
-
-func NewCorporation(number int, letter string, corporation corporation.Interface) *Corporation {
-	return &Corporation{number, letter, corporation}
-}
-
-func (t *Corporation) Number() int {
-	return t.number
-}
-
-func (t *Corporation) Letter() string {
-	return t.letter
-}
-
-func (t *Corporation) ContentType() string {
-	return "corporation"
-}
-
-func (t *Corporation) Corporation() corporation.Interface {
-	return t.corporation
 }

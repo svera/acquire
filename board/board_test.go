@@ -10,7 +10,7 @@ import (
 
 func TestPutTile(t *testing.T) {
 	board := New()
-	tile := tile.NewOrphan(5, "B")
+	tile := tile.New(5, "B")
 	board.PutTile(tile)
 	if board.grid[5]["B"].ContentType() != "orphan" {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")
@@ -19,20 +19,20 @@ func TestPutTile(t *testing.T) {
 
 func TestTileFoundCorporation(t *testing.T) {
 	board := New()
-	board.grid[5]["D"] = tile.NewOrphan(5, "D")
-	board.grid[6]["C"] = tile.NewOrphan(6, "C")
-	board.grid[6]["E"] = tile.NewOrphan(6, "E")
-	board.grid[7]["D"] = tile.NewOrphan(7, "D")
+	board.grid[5]["D"] = tile.New(5, "D", tile.Orphan{})
+	board.grid[6]["C"] = tile.New(6, "C", tile.Orphan{})
+	board.grid[6]["E"] = tile.New(6, "E", tile.Orphan{})
+	board.grid[7]["D"] = tile.New(7, "D", tile.Orphan{})
 	found, corporationTiles := board.TileFoundCorporation(
-		tile.NewOrphan(6, "D"),
+		tile.New(6, "D"),
 	)
 
 	expectedCorporationTiles := []Container{
-		tile.NewOrphan(6, "D"),
-		tile.NewOrphan(5, "D"),
-		tile.NewOrphan(6, "C"),
-		tile.NewOrphan(6, "E"),
-		tile.NewOrphan(7, "D"),
+		tile.New(6, "D", tile.Orphan{}),
+		tile.New(5, "D", tile.Orphan{}),
+		tile.New(6, "C", tile.Orphan{}),
+		tile.New(6, "E", tile.Orphan{}),
+		tile.New(7, "D", tile.Orphan{}),
 	}
 
 	if !found {
@@ -46,17 +46,17 @@ func TestTileFoundCorporation(t *testing.T) {
 func TestTileNotFoundCorporation(t *testing.T) {
 	board := New()
 	corp, _ := corporation.New("Test 1", 0, 1)
-	found, corporationTiles := board.TileFoundCorporation(tile.NewOrphan(6, "D"))
+	found, corporationTiles := board.TileFoundCorporation(tile.New(6, "D", tile.Orphan{}))
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
 	}
 
-	board.grid[5]["E"] = tile.NewOrphan(5, "E")
-	board.grid[7]["E"] = corp
-	board.grid[6]["D"] = tile.NewOrphan(6, "D")
-	board.grid[6]["F"] = tile.NewOrphan(6, "F")
+	board.grid[5]["E"] = tile.New(5, "E", tile.Orphan{})
+	board.grid[7]["E"] = tile.New(5, "E", corp)
+	board.grid[6]["D"] = tile.New(6, "D", tile.Orphan{})
+	board.grid[6]["F"] = tile.New(6, "F", tile.Orphan{})
 
-	found, corporationTiles = board.TileFoundCorporation(tile.NewOrphan(6, "E"))
+	found, corporationTiles = board.TileFoundCorporation(tile.New(6, "E", tile.Orphan{}))
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "E", corporationTiles)
 	}
@@ -76,23 +76,23 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	corp2, _ := corporation.New("Test 2", 1, 2)
 	corp3, _ := corporation.New("Test 3", 2, 3)
 	corp4, _ := corporation.New("Test 3", 2, 4)
-	board.grid[2]["E"] = corp1
-	board.grid[3]["E"] = corp1
-	board.grid[4]["E"] = corp1
-	board.grid[5]["E"] = corp1
-	board.grid[7]["E"] = corp2
-	board.grid[8]["E"] = corp2
-	board.grid[9]["E"] = corp2
-	board.grid[10]["E"] = corp2
-	board.grid[11]["E"] = corp2
-	board.grid[6]["B"] = corp3
-	board.grid[6]["C"] = corp3
-	board.grid[6]["D"] = corp3
-	board.grid[6]["F"] = corp4
-	board.grid[6]["G"] = corp4
+	board.grid[2]["E"] = tile.New(2, "E", corp1)
+	board.grid[3]["E"] = tile.New(3, "E", corp1)
+	board.grid[4]["E"] = tile.New(4, "E", corp1)
+	board.grid[5]["E"] = tile.New(5, "E", corp1)
+	board.grid[7]["E"] = tile.New(7, "E", corp2)
+	board.grid[8]["E"] = tile.New(8, "E", corp2)
+	board.grid[9]["E"] = tile.New(9, "E", corp2)
+	board.grid[10]["E"] = tile.New(10, "E", corp2)
+	board.grid[11]["E"] = tile.New(11, "E", corp2)
+	board.grid[6]["B"] = tile.New(6, "B", corp3)
+	board.grid[6]["C"] = tile.New(6, "C", corp3)
+	board.grid[6]["D"] = tile.New(6, "D", corp3)
+	board.grid[6]["F"] = tile.New(6, "F", corp4)
+	board.grid[6]["G"] = tile.New(6, "G", corp4)
 
 	expectedCorporations := []corporation.Interface{corp1, corp2, corp3, corp4}
-	merge, corporations := board.TileMergeCorporations(tile.NewOrphan(6, "E"))
+	merge, corporations := board.TileMergeCorporations(tile.New(6, "E"))
 	//sort.Ints(corporationIds)
 	if !reflect.DeepEqual(corporations, expectedCorporations) {
 		t.Errorf("Position %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporations, corporations)
@@ -108,12 +108,12 @@ func TestTileQuadrupleMerge(t *testing.T) {
 func TestTileDontMerge(t *testing.T) {
 	board := New()
 	corp2, _ := corporation.New("Test 2", 1, 2)
-	board.grid[3]["E"] = tile.NewOrphan(3, "E")
-	board.grid[5]["E"] = corp2
-	board.grid[6]["E"] = corp2
+	board.grid[3]["E"] = tile.New(3, "E", tile.Orphan{})
+	board.grid[5]["E"] = tile.New(5, "E", corp2)
+	board.grid[6]["E"] = tile.New(6, "E", corp2)
 
 	expectedCorporationsMerged := []corporation.Interface{}
-	merge, corporations := board.TileMergeCorporations(tile.NewOrphan(4, "E"))
+	merge, corporations := board.TileMergeCorporations(tile.New(4, "E", tile.Orphan{}))
 	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
 		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
 	}
@@ -130,20 +130,20 @@ func TestTileDontMerge(t *testing.T) {
 func TestTileGrowCorporation(t *testing.T) {
 	board := New()
 	corp2, _ := corporation.New("Test 2", 1, 2)
-	board.grid[5]["E"] = tile.NewOrphan(5, "E")
-	board.grid[7]["E"] = corp2
-	board.grid[8]["E"] = corp2
-	board.grid[6]["D"] = tile.NewOrphan(6, "D")
-	board.grid[6]["F"] = tile.NewOrphan(6, "F")
+	board.grid[5]["E"] = tile.New(5, "E", tile.Orphan{})
+	board.grid[7]["E"] = tile.New(7, "E", corp2)
+	board.grid[8]["E"] = tile.New(8, "E", corp2)
+	board.grid[6]["D"] = tile.New(6, "D", tile.Orphan{})
+	board.grid[6]["F"] = tile.New(6, "F", tile.Orphan{})
 
 	expectedTilesToAppend := []Container{
-		tile.NewOrphan(5, "E"),
-		tile.NewOrphan(6, "D"),
-		tile.NewOrphan(6, "E"),
-		corp2,
+		tile.New(5, "E", tile.Orphan{}),
+		tile.New(6, "D", tile.Orphan{}),
+		tile.New(6, "E", tile.Orphan{}),
+		tile.New(7, "E", corp2),
 	}
 	expectedCorporationToGrow := corp2
-	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(tile.NewOrphan(6, "E"))
+	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(tile.New(6, "E", tile.Orphan{}))
 	if !slicesSameContent(tilesToAppend, expectedTilesToAppend) {
 		t.Errorf(
 			"Position %d%s must grow corporation %d by %v, got %v in corporation %d instead",
@@ -164,10 +164,10 @@ func TestTileDontGrowCorporation(t *testing.T) {
 	board := New()
 	corp2, _ := corporation.New("Test 2", 1, 2)
 
-	board.grid[7]["E"] = corp2
-	board.grid[8]["E"] = corp2
+	board.grid[7]["E"] = tile.New(7, "E", corp2)
+	board.grid[8]["E"] = tile.New(8, "E", corp2)
 
-	grow, _, _ := board.TileGrowCorporation(tile.NewOrphan(6, "C"))
+	grow, _, _ := board.TileGrowCorporation(tile.New(6, "C", tile.Orphan{}))
 	if grow {
 		t.Errorf(
 			"Position %d%s must not grow any corporation, but got true",
@@ -179,10 +179,10 @@ func TestTileDontGrowCorporation(t *testing.T) {
 
 func TestAdjacentCells(t *testing.T) {
 	brd := New()
-	tl := tile.NewOrphan(1, "A")
+	tl := tile.New(1, "A")
 	expectedAdjacentCells := []Container{
-		tile.NewOrphan(2, "A"),
-		tile.NewOrphan(1, "B"),
+		tile.New(2, "A", tile.Orphan{}),
+		tile.New(1, "B", tile.Orphan{}),
 	}
 
 	adjacentCells := brd.AdjacentCells(tl)
@@ -197,14 +197,14 @@ func TestAdjacentCells(t *testing.T) {
 func TestSetTiles(t *testing.T) {
 	brd := New()
 	corp, _ := corporation.New("Test", 1, 5)
-	tl1 := tile.NewCorporation(1, "A", corp)
-	tl2 := tile.NewCorporation(1, "B", corp)
+	tl1 := tile.New(1, "A", corp)
+	tl2 := tile.New(1, "B", corp)
 	tls := []board.Container{tl1, tl2}
 	brd.SetTiles(corp, tls)
 	if brd.Cell(tl1) != corp || brd.Cell(tl2) != corp {
 		t.Errorf(
 			"Cells %d%s and %d%s expected to belong to corporation",
-			tl1.Number, tl1.Letter, tl2.Number, tl2.Letter,
+			tl1.Number(), tl1.Letter(), tl2.Number(), tl2.Letter(),
 		)
 	}
 }

@@ -9,19 +9,19 @@ import (
 
 func TestPickTile(t *testing.T) {
 	player := New("Test")
-	tl := tile.NewOrphan(2, "C")
+	tl := tile.New(2, "C", tile.Orphan{})
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
 
-	player.tiles = []*tile.Orphan{
-		tile.NewOrphan(7, "C"),
-		tile.NewOrphan(5, "A"),
-		tile.NewOrphan(8, "E"),
-		tile.NewOrphan(3, "D"),
-		tile.NewOrphan(1, "B"),
-		tile.NewOrphan(4, "I"),
+	player.tiles = []*tile.Tile{
+		tile.New(7, "C", tile.Orphan{}),
+		tile.New(5, "A", tile.Orphan{}),
+		tile.New(8, "E", tile.Orphan{}),
+		tile.New(3, "D", tile.Orphan{}),
+		tile.New(1, "B", tile.Orphan{}),
+		tile.New(4, "I", tile.Orphan{}),
 	}
 	player.PickTile(tl)
 	if len(player.tiles) > 6 {
@@ -62,16 +62,16 @@ func TestSort(t *testing.T) {
 func TestUseTile(t *testing.T) {
 	player := New("Test")
 
-	player.tiles = []*tile.Orphan{
-		tile.NewOrphan(7, "C"),
-		tile.NewOrphan(5, "A"),
-		tile.NewOrphan(8, "E"),
-		tile.NewOrphan(3, "D"),
-		tile.NewOrphan(1, "B"),
-		tile.NewOrphan(4, "I"),
+	player.tiles = []*tile.Tile{
+		tile.New(7, "C", tile.Orphan{}),
+		tile.New(5, "A", tile.Orphan{}),
+		tile.New(8, "E", tile.Orphan{}),
+		tile.New(3, "D", tile.Orphan{}),
+		tile.New(1, "B", tile.Orphan{}),
+		tile.New(4, "I", tile.Orphan{}),
 	}
 
-	tl := tile.NewOrphan(5, "A")
+	tl := tile.New(5, "A", tile.Orphan{})
 	player.DiscardTile(tl)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
