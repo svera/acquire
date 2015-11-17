@@ -185,8 +185,8 @@ func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
 }
 
-func (b *Board) SetTiles(cp corporation.Interface, cells []Coordinates) {
-	for _, cell := range cells {
-		b.grid[cell.Number][cell.Letter] = cp
+func (b *Board) SetTiles(cp corporation.Interface, tls []Container) {
+	for _, tl := range tls {
+		b.grid[tl.number()][tl.letter()] = cp
 	}
 }

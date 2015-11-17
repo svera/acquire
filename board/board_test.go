@@ -197,14 +197,14 @@ func TestAdjacentCells(t *testing.T) {
 func TestSetTiles(t *testing.T) {
 	brd := New()
 	corp, _ := corporation.New("Test", 1, 5)
-	cell1 := Coordinates{Number: 1, Letter: "A"}
-	cell2 := Coordinates{Number: 1, Letter: "B"}
-	cells := []Coordinates{cell1, cell2}
-	brd.SetTiles(corp, cells)
-	if brd.Cell(cell1) != corp || brd.Cell(cell2) != corp {
+	tl1 := tile.NewCorporation(1, "A", corp)
+	tl2 := tile.NewCorporation(1, "B", corp)
+	tls := []board.Container{tl1, tl2}
+	brd.SetTiles(corp, tls)
+	if brd.Cell(tl1) != corp || brd.Cell(tl2) != corp {
 		t.Errorf(
-			"Cells %d%s and %d%s expected to belong to corporation %d",
-			cell1.Number, cell1.Letter, cell2.Number, cell2.Letter, corp.Id(),
+			"Cells %d%s and %d%s expected to belong to corporation",
+			tl1.Number, tl1.Letter, tl2.Number, tl2.Letter,
 		)
 	}
 }
