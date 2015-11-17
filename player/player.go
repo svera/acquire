@@ -65,7 +65,7 @@ func (p *Player) ReceiveBonus(amount int) {
 
 func (p *Player) DiscardTile(tile *tile.Orphan) error {
 	for i, currentTile := range p.tiles {
-		if currentTile.Number == tile.Number && currentTile.Letter == tile.Letter {
+		if currentTile.Number() == tile.Number() && currentTile.Letter() == tile.Letter() {
 			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)
 			return nil
 		}

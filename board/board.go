@@ -40,8 +40,8 @@ func (b *Board) Cell(t Coordinates) Container {
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) TileFoundCorporation(t *tile.Orphan) (bool, []Coordinates) {
-	var newCorporationTiles []Coordinates
+func (b *Board) TileFoundCorporation(t *tile.Orphan) (bool, []Container) {
+	var newCorporationTiles []Container
 	adjacent := b.adjacentNonCorporationTiles(t)
 	if len(adjacent) == 4 {
 		for _, adjacentCell := range adjacent {
@@ -98,24 +98,24 @@ func (b *Board) TileGrowCorporation(t *tile.Orphan) (bool, []Container, corporat
 
 // Puts the passed tile on the board
 func (b *Board) PutTile(t *tile.Orphan) {
-	b.grid[t.Number][t.Letter] = t
+	b.grid[t.Number()][t.Letter()] = t
 }
 
 // Returns all cells adjacent to the passed one
 func (b *Board) AdjacentCells(t *tile.Orphan) []Container {
 	var adjacent []Container
 
-	if t.Letter > "A" {
-		adjacent = append(adjacent, b.grid[t.Number][previousLetter(t.Letter)])
+	if t.Letter() > "A" {
+		adjacent = append(adjacent, b.grid[t.Number()][previousLetter(t.Letter())])
 	}
-	if t.Letter < "I" {
-		adjacent = append(adjacent, b.grid[t.Number][nextLetter(t.Letter)])
+	if t.Letter() < "I" {
+		adjacent = append(adjacent, b.grid[t.Number()][nextLetter(t.Letter())])
 	}
-	if t.Number > 1 {
-		adjacent = append(adjacent, b.grid[t.Number-1][t.Letter])
+	if t.Number() > 1 {
+		adjacent = append(adjacent, b.grid[t.Number()-1][t.Letter()])
 	}
-	if t.Number < 12 {
-		adjacent = append(adjacent, b.grid[t.Number+1][t.Letter])
+	if t.Number() < 12 {
+		adjacent = append(adjacent, b.grid[t.Number()+1][t.Letter()])
 	}
 	return adjacent
 }
@@ -185,8 +185,8 @@ func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
 }
 
-func (b *Board) SetTiles(cp corporation.Interface, tls []Container) {
-	for _, tl := range tls {
-		b.grid[tl.number()][tl.letter()] = cp
+func (b *Board) SetTiles(cp corporation.Interface, tiles []Container) {
+	for _, tl := range tiles {
+		b.grid[tl.Number()][tl.Letter()] = cp
 	}
 }

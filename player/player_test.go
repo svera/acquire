@@ -9,19 +9,19 @@ import (
 
 func TestPickTile(t *testing.T) {
 	player := New("Test")
-	tl := tile.New(2, "C")
+	tl := tile.NewOrphan(2, "C")
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
 
 	player.tiles = []*tile.Orphan{
-		tile.New(7, "C"),
-		tile.New(5, "A"),
-		tile.New(8, "E"),
-		tile.New(3, "D"),
-		tile.New(1, "B"),
-		tile.New(4, "I"),
+		tile.NewOrphan(7, "C"),
+		tile.NewOrphan(5, "A"),
+		tile.NewOrphan(8, "E"),
+		tile.NewOrphan(3, "D"),
+		tile.NewOrphan(1, "B"),
+		tile.NewOrphan(4, "I"),
 	}
 	player.PickTile(tl)
 	if len(player.tiles) > 6 {
@@ -63,20 +63,20 @@ func TestUseTile(t *testing.T) {
 	player := New("Test")
 
 	player.tiles = []*tile.Orphan{
-		tile.New(7, "C"),
-		tile.New(5, "A"),
-		tile.New(8, "E"),
-		tile.New(3, "D"),
-		tile.New(1, "B"),
-		tile.New(4, "I"),
+		tile.NewOrphan(7, "C"),
+		tile.NewOrphan(5, "A"),
+		tile.NewOrphan(8, "E"),
+		tile.NewOrphan(3, "D"),
+		tile.NewOrphan(1, "B"),
+		tile.NewOrphan(4, "I"),
 	}
 
-	tl := tile.New(5, "A")
+	tl := tile.NewOrphan(5, "A")
 	player.DiscardTile(tl)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
 	}
-	if tl.Number != 5 || tl.Letter != "A" {
+	if tl.Number() != 5 || tl.Letter() != "A" {
 		t.Errorf("DiscardTile() must return tile 5A")
 	}
 }

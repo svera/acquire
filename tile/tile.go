@@ -1,5 +1,9 @@
 package tile
 
+import (
+	"github.com/svera/acquire/corporation"
+)
+
 type Empty struct {
 	number int
 	letter string
