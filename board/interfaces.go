@@ -7,7 +7,7 @@ import (
 
 type Interface interface {
 	Cell(t Coordinates) int
-	TileFoundCorporation(t *tile.Orphan) (bool, []Container)
+	TileFoundCorporation(t *tile.Orphan) (bool, []Coordinates)
 	TileMergeCorporations(t *tile.Orphan) (bool, []Container)
 	TileGrowCorporation(t *tile.Orphan) (bool, []Container, int)
 	PutTile(t *tile.Orphan)
@@ -16,5 +16,7 @@ type Interface interface {
 }
 
 type Container interface {
+	Number() int
+	Letter() string
 	ContentType() string
 }

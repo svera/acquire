@@ -23,11 +23,10 @@ func New() *Board {
 		grid: new([13]map[string]Container),
 	}
 
-	emptyCell := &Empty{}
 	for number := 1; number < 13; number++ {
 		brd.grid[number] = make(map[string]Container)
 		for _, letter := range letters {
-			brd.grid[number][letter] = emptyCell
+			brd.grid[number][letter] = tile.NewEmpty(number, letter)
 		}
 	}
 
@@ -41,8 +40,8 @@ func (b *Board) Cell(t Coordinates) Container {
 
 // Checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) TileFoundCorporation(t *tile.Orphan) (bool, []Container) {
-	var newCorporationTiles []Container
+func (b *Board) TileFoundCorporation(t *tile.Orphan) (bool, []Coordinates) {
+	var newCorporationTiles []Coordinates
 	adjacent := b.adjacentNonCorporationTiles(t)
 	if len(adjacent) == 4 {
 		for _, adjacentCell := range adjacent {
