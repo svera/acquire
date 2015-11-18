@@ -1,11 +1,7 @@
 package tile
 
-import (
-	"github.com/svera/acquire/corporation"
-)
-
 type TileContent interface {
-	ContentType() string
+	Type() string
 }
 
 type Tile struct {
@@ -36,12 +32,12 @@ func (t *Tile) Content() TileContent {
 
 type Empty struct{}
 
-func (e Empty) ContentType() string {
+func (e Empty) Type() string {
 	return "empty"
 }
 
 type Orphan struct{}
 
-func (o Orphan) ContentType() string {
+func (o Orphan) Type() string {
 	return "orphan"
 }

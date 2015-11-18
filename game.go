@@ -32,7 +32,7 @@ type Game struct {
 	corporations  [7]corporation.Interface
 	tileset       tileset.Interface
 	currentPlayer int
-	newCorpTiles  []board.Coordinates
+	newCorpTiles  []*tile.Tile
 }
 
 func New(
@@ -194,11 +194,11 @@ func (g *Game) getStockHolders(corp corporation.Interface) []player.ShareInterfa
 
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
-func (g *Game) isTileUnplayable(tl *tile.Orphan) bool {
+func (g *Game) isTileUnplayable(tl *tile.Tile) bool {
 	adjacents := g.board.AdjacentCells(tl)
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.ContentType() == "corporation" && adjacent.(corporation.Interface).IsSafe() {
+		if adjacent.Content().Type() == "corporation" && adjacent.Content().(corporation.Interface).IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -210,13 +210,13 @@ func (g *Game) isTileUnplayable(tl *tile.Orphan) bool {
 
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
-func (g *Game) isTileTemporaryUnplayable(tl *tile.Orphan) bool {
+func (g *Game) isTileTemporaryUnplayable(tl *tile.Tile) bool {
 	if len(g.getActiveCorporations()) < totalCorporations {
 		return false
 	}
 	adjacents := g.board.AdjacentCells(tl)
 	for _, adjacent := range adjacents {
-		if adjacent.ContentType() == "orphan" {
+		if adjacent.Content().Type() == "orphan" {
 			return true
 		}
 	}
@@ -228,7 +228,7 @@ func (g *Game) CurrentPlayer() player.Interface {
 	return g.players[g.currentPlayer]
 }
 
-func (g *Game) PlayTile(tl *tile.Orphan) error {
+func (g *Game) PlayTile(tl *tile.Tile) error {
 	if g.state.Name() != "PlayTile" {
 		return errors.New(ActionNotAllowed)
 	}
@@ -244,8 +244,8 @@ func (g *Game) PlayTile(tl *tile.Orphan) error {
 		} else */if found, tiles := g.board.TileFoundCorporation(tl); found {
 		g.state, _ = g.state.ToFoundCorp()
 		g.newCorpTiles = tiles
-	} else if grow, tiles, corporationId := g.board.TileGrowCorporation(tl); grow {
-		g.growCorporation(g.corporations[corporationId], tiles)
+	} else if grow, tiles, corp := g.board.TileGrowCorporation(tl); grow {
+		g.growCorporation(corp, tiles)
 		g.state, _ = g.state.ToBuyStock()
 	} else {
 		g.board.PutTile(tl)
@@ -263,15 +263,15 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 	}
 	g.board.SetTiles(corp, g.newCorpTiles)
 	corp.Grow(len(g.newCorpTiles))
-	g.newCorpTiles = []board.Coordinates{}
+	g.newCorpTiles = []*tile.Tile{}
 	g.CurrentPlayer().GetFounderStockShare(corp)
 	g.state, _ = g.state.ToBuyStock()
 	return nil
 }
 
-func (g *Game) growCorporation(corp corporation.Interface, tiles []board.Coordinates) {
+func (g *Game) growCorporation(corp corporation.Interface, tiles []*tile.Tile) {
 	g.board.SetTiles(corp, tiles)
-	corp.AddTiles(len(tiles))
+	corp.Grow(len(tiles))
 }
 
 // Increases the number which specifies the current player

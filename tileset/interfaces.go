@@ -5,5 +5,5 @@ import (
 )
 
 type Interface interface {
-	Draw() (*tile.Orphan, error)
+	Draw() (*tile.Tile, error)
 }

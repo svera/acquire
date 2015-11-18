@@ -11,7 +11,7 @@ const (
 )
 
 type Tileset struct {
-	tiles []*tile.Orphan
+	tiles []*tile.Tile
 }
 
 func New() *Tileset {

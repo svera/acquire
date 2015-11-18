@@ -134,6 +134,6 @@ func (c *Corporation) Class() int {
 	return c.class
 }
 
-func (c *Corporation) ContentType() string {
+func (c *Corporation) Type() string {
 	return "corporation"
 }

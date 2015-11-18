@@ -14,7 +14,7 @@ const (
 type Player struct {
 	name   string
 	cash   int
-	tiles  []*tile.Orphan
+	tiles  []*tile.Tile
 	shares [7]int
 }
 
@@ -47,7 +47,7 @@ func (p *Player) GetFounderStockShare(corp corporation.Interface) {
 }
 
 // Adds a new tile to the players' tileset
-func (p *Player) PickTile(tile *tile.Orphan) error {
+func (p *Player) PickTile(tile *tile.Tile) error {
 	if len(p.tiles) >= 6 {
 		return errors.New(TooManyTiles)
 	}
@@ -55,7 +55,7 @@ func (p *Player) PickTile(tile *tile.Orphan) error {
 	return nil
 }
 
-func (p *Player) Tiles() []*tile.Orphan {
+func (p *Player) Tiles() []*tile.Tile {
 	return p.tiles
 }
 
@@ -63,7 +63,7 @@ func (p *Player) ReceiveBonus(amount int) {
 	p.cash += amount
 }
 
-func (p *Player) DiscardTile(tile *tile.Orphan) error {
+func (p *Player) DiscardTile(tile *tile.Tile) error {
 	for i, currentTile := range p.tiles {
 		if currentTile.Number() == tile.Number() && currentTile.Letter() == tile.Letter() {
 			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)

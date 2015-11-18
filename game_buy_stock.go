@@ -2,7 +2,7 @@ package game
 
 import (
 	"errors"
-	"github.com/svera/acquire/tileset"
+	"github.com/svera/acquire/tile"
 )
 
 // Buys stock from corporations
@@ -50,7 +50,7 @@ func (g *Game) checkBuy(buys map[int]int) error {
 // the one he/she played. This is not done until the end of
 // the turn.
 func (g *Game) drawTile() error {
-	var tile board.Coordinates
+	var tile *tile.Tile
 	var err error
 	if tile, err = g.tileset.Draw(); err != nil {
 		return err

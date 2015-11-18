@@ -5,6 +5,7 @@ import (
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
+	"github.com/svera/acquire/tile"
 	"github.com/svera/acquire/tileset"
 	"testing"
 )
@@ -148,8 +149,8 @@ func TestGetMainStockHolders(t *testing.T) {
 
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := board.Coordinates{Number: 6, Letter: "E"}
-	bd.PutTile(board.Coordinates{Number: 5, Letter: "E"})
+	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	bd.PutTile(tile.New(5, "E", tile.Orphan{}))
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -169,9 +170,9 @@ func TestFoundCorporation(t *testing.T) {
 		t.Errorf("Game in a state different than FoundCorp must not execute FoundCorporation()")
 	}
 	game.state = &fsm.FoundCorp{}
-	newCorpTiles := []board.Coordinates{
-		{Number: 5, Letter: "E"},
-		{Number: 6, Letter: "E"},
+	newCorpTiles := []*tile.Tile{
+		tile.New(5, "E", tile.Orphan{}),
+		tile.New(6, "E", tile.Orphan{}),
 	}
 	game.newCorpTiles = newCorpTiles
 	game.FoundCorporation(corporations[0])
@@ -184,18 +185,21 @@ func TestFoundCorporation(t *testing.T) {
 	if corporations[0].Size() != 2 {
 		t.Errorf("Corporation must have 2 tiles, got %d", corporations[0].Size())
 	}
-	if game.board.Cell(newCorpTiles[0]) != 0 || game.board.Cell(newCorpTiles[1]) != 0 {
+	if game.board.Cell(newCorpTiles[0].Number(), newCorpTiles[0].Letter()).Content() != corporations[0] || game.board.Cell(newCorpTiles[1].Number(), newCorpTiles[1].Letter()).Content() != corporations[0] {
 		t.Errorf("Corporation tiles are not set on board")
 	}
 }
 
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := board.Coordinates{Number: 6, Letter: "E"}
-	corpTiles := []board.Coordinates{{Number: 7, Letter: "E"}, {Number: 8, Letter: "E"}}
+	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	corpTiles := []*tile.Tile{
+		tile.New(7, "E", corporations[0]),
+		tile.New(8, "E", corporations[0]),
+	}
 	corporations[0].Grow(len(corpTiles))
 	bd.SetTiles(corporations[0], corpTiles)
-	bd.PutTile(board.Coordinates{Number: 5, Letter: "E"})
+	bd.PutTile(tile.New(5, "E", tile.Orphan{}))
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -255,17 +259,17 @@ func TestDrawTile(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].(*corporation.Stub).SetSize(11)
 	corporations[1].(*corporation.Stub).SetSize(15)
-	unplayableTile := board.Coordinates{Number: 6, Letter: "D"}
-	bd.SetTiles(corporations[0], []board.Coordinates{{Number: 5, Letter: "D"}})
-	bd.SetTiles(corporations[1], []board.Coordinates{{Number: 7, Letter: "D"}})
+	unplayableTile := tile.New(6, "D", tile.Orphan{})
+	bd.SetTiles(corporations[0], []*tile.Tile{tile.New(5, "D", tile.Orphan{})})
+	bd.SetTiles(corporations[1], []*tile.Tile{tile.New(7, "D", tile.Orphan{})})
 
 	game, _ := New(bd, players, corporations, ts)
-	players[0].(*player.Stub).SetTiles([]board.Coordinates{unplayableTile})
+	players[0].(*player.Stub).SetTiles([]*tile.Tile{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
 	game.drawTile()
 	for _, tile := range players[0].Tiles() {
-		if tile.Number == unplayableTile.Number && tile.Letter == unplayableTile.Letter {
+		if tile.Number() == unplayableTile.Number() && tile.Letter() == unplayableTile.Letter() {
 			t.Errorf("Unplayable tile not discarded after drawing new tile, got %v", players[0].Tiles())
 		}
 	}
