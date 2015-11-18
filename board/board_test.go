@@ -28,11 +28,11 @@ func TestTileFoundCorporation(t *testing.T) {
 	)
 
 	expectedCorporationTiles := []*tile.Tile{
-		tile.New(6, "D", tile.Orphan{}),
-		tile.New(5, "D", tile.Orphan{}),
-		tile.New(6, "C", tile.Orphan{}),
-		tile.New(6, "E", tile.Orphan{}),
-		tile.New(7, "D", tile.Orphan{}),
+		board.grid[6]["D"],
+		board.grid[5]["D"],
+		board.grid[6]["C"],
+		board.grid[6]["E"],
+		board.grid[7]["D"],
 	}
 
 	if !found {
