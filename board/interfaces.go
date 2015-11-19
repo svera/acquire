@@ -6,11 +6,11 @@ import (
 )
 
 type Interface interface {
-	Cell(number int, letter string) *tile.Tile
-	TileFoundCorporation(t *tile.Tile) (bool, []*tile.Tile)
-	TileMergeCorporations(t *tile.Tile) (bool, []corporation.Interface)
-	TileGrowCorporation(t *tile.Tile) (bool, []*tile.Tile, corporation.Interface)
-	PutTile(t *tile.Tile)
-	AdjacentCells(t *tile.Tile) []*tile.Tile
-	SetTiles(cp corporation.Interface, tiles []*tile.Tile)
+	Cell(number int, letter string) tile.Interface
+	TileFoundCorporation(t tile.Interface) (bool, []tile.Interface)
+	TileMergeCorporations(t tile.Interface) (bool, []corporation.Interface)
+	TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, corporation.Interface)
+	PutTile(t tile.Interface)
+	AdjacentCells(t tile.Interface) []tile.Interface
+	SetTiles(cp corporation.Interface, tiles []tile.Interface)
 }

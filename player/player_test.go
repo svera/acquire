@@ -15,7 +15,7 @@ func TestPickTile(t *testing.T) {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
 
-	player.tiles = []*tile.Tile{
+	player.tiles = []tile.Interface{
 		tile.New(7, "C", tile.Orphan{}),
 		tile.New(5, "A", tile.Orphan{}),
 		tile.New(8, "E", tile.Orphan{}),
@@ -62,7 +62,7 @@ func TestSort(t *testing.T) {
 func TestUseTile(t *testing.T) {
 	player := New("Test")
 
-	player.tiles = []*tile.Tile{
+	player.tiles = []tile.Interface{
 		tile.New(7, "C", tile.Orphan{}),
 		tile.New(5, "A", tile.Orphan{}),
 		tile.New(8, "E", tile.Orphan{}),

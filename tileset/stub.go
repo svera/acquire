@@ -14,7 +14,7 @@ func NewStub() *Stub {
 	return &stub
 }
 
-func (t *Stub) DiscardTile(tl *tile.Tile) {
+func (t *Stub) DiscardTile(tl tile.Interface) {
 	for i, currentTile := range t.tiles {
 		if currentTile.Number() == tl.Number() && currentTile.Letter() == tl.Letter() {
 			t.tiles = append(t.tiles[:i], t.tiles[i+1:]...)

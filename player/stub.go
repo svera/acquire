@@ -27,6 +27,6 @@ func (p *Stub) SetCash(amount int) {
 	p.cash = amount
 }
 
-func (p *Stub) SetTiles(tiles []*tile.Tile) {
+func (p *Stub) SetTiles(tiles []tile.Interface) {
 	p.tiles = tiles
 }

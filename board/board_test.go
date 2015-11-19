@@ -23,12 +23,13 @@ func TestTileFoundCorporation(t *testing.T) {
 	board.grid[6]["C"] = tile.New(6, "C", tile.Orphan{})
 	board.grid[6]["E"] = tile.New(6, "E", tile.Orphan{})
 	board.grid[7]["D"] = tile.New(7, "D", tile.Orphan{})
+	foundingTile := tile.New(6, "D", tile.Orphan{})
 	found, corporationTiles := board.TileFoundCorporation(
-		tile.New(6, "D", tile.Orphan{}),
+		foundingTile,
 	)
 
-	expectedCorporationTiles := []*tile.Tile{
-		board.grid[6]["D"],
+	expectedCorporationTiles := []tile.Interface{
+		foundingTile,
 		board.grid[5]["D"],
 		board.grid[6]["C"],
 		board.grid[6]["E"],
@@ -38,7 +39,7 @@ func TestTileFoundCorporation(t *testing.T) {
 	if !found {
 		t.Errorf("TileFoundCorporation() must return true")
 	}
-	if !slicesSameContent(corporationTiles, expectedCorporationTiles) {
+	if !slicesSameCells(corporationTiles, expectedCorporationTiles) {
 		t.Errorf("Position %d%s must found a corporation with tiles %v, got %v instead", 6, "D", expectedCorporationTiles, corporationTiles)
 	}
 }
@@ -94,7 +95,7 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	expectedCorporations := []corporation.Interface{corp1, corp2, corp3, corp4}
 	merge, corporations := board.TileMergeCorporations(tile.New(6, "E", tile.Orphan{}))
 	//sort.Ints(corporationIds)
-	if !reflect.DeepEqual(corporations, expectedCorporations) {
+	if !slicesSameCorporations(corporations, expectedCorporations) {
 		t.Errorf("Position %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporations, corporations)
 	}
 	if !merge {
@@ -135,24 +136,25 @@ func TestTileGrowCorporation(t *testing.T) {
 	board.grid[8]["E"] = tile.New(8, "E", corp2)
 	board.grid[6]["D"] = tile.New(6, "D", tile.Orphan{})
 	board.grid[6]["F"] = tile.New(6, "F", tile.Orphan{})
+	growerTile := tile.New(6, "E", tile.Orphan{})
 
-	expectedTilesToAppend := []*tile.Tile{
-		tile.New(5, "E", tile.Orphan{}),
-		tile.New(6, "D", tile.Orphan{}),
-		tile.New(6, "E", tile.Orphan{}),
-		tile.New(7, "E", corp2),
+	expectedTilesToAppend := []tile.Interface{
+		board.grid[5]["E"],
+		board.grid[6]["D"],
+		growerTile,
+		board.grid[7]["E"],
 	}
 	expectedCorporationToGrow := corp2
-	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(tile.New(6, "E", tile.Orphan{}))
-	if !slicesSameContent(tilesToAppend, expectedTilesToAppend) {
+	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(growerTile)
+	if !slicesSameCells(tilesToAppend, expectedTilesToAppend) {
 		t.Errorf(
-			"Position %d%s must grow corporation %d by %v, got %v in corporation %d instead",
+			"Position %d%s must grow corporation %s by %v, got %v in corporation %s instead",
 			6,
 			"E",
-			expectedCorporationToGrow,
+			expectedCorporationToGrow.Name(),
 			expectedTilesToAppend,
 			tilesToAppend,
-			corporationToGrow,
+			corporationToGrow.Name(),
 		)
 	}
 	if !grow {
@@ -180,13 +182,13 @@ func TestTileDontGrowCorporation(t *testing.T) {
 func TestAdjacentCells(t *testing.T) {
 	brd := New()
 	tl := tile.New(1, "A", tile.Orphan{})
-	expectedAdjacentCells := []*tile.Tile{
+	expectedAdjacentCells := []tile.Interface{
 		tile.New(2, "A", tile.Orphan{}),
 		tile.New(1, "B", tile.Orphan{}),
 	}
 
 	adjacentCells := brd.AdjacentCells(tl)
-	if !slicesSameContent(adjacentCells, expectedAdjacentCells) {
+	if !slicesSameCells(adjacentCells, expectedAdjacentCells) {
 		t.Errorf(
 			"Position %d%s expected to have adjacent tiles %v, got %v",
 			tl.Number, tl.Letter, expectedAdjacentCells, adjacentCells,
@@ -199,7 +201,7 @@ func TestSetTiles(t *testing.T) {
 	corp, _ := corporation.New("Test", 1, 5)
 	tl1 := tile.New(1, "A", corp)
 	tl2 := tile.New(1, "B", corp)
-	tls := []*tile.Tile{tl1, tl2}
+	tls := []tile.Interface{tl1, tl2}
 	brd.SetTiles(corp, tls)
 	if brd.Cell(tl1.Number(), tl1.Letter()).Content() != corp || brd.Cell(tl2.Number(), tl2.Letter()).Content() != corp {
 		t.Errorf(
@@ -209,7 +211,29 @@ func TestSetTiles(t *testing.T) {
 	}
 }
 
-func slicesSameContent(slice1 []*tile.Tile, slice2 []*tile.Tile) bool {
+// Compare coordinates of tiles from two slices, order independent
+func slicesSameCells(slice1 []tile.Interface, slice2 []tile.Interface) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+	var inSlice bool
+	for _, val1 := range slice1 {
+		inSlice = false
+		for _, val2 := range slice2 {
+			if val1.Number() == val2.Number() && val1.Letter() == val2.Letter() {
+				inSlice = true
+				break
+			}
+		}
+		if !inSlice {
+			return false
+		}
+	}
+	return true
+}
+
+// Compare corporations from two slices, order independent
+func slicesSameCorporations(slice1 []corporation.Interface, slice2 []corporation.Interface) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}

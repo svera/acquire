@@ -170,7 +170,7 @@ func TestFoundCorporation(t *testing.T) {
 		t.Errorf("Game in a state different than FoundCorp must not execute FoundCorporation()")
 	}
 	game.state = &fsm.FoundCorp{}
-	newCorpTiles := []*tile.Tile{
+	newCorpTiles := []tile.Interface{
 		tile.New(5, "E", tile.Orphan{}),
 		tile.New(6, "E", tile.Orphan{}),
 	}
@@ -193,7 +193,7 @@ func TestFoundCorporation(t *testing.T) {
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tile.New(6, "E", tile.Orphan{})
-	corpTiles := []*tile.Tile{
+	corpTiles := []tile.Interface{
 		tile.New(7, "E", corporations[0]),
 		tile.New(8, "E", corporations[0]),
 	}
@@ -260,11 +260,11 @@ func TestDrawTile(t *testing.T) {
 	corporations[0].(*corporation.Stub).SetSize(11)
 	corporations[1].(*corporation.Stub).SetSize(15)
 	unplayableTile := tile.New(6, "D", tile.Orphan{})
-	bd.SetTiles(corporations[0], []*tile.Tile{tile.New(5, "D", tile.Orphan{})})
-	bd.SetTiles(corporations[1], []*tile.Tile{tile.New(7, "D", tile.Orphan{})})
+	bd.SetTiles(corporations[0], []tile.Interface{tile.New(5, "D", tile.Orphan{})})
+	bd.SetTiles(corporations[1], []tile.Interface{tile.New(7, "D", tile.Orphan{})})
 
 	game, _ := New(bd, players, corporations, ts)
-	players[0].(*player.Stub).SetTiles([]*tile.Tile{unplayableTile})
+	players[0].(*player.Stub).SetTiles([]tile.Interface{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
 	game.drawTile()

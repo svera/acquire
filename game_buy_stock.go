@@ -50,7 +50,7 @@ func (g *Game) checkBuy(buys map[int]int) error {
 // the one he/she played. This is not done until the end of
 // the turn.
 func (g *Game) drawTile() error {
-	var tile *tile.Tile
+	var tile tile.Interface
 	var err error
 	if tile, err = g.tileset.Draw(); err != nil {
 		return err
