@@ -14,13 +14,13 @@ func NewStub(name string) *Stub {
 		Player{
 			name:   name,
 			cash:   6000,
-			shares: [7]int{},
+			shares: map[string]int{},
 		},
 	}
 }
 
 func (p *Stub) SetShares(c corporation.Interface, amount int) {
-	p.shares[c.Id()] = amount
+	p.shares[c.Name()] = amount
 }
 
 func (p *Stub) SetCash(amount int) {

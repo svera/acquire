@@ -15,25 +15,25 @@ type Player struct {
 	name   string
 	cash   int
 	tiles  []tile.Interface
-	shares [7]int
+	shares map[string]int
 }
 
 func New(name string) *Player {
 	return &Player{
 		name:   name,
 		cash:   6000,
-		shares: [7]int{},
+		shares: map[string]int{},
 	}
 }
 
 func (p *Player) Shares(corp corporation.Interface) int {
-	return p.shares[corp.Id()]
+	return p.shares[corp.Name()]
 }
 
 // Buys stock from corporation
 func (p *Player) Buy(corp corporation.Interface, amount int) {
 	corp.SetStock(corp.Stock() - amount)
-	p.shares[corp.Id()] = amount
+	p.shares[corp.Name()] = amount
 	p.cash -= corp.StockPrice() * amount
 }
 
@@ -42,7 +42,7 @@ func (p *Player) Buy(corp corporation.Interface, amount int) {
 func (p *Player) GetFounderStockShare(corp corporation.Interface) {
 	if corp.Stock() > 0 {
 		corp.SetStock(corp.Stock() - 1)
-		p.shares[corp.Id()] += 1
+		p.shares[corp.Name()] += 1
 	}
 }
 

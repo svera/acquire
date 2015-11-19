@@ -19,21 +19,21 @@ func TestNewGameWrongNumberPlayers(t *testing.T) {
 	}
 }
 
-func TestNewGameNotUniqueCorpIds(t *testing.T) {
+func TestNewGameNotUniqueCorpNames(t *testing.T) {
 	players, corporations, board, tileset := setup()
 
-	corporations[0] = corporation.NewStub("A", 0, 0)
-	corporations[1] = corporation.NewStub("B", 0, 0)
+	corporations[0] = corporation.NewStub("A", 0)
+	corporations[1] = corporation.NewStub("A", 0)
 
-	if _, err := New(board, players, corporations, tileset); err.Error() != CorpIdNotUnique {
-		t.Errorf("Corporations must have unique values, expecting %s error, got %s", CorpIdNotUnique, err.Error())
+	if _, err := New(board, players, corporations, tileset); err.Error() != CorpNameNotUnique {
+		t.Errorf("Corporations must have unique names, expecting %s error, got %s", CorpNameNotUnique, err.Error())
 	}
 }
 
 func TestNewGameWrongNumberOfCorpsPerClass(t *testing.T) {
 	players, corporations, board, tileset := setup()
 
-	corporations[2] = corporation.NewStub("C", 0, 2)
+	corporations[2] = corporation.NewStub("C", 0)
 
 	if _, err := New(board, players, corporations, tileset); err.Error() != WrongNumberCorpsClass {
 		t.Errorf("Game must catch wrong number of corporations per class")
@@ -282,13 +282,13 @@ func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, til
 	players = append(players, player.NewStub("Test3"))
 
 	var corporations [7]corporation.Interface
-	corporations[0] = corporation.NewStub("A", 0, 0)
-	corporations[1] = corporation.NewStub("B", 0, 1)
-	corporations[2] = corporation.NewStub("C", 1, 2)
-	corporations[3] = corporation.NewStub("D", 1, 3)
-	corporations[4] = corporation.NewStub("E", 1, 4)
-	corporations[5] = corporation.NewStub("F", 2, 5)
-	corporations[6] = corporation.NewStub("G", 2, 6)
+	corporations[0] = corporation.NewStub("A", 0)
+	corporations[1] = corporation.NewStub("B", 0)
+	corporations[2] = corporation.NewStub("C", 1)
+	corporations[3] = corporation.NewStub("D", 1)
+	corporations[4] = corporation.NewStub("E", 1)
+	corporations[5] = corporation.NewStub("F", 2)
+	corporations[6] = corporation.NewStub("G", 2)
 
 	board := board.New()
 	tileset := tileset.NewStub()
