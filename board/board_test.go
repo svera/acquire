@@ -46,7 +46,7 @@ func TestTileFoundCorporation(t *testing.T) {
 
 func TestTileNotFoundCorporation(t *testing.T) {
 	board := New()
-	corp, _ := corporation.New("Test 1", 0, 1)
+	corp, _ := corporation.New("Test 1", 0)
 	found, corporationTiles := board.TileFoundCorporation(tile.New(6, "D", tile.Orphan{}))
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
@@ -73,10 +73,10 @@ func TestTileNotFoundCorporation(t *testing.T) {
 // G         []
 func TestTileQuadrupleMerge(t *testing.T) {
 	board := New()
-	corp1, _ := corporation.New("Test 1", 0, 1)
-	corp2, _ := corporation.New("Test 2", 1, 2)
-	corp3, _ := corporation.New("Test 3", 2, 3)
-	corp4, _ := corporation.New("Test 3", 2, 4)
+	corp1, _ := corporation.New("Test 1", 0)
+	corp2, _ := corporation.New("Test 2", 1)
+	corp3, _ := corporation.New("Test 3", 2)
+	corp4, _ := corporation.New("Test 3", 2)
 	board.grid[2]["E"] = tile.New(2, "E", corp1)
 	board.grid[3]["E"] = tile.New(3, "E", corp1)
 	board.grid[4]["E"] = tile.New(4, "E", corp1)
@@ -108,7 +108,7 @@ func TestTileQuadrupleMerge(t *testing.T) {
 // E []><[][]
 func TestTileDontMerge(t *testing.T) {
 	board := New()
-	corp2, _ := corporation.New("Test 2", 1, 2)
+	corp2, _ := corporation.New("Test 2", 1)
 	board.grid[3]["E"] = tile.New(3, "E", tile.Orphan{})
 	board.grid[5]["E"] = tile.New(5, "E", corp2)
 	board.grid[6]["E"] = tile.New(6, "E", corp2)
@@ -130,7 +130,7 @@ func TestTileDontMerge(t *testing.T) {
 // F   []
 func TestTileGrowCorporation(t *testing.T) {
 	board := New()
-	corp2, _ := corporation.New("Test 2", 1, 2)
+	corp2, _ := corporation.New("Test 2", 1)
 	board.grid[5]["E"] = tile.New(5, "E", tile.Orphan{})
 	board.grid[7]["E"] = tile.New(7, "E", corp2)
 	board.grid[8]["E"] = tile.New(8, "E", corp2)
@@ -164,7 +164,7 @@ func TestTileGrowCorporation(t *testing.T) {
 
 func TestTileDontGrowCorporation(t *testing.T) {
 	board := New()
-	corp2, _ := corporation.New("Test 2", 1, 2)
+	corp2, _ := corporation.New("Test 2", 1)
 
 	board.grid[7]["E"] = tile.New(7, "E", corp2)
 	board.grid[8]["E"] = tile.New(8, "E", corp2)
@@ -198,7 +198,7 @@ func TestAdjacentCells(t *testing.T) {
 
 func TestSetTiles(t *testing.T) {
 	brd := New()
-	corp, _ := corporation.New("Test", 1, 5)
+	corp, _ := corporation.New("Test", 1)
 	tl1 := tile.New(1, "A", corp)
 	tl2 := tile.New(1, "B", corp)
 	tls := []tile.Interface{tl1, tl2}

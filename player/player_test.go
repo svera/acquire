@@ -37,7 +37,7 @@ func TestSort(t *testing.T) {
 		NewStub("Test4"),
 	}
 
-	corp, _ := corporation.New("Test", 0, 0)
+	corp, _ := corporation.New("Test", 0)
 
 	players[0].(*Stub).SetShares(corp, 3)
 	players[1].(*Stub).SetShares(corp, 1)

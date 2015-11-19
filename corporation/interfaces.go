@@ -1,7 +1,6 @@
 package corporation
 
 type Interface interface {
-	Id() int
 	Grow(number int)
 	Stock() int
 	SetStock(stock int)

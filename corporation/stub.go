@@ -4,10 +4,9 @@ type Stub struct {
 	Corporation
 }
 
-func NewStub(name string, class int, id int) *Stub {
+func NewStub(name string, class int) *Stub {
 	return &Stub{
 		Corporation: Corporation{
-			id:          id,
 			name:        name,
 			class:       class,
 			stock:       25,

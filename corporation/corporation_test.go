@@ -6,10 +6,10 @@ import (
 
 func TestStockPrice(t *testing.T) {
 	var corporations = new([4]*Corporation)
-	corporations[0], _ = New("class0", 0, 0)
-	corporations[1], _ = New("class1", 1, 1)
-	corporations[2], _ = New("class2", 2, 2)
-	corporations[3], _ = New("class0 big", 0, 3)
+	corporations[0], _ = New("class0", 0)
+	corporations[1], _ = New("class1", 1)
+	corporations[2], _ = New("class2", 2)
+	corporations[3], _ = New("class0 big", 0)
 
 	corporations[0].size = 2
 	corporations[1].size = 2
@@ -35,7 +35,7 @@ func TestStockPrice(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	expectedSize := 8
 	corp.size = expectedSize
 	if size := corp.Size(); size != expectedSize {
@@ -44,7 +44,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestGrow(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	expectedSize := 2
 	corp.Grow(2)
 	if corp.size != expectedSize {
@@ -52,17 +52,8 @@ func TestGrow(t *testing.T) {
 	}
 }
 
-func TestId(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
-	expectedId := 5
-	corp.id = expectedId
-	if corp.Id() != expectedId {
-		t.Errorf("Corporation ID not got")
-	}
-}
-
 func TestStock(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	expectedStock := 20
 	corp.stock = expectedStock
 	if corp.Stock() != expectedStock {
@@ -71,7 +62,7 @@ func TestStock(t *testing.T) {
 }
 
 func TestSetStock(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	expectedStock := 20
 	corp.SetStock(expectedStock)
 	if corp.stock != expectedStock {
@@ -80,7 +71,7 @@ func TestSetStock(t *testing.T) {
 }
 
 func TestMajorityBonus(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	corp.size = 2
 	expectedMajorityBonus := 2000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
@@ -95,7 +86,7 @@ func TestMajorityBonus(t *testing.T) {
 }
 
 func TestMinorityBonus(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	corp.size = 2
 	expectedMinorityBonus := 1000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
@@ -110,7 +101,7 @@ func TestMinorityBonus(t *testing.T) {
 }
 
 func TestIsSafe(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	corp.size = 2
 	if corp.IsSafe() {
 		t.Errorf("Unsafe corporation regarded as safe")
@@ -122,7 +113,7 @@ func TestIsSafe(t *testing.T) {
 }
 
 func TestIsActive(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	if corp.IsActive() {
 		t.Errorf("Inactive corporation regarded as active")
 	}
@@ -133,7 +124,7 @@ func TestIsActive(t *testing.T) {
 }
 
 func TestName(t *testing.T) {
-	corp, _ := New("Test", 0, 0)
+	corp, _ := New("Test", 0)
 	if corp.Name() != "Test" {
 		t.Errorf("Expected corporation name 'Test'")
 	}

@@ -1,9 +1,5 @@
 package tile
 
-type TileContent interface {
-	Type() string
-}
-
 type Tile struct {
 	number  int
 	letter  string

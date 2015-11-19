@@ -12,11 +12,9 @@ type prices struct {
 
 const (
 	WrongCorporationClass = "wrong_corporation_class"
-	WrongCorporationId    = "wrong_corporation_id"
 )
 
 type Corporation struct {
-	id          int
 	name        string
 	class       int
 	stock       int
@@ -24,15 +22,12 @@ type Corporation struct {
 	size        int
 }
 
-func New(name string, class int, id int) (*Corporation, error) {
+func New(name string, class int) (*Corporation, error) {
 	if class < 0 || class > 2 {
 		return nil, errors.New(WrongCorporationClass)
 	}
-	if id < 0 || id > 6 {
-		return nil, errors.New(WrongCorporationId)
-	}
+
 	corporation := &Corporation{
-		id:          id,
 		name:        name,
 		stock:       25,
 		class:       class,
@@ -44,10 +39,6 @@ func New(name string, class int, id int) (*Corporation, error) {
 
 func (c *Corporation) Size() int {
 	return c.size
-}
-
-func (c *Corporation) Id() int {
-	return c.id
 }
 
 func (c *Corporation) Grow(number int) {

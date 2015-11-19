@@ -13,11 +13,6 @@ type Board struct {
 	grid *[13]map[string]tile.Interface
 }
 
-type Coordinates struct {
-	Number int
-	Letter string
-}
-
 func New() *Board {
 	brd := Board{
 		grid: new([13]map[string]tile.Interface),
