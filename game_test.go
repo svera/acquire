@@ -25,8 +25,8 @@ func TestNewGameNotUniqueCorpNames(t *testing.T) {
 	corporations[0] = corporation.NewStub("A", 0)
 	corporations[1] = corporation.NewStub("A", 0)
 
-	if _, err := New(board, players, corporations, tileset); err.Error() != CorpNameNotUnique {
-		t.Errorf("Corporations must have unique names, expecting %s error, got %s", CorpNameNotUnique, err.Error())
+	if _, err := New(board, players, corporations, tileset); err.Error() != CorpNamesNotUnique {
+		t.Errorf("Corporations must have unique names, expecting %s error, got %s", CorpNamesNotUnique, err.Error())
 	}
 }
 

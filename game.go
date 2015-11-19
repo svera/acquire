@@ -19,7 +19,7 @@ const (
 	TilePermanentlyUnplayable = "tile_permanently_unplayable"
 	NotEnoughCash             = "not_enough_cash"
 	TooManyStockSharesToBuy   = "too_many_stock_shares_to_buy"
-	CorpNameNotUnique         = "corp_name_not_unique"
+	CorpNamesNotUnique        = "corp_names_not_unique"
 	WrongNumberCorpsClass     = "wrong_number_corps_class"
 	CorporationAlreadyOnBoard = "corporation_already_on_board"
 	WrongNumberPlayers        = "wrong_number_players"
@@ -41,7 +41,7 @@ func New(
 		return nil, errors.New(WrongNumberPlayers)
 	}
 	if !areNamesUnique(corporations) {
-		return nil, errors.New(CorpNameNotUnique)
+		return nil, errors.New(CorpNamesNotUnique)
 	}
 	if !isNumberOfCorpsPerClassRight(corporations) {
 		return nil, errors.New(WrongNumberCorpsClass)
@@ -61,7 +61,7 @@ func New(
 	return &gm, nil
 }
 
-// Check that the passed corporations have unique IDs
+// Check that the passed corporations have unique names
 func areNamesUnique(corporations [7]corporation.Interface) bool {
 	for i, corp1 := range corporations {
 		if i < len(corporations)-1 {
