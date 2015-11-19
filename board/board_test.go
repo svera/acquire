@@ -142,7 +142,7 @@ func TestTileGrowCorporation(t *testing.T) {
 		board.grid[5]["E"],
 		board.grid[6]["D"],
 		growerTile,
-		board.grid[7]["E"],
+		board.grid[6]["F"],
 	}
 	expectedCorporationToGrow := corp2
 	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(growerTile)
