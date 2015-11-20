@@ -179,13 +179,13 @@ func stockHoldersWithSameAmount(start int, stockHolders []player.ShareInterface,
 // of that corporation
 func (g *Game) getStockHolders(corp corporation.Interface) []player.ShareInterface {
 	var stockHolders []player.ShareInterface
-	sharesDesc := func(p1, p2 player.ShareInterface) bool {
-		return p1.Shares(corp) > p2.Shares(corp)
+	sharesDesc := func(pl1, pl2 player.ShareInterface) bool {
+		return pl1.Shares(corp) > pl2.Shares(corp)
 	}
 
-	for _, player := range g.players {
-		if player.Shares(corp) > 0 {
-			stockHolders = append(stockHolders, player)
+	for _, pl := range g.players {
+		if pl.Shares(corp) > 0 {
+			stockHolders = append(stockHolders, pl)
 		}
 	}
 	player.By(sharesDesc).Sort(stockHolders)

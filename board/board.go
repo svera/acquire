@@ -62,6 +62,10 @@ func (b *Board) TileMergeCorporations(t tile.Interface) (bool, []corporation.Int
 		corporations = append(corporations, corp)
 	}
 	if len(corporations) > 1 {
+		sizeDesc := func(corp1, corp2 corporation.Interface) bool {
+			return corp1.Size() > corp2.Size()
+		}
+		corporation.By(sizeDesc).Sort(corporations)
 		return true, corporations
 	}
 	return false, []corporation.Interface{}
