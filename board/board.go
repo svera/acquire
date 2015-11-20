@@ -56,6 +56,11 @@ func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) 
 // corporation IDs to be merged
 func (b *Board) TileMergeCorporations(t tile.Interface) (bool, []corporation.Interface) {
 	var corporations []corporation.Interface
+	//corporations := map[string][]corporation.Interface{
+	//	"acquirer": []corporation.Interface{},
+	//	"defunct":  []corporation.Interface{},
+	//}
+
 	adjacent := b.adjacentCorporationTiles(t)
 	for _, adjacentCell := range adjacent {
 		corp, _ := adjacentCell.Content().(corporation.Interface)
@@ -69,6 +74,23 @@ func (b *Board) TileMergeCorporations(t tile.Interface) (bool, []corporation.Int
 		return true, corporations
 	}
 	return false, []corporation.Interface{}
+}
+
+func categorizeMerge(corporations []corporation.Interface) map[string][]corporation.Interface {
+	merge := map[string][]corporation.Interface{
+		"acquirer": []corporation.Interface{},
+		"defunct":  []corporation.Interface{},
+	}
+
+	for i := 1; i < len(corporations); i++ {
+		if corporations[i].Size() == corporations[0].Size() {
+			merge["acquirer"] = append(merge["acquirer"], corporations[i])
+		} else {
+			merge["defunct"] = append(merge["defunct"], corporations[i])
+		}
+	}
+
+	return merge
 }
 
 // Check if the passed tile grows a corporation
