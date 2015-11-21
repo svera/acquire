@@ -12,7 +12,7 @@ func TestPutTile(t *testing.T) {
 	board := New()
 	tile := tile.New(5, "B", tile.Orphan{})
 	board.PutTile(tile)
-	if board.grid[5]["B"].Content().Type() != "orphan" {
+	if board.grid[5]["B"].Owner().Type() != "orphan" {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")
 	}
 }
@@ -73,10 +73,15 @@ func TestTileNotFoundCorporation(t *testing.T) {
 // G         []
 func TestTileQuadrupleMerge(t *testing.T) {
 	board := New()
-	corp1, _ := corporation.New("Test 1", 0)
-	corp2, _ := corporation.New("Test 2", 1)
-	corp3, _ := corporation.New("Test 3", 2)
-	corp4, _ := corporation.New("Test 3", 2)
+	corp1 := corporation.NewStub("Test 1", 0)
+	corp2 := corporation.NewStub("Test 2", 1)
+	corp3 := corporation.NewStub("Test 3", 2)
+	corp4 := corporation.NewStub("Test 3", 2)
+	corp1.SetSize(4)
+	corp2.SetSize(5)
+	corp3.SetSize(3)
+	corp4.SetSize(2)
+
 	board.grid[2]["E"] = tile.New(2, "E", corp1)
 	board.grid[3]["E"] = tile.New(3, "E", corp1)
 	board.grid[4]["E"] = tile.New(4, "E", corp1)
@@ -92,10 +97,56 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	board.grid[6]["F"] = tile.New(6, "F", corp4)
 	board.grid[6]["G"] = tile.New(6, "G", corp4)
 
-	expectedCorporations := []corporation.Interface{corp1, corp2, corp3, corp4}
+	expectedCorporations := map[string][]corporation.Interface{
+		"acquirer": []corporation.Interface{corp2},
+		"defunct": []corporation.Interface{corp1, corp3, corp4},
+	}
 	merge, corporations := board.TileMergeCorporations(tile.New(6, "E", tile.Orphan{}))
-	//sort.Ints(corporationIds)
-	if !slicesSameCorporations(corporations, expectedCorporations) {
+
+	if !slicesSameCorporations(corporations["acquirer"], expectedCorporations["acquirer"]) ||
+		!slicesSameCorporations(corporations["defunct"], expectedCorporations["defunct"]) {
+		t.Errorf("Position %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporations, corporations)
+	}
+	if !merge {
+		t.Errorf("TileMergeCorporations() must return true")
+	}
+}
+
+// Testing quadruple merge tie as this:
+//   4 5 6 7 8 
+// C     []
+// D     []
+// E [][]><[][]
+// F     []
+// G     []
+func TestTileQuadrupleMergeTie(t *testing.T) {
+	board := New()
+	corp1 := corporation.NewStub("Test 1", 0)
+	corp2 := corporation.NewStub("Test 2", 1)
+	corp3 := corporation.NewStub("Test 3", 2)
+	corp4 := corporation.NewStub("Test 3", 2)
+	corp1.SetSize(2)
+	corp2.SetSize(2)
+	corp3.SetSize(2)
+	corp4.SetSize(2)
+
+	board.grid[4]["E"] = tile.New(4, "E", corp1)
+	board.grid[5]["E"] = tile.New(5, "E", corp1)
+	board.grid[7]["E"] = tile.New(7, "E", corp2)
+	board.grid[8]["E"] = tile.New(8, "E", corp2)
+	board.grid[6]["C"] = tile.New(6, "C", corp3)
+	board.grid[6]["D"] = tile.New(6, "D", corp3)
+	board.grid[6]["F"] = tile.New(6, "F", corp4)
+	board.grid[6]["G"] = tile.New(6, "G", corp4)
+
+	expectedCorporations := map[string][]corporation.Interface{
+		"acquirer": []corporation.Interface{corp1, corp2, corp3, corp4},
+		"defunct": []corporation.Interface{},
+	}
+	merge, corporations := board.TileMergeCorporations(tile.New(6, "E", tile.Orphan{}))
+
+	if !slicesSameCorporations(corporations["acquirer"], expectedCorporations["acquirer"]) ||
+		!slicesSameCorporations(corporations["defunct"], expectedCorporations["defunct"]) {
 		t.Errorf("Position %d%s must merge corporations %v, got %v instead", 6, "E", expectedCorporations, corporations)
 	}
 	if !merge {
@@ -113,7 +164,7 @@ func TestTileDontMerge(t *testing.T) {
 	board.grid[5]["E"] = tile.New(5, "E", corp2)
 	board.grid[6]["E"] = tile.New(6, "E", corp2)
 
-	expectedCorporationsMerged := []corporation.Interface{}
+	expectedCorporationsMerged := map[string][]corporation.Interface{}
 	merge, corporations := board.TileMergeCorporations(tile.New(4, "E", tile.Orphan{}))
 	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
 		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
@@ -203,7 +254,7 @@ func TestSetTiles(t *testing.T) {
 	tl2 := tile.New(1, "B", corp)
 	tls := []tile.Interface{tl1, tl2}
 	brd.SetTiles(corp, tls)
-	if brd.Cell(tl1.Number(), tl1.Letter()).Content() != corp || brd.Cell(tl2.Number(), tl2.Letter()).Content() != corp {
+	if brd.Cell(tl1.Number(), tl1.Letter()).Owner() != corp || brd.Cell(tl2.Number(), tl2.Letter()).Owner() != corp {
 		t.Errorf(
 			"Cells %d%s and %d%s expected to belong to corporation",
 			tl1.Number(), tl1.Letter(), tl2.Number(), tl2.Letter(),

@@ -185,7 +185,7 @@ func TestFoundCorporation(t *testing.T) {
 	if corporations[0].Size() != 2 {
 		t.Errorf("Corporation must have 2 tiles, got %d", corporations[0].Size())
 	}
-	if game.board.Cell(newCorpTiles[0].Number(), newCorpTiles[0].Letter()).Content() != corporations[0] || game.board.Cell(newCorpTiles[1].Number(), newCorpTiles[1].Letter()).Content() != corporations[0] {
+	if game.board.Cell(newCorpTiles[0].Number(), newCorpTiles[0].Letter()).Owner() != corporations[0] || game.board.Cell(newCorpTiles[1].Number(), newCorpTiles[1].Letter()).Owner() != corporations[0] {
 		t.Errorf("Corporation tiles are not set on board")
 	}
 }

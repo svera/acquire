@@ -198,7 +198,7 @@ func (g *Game) isTileUnplayable(tl tile.Interface) bool {
 	adjacents := g.board.AdjacentCells(tl)
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Content().Type() == "corporation" && adjacent.Content().(corporation.Interface).IsSafe() {
+		if adjacent.Owner().Type() == "corporation" && adjacent.Owner().(corporation.Interface).IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -216,7 +216,7 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 	}
 	adjacents := g.board.AdjacentCells(tl)
 	for _, adjacent := range adjacents {
-		if adjacent.Content().Type() == "orphan" {
+		if adjacent.Owner().Type() == "orphan" {
 			return true
 		}
 	}

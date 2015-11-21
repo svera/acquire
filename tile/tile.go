@@ -3,11 +3,11 @@ package tile
 type Tile struct {
 	number  int
 	letter  string
-	content TileContent
+	owner Owner
 }
 
-func New(number int, letter string, content TileContent) *Tile {
-	return &Tile{number, letter, content}
+func New(number int, letter string, owner Owner) *Tile {
+	return &Tile{number, letter, owner}
 }
 
 func (t *Tile) Number() int {
@@ -18,12 +18,12 @@ func (t *Tile) Letter() string {
 	return t.letter
 }
 
-func (t *Tile) SetContent(content TileContent) {
-	t.content = content
+func (t *Tile) SetOwner(owner Owner) {
+	t.owner = owner
 }
 
-func (t *Tile) Content() TileContent {
-	return t.content
+func (t *Tile) Owner() Owner {
+	return t.owner
 }
 
 type Empty struct{}

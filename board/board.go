@@ -40,7 +40,7 @@ func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) 
 	adjacent := b.adjacentNonCorporationTiles(t)
 	if len(adjacent) == 4 {
 		for _, adjacentCell := range adjacent {
-			if adjacentCell.Content().Type() == "orphan" {
+			if adjacentCell.Owner().Type() == "orphan" {
 				newCorporationTiles = append(newCorporationTiles, adjacentCell)
 			}
 		}
@@ -54,7 +54,7 @@ func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) 
 
 // Checks if the passed tile merges two or more corporations, returns a slice of
 // corporation IDs to be merged
-func (b *Board) TileMergeCorporations(t tile.Interface) (bool, []corporation.Interface) {
+func (b *Board) TileMergeCorporations(t tile.Interface) (bool, map[string][]corporation.Interface) {
 	var corporations []corporation.Interface
 	//corporations := map[string][]corporation.Interface{
 	//	"acquirer": []corporation.Interface{},
@@ -63,7 +63,7 @@ func (b *Board) TileMergeCorporations(t tile.Interface) (bool, []corporation.Int
 
 	adjacent := b.adjacentCorporationTiles(t)
 	for _, adjacentCell := range adjacent {
-		corp, _ := adjacentCell.Content().(corporation.Interface)
+		corp, _ := adjacentCell.Owner().(corporation.Interface)
 		corporations = append(corporations, corp)
 	}
 	if len(corporations) > 1 {
@@ -71,14 +71,14 @@ func (b *Board) TileMergeCorporations(t tile.Interface) (bool, []corporation.Int
 			return corp1.Size() > corp2.Size()
 		}
 		corporation.By(sizeDesc).Sort(corporations)
-		return true, corporations
+		return true, categorizeMerge(corporations)
 	}
-	return false, []corporation.Interface{}
+	return false, map[string][]corporation.Interface{}
 }
 
 func categorizeMerge(corporations []corporation.Interface) map[string][]corporation.Interface {
 	merge := map[string][]corporation.Interface{
-		"acquirer": []corporation.Interface{},
+		"acquirer": []corporation.Interface{corporations[0]},
 		"defunct":  []corporation.Interface{},
 	}
 
@@ -102,11 +102,11 @@ func (b *Board) TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, c
 	corporationToGrow := nullCorporation
 	adjacent := b.adjacentTiles(t)
 	for _, adjacentCell := range adjacent {
-		if adjacentCell.Content().Type() != "orphan" {
+		if adjacentCell.Owner().Type() != "orphan" {
 			if corporationToGrow != nullCorporation {
 				return false, []tile.Interface{}, nullCorporation
 			}
-			corporationToGrow = adjacentCell.Content().(corporation.Interface)
+			corporationToGrow = adjacentCell.Owner().(corporation.Interface)
 		} else {
 			tilesToAppend = append(tilesToAppend, adjacentCell)
 		}
@@ -157,7 +157,7 @@ func (b *Board) adjacentTiles(t tile.Interface) []tile.Interface {
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tile.Interface) bool {
-			if t.Content().Type() != "empty" {
+			if t.Owner().Type() != "empty" {
 				return true
 			}
 			return false
@@ -169,7 +169,7 @@ func (b *Board) adjacentCorporationTiles(t tile.Interface) []tile.Interface {
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tile.Interface) bool {
-			if t.Content().Type() == "corporation" {
+			if t.Owner().Type() == "corporation" {
 				return true
 			}
 			return false
@@ -181,7 +181,7 @@ func (b *Board) adjacentNonCorporationTiles(t tile.Interface) []tile.Interface {
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tile.Interface) bool {
-			if t.Content().Type() == "orphan" || t.Content().Type() == "empty" {
+			if t.Owner().Type() == "orphan" || t.Owner().Type() == "empty" {
 				return true
 			}
 			return false
@@ -208,6 +208,6 @@ func nextLetter(letter string) string {
 
 func (b *Board) SetTiles(cp corporation.Interface, tiles []tile.Interface) {
 	for _, tl := range tiles {
-		b.grid[tl.Number()][tl.Letter()].SetContent(cp)
+		b.grid[tl.Number()][tl.Letter()].SetOwner(cp)
 	}
 }

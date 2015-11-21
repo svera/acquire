@@ -8,7 +8,7 @@ import (
 type Interface interface {
 	Cell(number int, letter string) tile.Interface
 	TileFoundCorporation(t tile.Interface) (bool, []tile.Interface)
-	TileMergeCorporations(t tile.Interface) (bool, []corporation.Interface)
+	TileMergeCorporations(t tile.Interface) (bool, map[string][]corporation.Interface)
 	TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, corporation.Interface)
 	PutTile(t tile.Interface)
 	AdjacentCells(t tile.Interface) []tile.Interface

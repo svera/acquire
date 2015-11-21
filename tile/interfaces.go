@@ -1,12 +1,12 @@
 package tile
 
-type TileContent interface {
+type Owner interface {
 	Type() string
 }
 
 type Interface interface {
 	Number() int
 	Letter() string
-	SetContent(content TileContent)
-	Content() TileContent
+	SetOwner(owner Owner)
+	Owner() Owner
 }
