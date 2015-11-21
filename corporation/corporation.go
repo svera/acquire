@@ -1,3 +1,4 @@
+// Model which manager corporations in game
 package corporation
 
 import (
@@ -37,10 +38,12 @@ func New(name string, class int) (*Corporation, error) {
 	return corporation, nil
 }
 
+// Returns corporation size on board
 func (c *Corporation) Size() int {
 	return c.size
 }
 
+// Increase corporation size in tiles
 func (c *Corporation) Grow(number int) {
 	c.size += number
 }
@@ -75,10 +78,12 @@ func initPricesChart(class int) map[int]prices {
 	return pricesChart
 }
 
+// Returns corporation's amount of stock shares available
 func (c *Corporation) Stock() int {
 	return c.stock
 }
 
+// Set corporation's amount of stock shares available
 func (c *Corporation) SetStock(stock int) {
 	c.stock = stock
 }
@@ -117,14 +122,17 @@ func (c *Corporation) IsActive() bool {
 	return c.Size() > 0
 }
 
+// Returns corporation name
 func (c *Corporation) Name() string {
 	return c.name
 }
 
+// Returns corporation class
 func (c *Corporation) Class() int {
 	return c.class
 }
 
+// Return type, to comply with owner interface
 func (c *Corporation) Type() string {
 	return "corporation"
 }

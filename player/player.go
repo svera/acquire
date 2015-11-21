@@ -1,3 +1,4 @@
+// Player model, which manages player status in game.
 package player
 
 import (
@@ -26,6 +27,7 @@ func New(name string) *Player {
 	}
 }
 
+// Returns the number of shares for the passed corporation owned by the player
 func (p *Player) Shares(corp corporation.Interface) int {
 	return p.shares[corp.Name()]
 }
@@ -55,6 +57,7 @@ func (p *Player) PickTile(tile tile.Interface) error {
 	return nil
 }
 
+// Return player's tiles
 func (p *Player) Tiles() []tile.Interface {
 	return p.tiles
 }
@@ -63,6 +66,7 @@ func (p *Player) ReceiveBonus(amount int) {
 	p.cash += amount
 }
 
+// Discard passed tile from player's hand
 func (p *Player) DiscardTile(tile tile.Interface) error {
 	for i, currentTile := range p.tiles {
 		if currentTile.Number() == tile.Number() && currentTile.Letter() == tile.Letter() {
@@ -73,6 +77,7 @@ func (p *Player) DiscardTile(tile tile.Interface) error {
 	return errors.New(TileNotOnHand)
 }
 
+// Returns player cash
 func (p *Player) Cash() int {
 	return p.cash
 }

@@ -206,6 +206,7 @@ func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
 }
 
+// Set tiles on board as belonging to the passed corporation
 func (b *Board) SetTiles(cp corporation.Interface, tiles []tile.Interface) {
 	for _, tl := range tiles {
 		b.grid[tl.Number()][tl.Letter()].SetOwner(cp)
