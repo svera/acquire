@@ -220,6 +220,9 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 // Testing this merge:
 //   4 5 6 7 8 9
 // E [][]><[][][]
+//
+// In this case, only player 0 has shares of the defunct corp 0, which has
+// a size of 2, thus getting both majority and minority bonuses
 func TestPlayTileMergeCorporations(t *testing.T) {
 	players, corporations, bd, ts := setup()
 
