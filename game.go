@@ -123,21 +123,6 @@ func (g *Game) getActiveCorporations() []corporation.Interface {
 	return active
 }
 
-// Calculates and returns bonus amounts to be paid to owners of stock of a
-// defunct corporation
-func (g *Game) PayBonusesForDefunctCorporation(corp corporation.Interface) {
-	stockHolders := g.GetMainStockHolders(corp)
-	numberMajorityHolders := len(stockHolders["majority"])
-	numberMinorityHolders := len(stockHolders["minority"])
-
-	for _, majorityStockHolder := range stockHolders["majority"] {
-		majorityStockHolder.ReceiveBonus(corp.MajorityBonus() / int(numberMajorityHolders))
-	}
-	for _, minorityStockHolder := range stockHolders["minority"] {
-		minorityStockHolder.ReceiveBonus(corp.MinorityBonus() / int(numberMinorityHolders))
-	}
-}
-
 // Taken from the game rules:
 // "If only one player owns stock in the defunct corporation, that player gets both bonuses. If there's
 // a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
@@ -238,12 +223,13 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 	if err := g.CurrentPlayer().DiscardTile(tl); err != nil {
 		return err
 	}
-	
-	if merge, corporations := g.board.TileMergeCorporations(tl); merge {
-		if isMergeTied(corporations) {
+
+	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
+		if isMergeTied(mergeCorps) {
 			g.state, _ = g.state.ToUntieMerge()
 		} else {
-			g.state, _ = g.state.ToSellTrade()				
+			g.payMergeBonuses(mergeCorps)
+			g.state, _ = g.state.ToSellTrade()
 		}
 	} else if found, tiles := g.board.TileFoundCorporation(tl); found {
 		g.state, _ = g.state.ToFoundCorp()
@@ -263,6 +249,31 @@ func isMergeTied(merge map[string][]corporation.Interface) bool {
 		return true
 	}
 	return false
+}
+
+// Calculates and returns bonus amounts to be paid to owners of stock of a
+// defunct corporation
+func (g *Game) payMergeBonuses(merge map[string][]corporation.Interface) {
+	for _, corp := range merge["defunct"] {
+		stockHolders := g.GetMainStockHolders(corp)
+		numberMajorityHolders := len(stockHolders["majority"])
+		numberMinorityHolders := len(stockHolders["minority"])
+
+		for _, majorityStockHolder := range stockHolders["majority"] {
+			majorityStockHolder.ReceiveBonus(corp.MajorityBonus() / numberMajorityHolders)
+		}
+		for _, minorityStockHolder := range stockHolders["minority"] {
+			minorityStockHolder.ReceiveBonus(corp.MinorityBonus() / numberMinorityHolders)
+		}
+	}
+}
+
+// TODO
+func (g *Game) SellTrade() error {
+	if g.state.Name() != "SellTrade" {
+		return errors.New(ActionNotAllowed)
+	}
+	return nil
 }
 
 func (g *Game) FoundCorporation(corp corporation.Interface) error {

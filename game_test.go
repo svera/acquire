@@ -217,6 +217,40 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	}
 }
 
+// Testing this merge:
+//   4 5 6 7 8 9
+// E [][]><[][][]
+func TestPlayTileMergeCorporations(t *testing.T) {
+	players, corporations, bd, ts := setup()
+
+	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	corp0Tiles := []tile.Interface{
+		tile.New(4, "E", corporations[0]),
+		tile.New(5, "E", corporations[0]),
+	}
+	corp1Tiles := []tile.Interface{
+		tile.New(7, "E", corporations[1]),
+		tile.New(8, "E", corporations[1]),
+		tile.New(9, "E", corporations[1]),
+	}
+	corporations[0].Grow(len(corp0Tiles))
+	corporations[1].Grow(len(corp1Tiles))
+	bd.SetTiles(corporations[0], corp0Tiles)
+	bd.SetTiles(corporations[1], corp1Tiles)
+
+	game, _ := New(bd, players, corporations, ts)
+	playerTiles := players[0].Tiles()
+	players[0].DiscardTile(playerTiles[0])
+	players[0].PickTile(tileToPlay)
+	players[0].(*player.Stub).SetShares(corporations[0], 6)
+
+	game.PlayTile(tileToPlay)
+	expectedPlayerCash := 9000
+	if players[0].Cash() != expectedPlayerCash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayerCash, players[0].Cash())
+	}
+}
+
 func TestBuyStock(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].Grow(2)
