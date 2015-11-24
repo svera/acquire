@@ -23,6 +23,7 @@ const (
 	WrongNumberCorpsClass     = "wrong_number_corps_class"
 	CorporationAlreadyOnBoard = "corporation_already_on_board"
 	WrongNumberPlayers        = "wrong_number_players"
+	NoCorporationSharesOwned  = "no_corporation_shares_owned"
 )
 
 type Game struct {
@@ -269,9 +270,23 @@ func (g *Game) payMergeBonuses(merge map[string][]corporation.Interface) {
 }
 
 // TODO
-func (g *Game) SellTrade() error {
+func (g *Game) SellTrade(pl player.Interface, sell []int, trade []int) error {
 	if g.state.Name() != "SellTrade" {
 		return errors.New(ActionNotAllowed)
+	}
+	for corpNumber, amount := range sell {
+		if amount > 0 && pl.Shares(g.corporations[corpNumber]) == 0 {
+			return errors.New(NoCorporationSharesOwned)
+		}
+	}
+	for corpNumber, amount := range trade {
+		if amount > 0 && pl.Shares(g.corporations[corpNumber]) == 0 {
+			return errors.New(NoCorporationSharesOwned)
+		}
+		if g.corporations[corpNumber].Stock() < (amount / 2) {
+			return errors.New(NotEnoughStockShares)
+		}
+
 	}
 	return nil
 }
