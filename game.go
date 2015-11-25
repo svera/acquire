@@ -270,20 +270,20 @@ func (g *Game) payMergeBonuses(merge map[string][]corporation.Interface) {
 }
 
 // TODO
-func (g *Game) SellTrade(pl player.Interface, sell []int, trade []int) error {
+func (g *Game) SellTrade(pl player.Interface, sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
 	if g.state.Name() != "SellTrade" {
 		return errors.New(ActionNotAllowed)
 	}
-	for corpNumber, amount := range sell {
-		if amount > 0 && pl.Shares(g.corporations[corpNumber]) == 0 {
+	for corp, amount := range sell {
+		if amount > 0 && pl.Shares(corp) == 0 {
 			return errors.New(NoCorporationSharesOwned)
 		}
 	}
-	for corpNumber, amount := range trade {
-		if amount > 0 && pl.Shares(g.corporations[corpNumber]) == 0 {
+	for corp, amount := range trade {
+		if amount > 0 && pl.Shares(corp) == 0 {
 			return errors.New(NoCorporationSharesOwned)
 		}
-		if g.corporations[corpNumber].Stock() < (amount / 2) {
+		if corp.Stock() < (amount / 2) {
 			return errors.New(NotEnoughStockShares)
 		}
 
