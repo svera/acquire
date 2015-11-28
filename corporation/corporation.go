@@ -83,9 +83,14 @@ func (c *Corporation) Stock() int {
 	return c.stock
 }
 
-// Set corporation's amount of stock shares available
-func (c *Corporation) SetStock(stock int) {
-	c.stock = stock
+// Add amount of stock shares to corporation stock
+func (c *Corporation) AddStock(amount int) {
+	c.stock += amount
+}
+
+// Add amount of stock shares to corporation stock
+func (c *Corporation) RemoveStock(amount int) {
+	c.stock -= amount
 }
 
 // Returns company's current value per stock share

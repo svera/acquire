@@ -15,6 +15,12 @@ func NewStub(name string, class int) *Stub {
 	}
 }
 
-func (c *Stub) SetSize(size int) {
+func (c *Stub) SetSize(size int) Interface {
 	c.size = size
+	return c
+}
+
+func (c *Stub) SetStock(amount int) Interface {
+	c.stock = amount
+	return c
 }

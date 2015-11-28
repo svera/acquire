@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/tile"
 )
 
@@ -17,10 +18,17 @@ func (g *Game) BuyStock(buys map[int]int) error {
 
 	for corporationId, amount := range buys {
 		corp := g.corporations[corporationId]
-		g.CurrentPlayer().Buy(corp, amount)
+		g.buy(corp, amount)
 	}
 
 	return g.drawTile()
+}
+
+func (g *Game) buy(corp corporation.Interface, amount int) {
+	corp.RemoveStock(amount)
+	g.CurrentPlayer().
+		AddShares(corp, amount).
+		RemoveCash(corp.StockPrice() * amount)
 }
 
 func (g *Game) checkBuy(buys map[int]int) error {

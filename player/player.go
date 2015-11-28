@@ -32,20 +32,14 @@ func (p *Player) Shares(corp corporation.Interface) int {
 	return p.shares[corp.Name()]
 }
 
-// Buys stock from corporation
-func (p *Player) Buy(corp corporation.Interface, amount int) {
-	corp.SetStock(corp.Stock() - amount)
-	p.shares[corp.Name()] = amount
-	p.cash -= corp.StockPrice() * amount
+func (p *Player) AddShares(corp corporation.Interface, amount int) Interface {
+	p.shares[corp.Name()] += amount
+	return p
 }
 
-// Receive a free stock share from a rencently found corporation, if it has
-// remaining shares available
-func (p *Player) GetFounderStockShare(corp corporation.Interface) {
-	if corp.Stock() > 0 {
-		corp.SetStock(corp.Stock() - 1)
-		p.shares[corp.Name()] += 1
-	}
+func (p *Player) RemoveShares(corp corporation.Interface, amount int) Interface {
+	p.shares[corp.Name()] -= amount
+	return p
 }
 
 // Adds a new tile to the players' tileset
@@ -80,4 +74,16 @@ func (p *Player) DiscardTile(tile tile.Interface) error {
 // Returns player cash
 func (p *Player) Cash() int {
 	return p.cash
+}
+
+// Add cash to player
+func (p *Player) AddCash(amount int) Interface {
+	p.cash += amount
+	return p
+}
+
+// Remove cash to player
+func (p *Player) RemoveCash(amount int) Interface {
+	p.cash -= amount
+	return p
 }

@@ -12,18 +12,19 @@ import (
 
 const totalCorporations = 7
 const (
-	ActionNotAllowed          = "action_not_allowed"
-	StockSharesNotBuyable     = "stock_shares_not_buyable"
-	NotEnoughStockShares      = "not_enough_stock_shares"
-	TileTemporaryUnplayable   = "tile_temporary_unplayable"
-	TilePermanentlyUnplayable = "tile_permanently_unplayable"
-	NotEnoughCash             = "not_enough_cash"
-	TooManyStockSharesToBuy   = "too_many_stock_shares_to_buy"
-	CorpNamesNotUnique        = "corp_names_not_unique"
-	WrongNumberCorpsClass     = "wrong_number_corps_class"
-	CorporationAlreadyOnBoard = "corporation_already_on_board"
-	WrongNumberPlayers        = "wrong_number_players"
-	NoCorporationSharesOwned  = "no_corporation_shares_owned"
+	ActionNotAllowed                = "action_not_allowed"
+	StockSharesNotBuyable           = "stock_shares_not_buyable"
+	NotEnoughStockShares            = "not_enough_stock_shares"
+	TileTemporaryUnplayable         = "tile_temporary_unplayable"
+	TilePermanentlyUnplayable       = "tile_permanently_unplayable"
+	NotEnoughCash                   = "not_enough_cash"
+	TooManyStockSharesToBuy         = "too_many_stock_shares_to_buy"
+	CorpNamesNotUnique              = "corp_names_not_unique"
+	WrongNumberCorpsClass           = "wrong_number_corps_class"
+	CorporationAlreadyOnBoard       = "corporation_already_on_board"
+	WrongNumberPlayers              = "wrong_number_players"
+	NoCorporationSharesOwned        = "no_corporation_shares_owned"
+	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
 )
 
 type Game struct {
@@ -34,6 +35,7 @@ type Game struct {
 	tileset       tileset.Interface
 	currentPlayer int
 	newCorpTiles  []tile.Interface
+	mergeCorps    map[string][]corporation.Interface
 }
 
 func New(
@@ -226,10 +228,11 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 	}
 
 	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
-		if isMergeTied(mergeCorps) {
+		g.mergeCorps = mergeCorps
+		if g.isMergeTied() {
 			g.state, _ = g.state.ToUntieMerge()
 		} else {
-			g.payMergeBonuses(mergeCorps)
+			g.payMergeBonuses()
 			g.state, _ = g.state.ToSellTrade()
 		}
 	} else if found, tiles := g.board.TileFoundCorporation(tl); found {
@@ -245,8 +248,10 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 	return nil
 }
 
-func isMergeTied(merge map[string][]corporation.Interface) bool {
-	if len(merge["acquirer"]) > 1 {
+// Checks if two ore more corps are tied for be the acquirer in a merge
+// whichs needs the merger player to decide which one would get that role.
+func (g *Game) isMergeTied() bool {
+	if len(g.mergeCorps["acquirer"]) > 1 {
 		return true
 	}
 	return false
@@ -254,8 +259,8 @@ func isMergeTied(merge map[string][]corporation.Interface) bool {
 
 // Calculates and returns bonus amounts to be paid to owners of stock of a
 // defunct corporation
-func (g *Game) payMergeBonuses(merge map[string][]corporation.Interface) {
-	for _, corp := range merge["defunct"] {
+func (g *Game) payMergeBonuses() {
+	for _, corp := range g.mergeCorps["defunct"] {
 		stockHolders := g.GetMainStockHolders(corp)
 		numberMajorityHolders := len(stockHolders["majority"])
 		numberMinorityHolders := len(stockHolders["minority"])
@@ -271,12 +276,43 @@ func (g *Game) payMergeBonuses(merge map[string][]corporation.Interface) {
 
 // TODO
 func (g *Game) SellTrade(pl player.Interface, sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
+	if err := g.checkSellTrade(pl, sell, trade); err != nil {
+		return err
+	}
+	for corp, amount := range sell {
+		g.sell(pl, corp, amount)
+	}
+
+	return nil
+}
+
+func (g *Game) sell(pl player.Interface, corp corporation.Interface, amount int) {
+	corp.AddStock(amount)
+	pl.
+		RemoveShares(corp, amount).
+		AddCash(corp.StockPrice() * amount)
+}
+
+func (g *Game) trade(pl player.Interface, corp corporation.Interface, amount int) {
+	acquirer := g.mergeCorps["acquirer"][0]
+	amountSharesAcquiringCorp := amount / 2
+	corp.AddStock(amount)
+	acquirer.RemoveStock(amountSharesAcquiringCorp)
+	pl.
+		RemoveShares(corp, amount).
+		AddShares(acquirer, amountSharesAcquiringCorp)
+}
+
+func (g *Game) checkSellTrade(pl player.Interface, sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
 	if g.state.Name() != "SellTrade" {
 		return errors.New(ActionNotAllowed)
 	}
 	for corp, amount := range sell {
 		if amount > 0 && pl.Shares(corp) == 0 {
 			return errors.New(NoCorporationSharesOwned)
+		}
+		if pl.Shares(corp) < amount {
+			return errors.New(NotEnoughCorporationSharesOwned)
 		}
 	}
 	for corp, amount := range trade {
@@ -286,7 +322,9 @@ func (g *Game) SellTrade(pl player.Interface, sell map[corporation.Interface]int
 		if corp.Stock() < (amount / 2) {
 			return errors.New(NotEnoughStockShares)
 		}
-
+		if pl.Shares(corp) < amount {
+			return errors.New(NotEnoughCorporationSharesOwned)
+		}
 	}
 	return nil
 }
@@ -301,9 +339,20 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 	g.board.SetTiles(corp, g.newCorpTiles)
 	corp.Grow(len(g.newCorpTiles))
 	g.newCorpTiles = []tile.Interface{}
-	g.CurrentPlayer().GetFounderStockShare(corp)
+	g.getFounderStockShare(g.CurrentPlayer(), corp)
 	g.state, _ = g.state.ToBuyStock()
 	return nil
+}
+
+// Receive a free stock share from a rencently found corporation, if it has
+// remaining shares available
+// TODO this should trigger an event warning that no founder stock share will be given
+// of the founded corporation has no stock shares left
+func (g *Game) getFounderStockShare(pl player.Interface, corp corporation.Interface) {
+	if corp.Stock() > 0 {
+		corp.RemoveStock(1)
+		pl.AddShares(corp, 1)
+	}
 }
 
 func (g *Game) growCorporation(corp corporation.Interface, tiles []tile.Interface) {

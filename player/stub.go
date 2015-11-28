@@ -19,14 +19,16 @@ func NewStub(name string) *Stub {
 	}
 }
 
-func (p *Stub) SetShares(c corporation.Interface, amount int) {
-	p.shares[c.Name()] = amount
-}
-
-func (p *Stub) SetCash(amount int) {
-	p.cash = amount
-}
-
 func (p *Stub) SetTiles(tiles []tile.Interface) {
 	p.tiles = tiles
+}
+
+func (p *Stub) SetShares(corp corporation.Interface, amount int) Interface {
+	p.shares[corp.Name()] = amount
+	return p
+}
+
+func (p *Stub) SetCash(amount int) Interface {
+	p.cash = amount
+	return p
 }

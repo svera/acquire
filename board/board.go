@@ -116,8 +116,9 @@ func (b *Board) TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, c
 }
 
 // Puts the passed tile on the board
-func (b *Board) PutTile(t tile.Interface) {
+func (b *Board) PutTile(t tile.Interface) Interface {
 	b.grid[t.Number()][t.Letter()] = t
+	return b
 }
 
 // Returns all cells adjacent to the passed one
@@ -205,8 +206,9 @@ func nextLetter(letter string) string {
 }
 
 // Set tiles on board as belonging to the passed corporation
-func (b *Board) SetTiles(cp corporation.Interface, tiles []tile.Interface) {
+func (b *Board) SetTiles(cp corporation.Interface, tiles []tile.Interface) Interface {
 	for _, tl := range tiles {
 		b.grid[tl.Number()][tl.Letter()].SetOwner(cp)
 	}
+	return b
 }

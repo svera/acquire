@@ -3,7 +3,8 @@ package corporation
 type Interface interface {
 	Grow(number int)
 	Stock() int
-	SetStock(stock int)
+	AddStock(amount int)
+	RemoveStock(amount int)
 	StockPrice() int
 	MajorityBonus() int
 	MinorityBonus() int

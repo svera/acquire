@@ -7,13 +7,15 @@ import (
 
 type Interface interface {
 	Shares(c corporation.Interface) int
+	AddShares(corp corporation.Interface, amount int) Interface
+	RemoveShares(corp corporation.Interface, amount int) Interface
 	ReceiveBonus(amount int)
-	Buy(corp corporation.Interface, amount int)
 	PickTile(t tile.Interface) error
 	Tiles() []tile.Interface
 	DiscardTile(t tile.Interface) error
 	Cash() int
-	GetFounderStockShare(corp corporation.Interface)
+	AddCash(amount int) Interface
+	RemoveCash(amount int) Interface
 }
 
 type ShareInterface interface {

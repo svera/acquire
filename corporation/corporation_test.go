@@ -61,10 +61,19 @@ func TestStock(t *testing.T) {
 	}
 }
 
-func TestSetStock(t *testing.T) {
+func TestAddStock(t *testing.T) {
 	corp, _ := New("Test", 0)
-	expectedStock := 20
-	corp.SetStock(expectedStock)
+	expectedStock := 45
+	corp.AddStock(20)
+	if corp.stock != expectedStock {
+		t.Errorf("Corporation stock not set")
+	}
+}
+
+func TestRemoveStock(t *testing.T) {
+	corp, _ := New("Test", 0)
+	expectedStock := 5
+	corp.RemoveStock(20)
 	if corp.stock != expectedStock {
 		t.Errorf("Corporation stock not set")
 	}

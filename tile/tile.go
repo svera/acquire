@@ -4,9 +4,9 @@
 package tile
 
 type Tile struct {
-	number  int
-	letter  string
-	owner Owner
+	number int
+	letter string
+	owner  Owner
 }
 
 func New(number int, letter string, owner Owner) *Tile {
@@ -24,8 +24,9 @@ func (t *Tile) Letter() string {
 }
 
 // Sets an owner for the tile
-func (t *Tile) SetOwner(owner Owner) {
+func (t *Tile) SetOwner(owner Owner) Interface {
 	t.owner = owner
+	return t
 }
 
 // Returns tile owner

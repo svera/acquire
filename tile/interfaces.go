@@ -7,6 +7,6 @@ type Owner interface {
 type Interface interface {
 	Number() int
 	Letter() string
-	SetOwner(owner Owner)
+	SetOwner(owner Owner) Interface
 	Owner() Owner
 }
