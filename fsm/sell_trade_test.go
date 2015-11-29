@@ -4,21 +4,21 @@ import "testing"
 
 func TestSellTradeToPlayTile(t *testing.T) {
 	state := &SellTrade{}
-	if state.ToPlayTile().Name() != "SellTrade" {
+	if state.ToPlayTile().Name() != "ErrorState" {
 		t.Errorf("Transition from SellTrade to PlayTile must not be valid")
 	}
 }
 
 func TestSellTradeToFoundCorp(t *testing.T) {
 	state := &SellTrade{}
-	if state.ToFoundCorp().Name() != "SellTrade" {
+	if state.ToFoundCorp().Name() != "ErrorState" {
 		t.Errorf("Transition from SellTrade to FoundCorp must not be valid")
 	}
 }
 
 func TestSellTradeToUntieMerge(t *testing.T) {
 	state := &SellTrade{}
-	if state.ToUntieMerge().Name() != "SellTrade" {
+	if state.ToUntieMerge().Name() != "ErrorState" {
 		t.Errorf("Transition from SellTrade to UntieMerge must not be valid")
 	}
 }

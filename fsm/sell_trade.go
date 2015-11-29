@@ -1,7 +1,7 @@
 package fsm
 
 type SellTrade struct {
-	BaseState
+	ErrorState
 }
 
 func (s *SellTrade) Name() string {

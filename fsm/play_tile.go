@@ -1,7 +1,7 @@
 package fsm
 
 type PlayTile struct {
-	BaseState
+	ErrorState
 }
 
 func (s *PlayTile) Name() string {

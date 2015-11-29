@@ -1,7 +1,7 @@
 package fsm
 
 type FoundCorp struct {
-	BaseState
+	ErrorState
 }
 
 func (s *FoundCorp) Name() string {

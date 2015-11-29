@@ -1,7 +1,7 @@
 package fsm
 
 type UntieMerge struct {
-	BaseState
+	ErrorState
 }
 
 func (s *UntieMerge) Name() string {

@@ -1,7 +1,7 @@
 package fsm
 
 type EndGame struct {
-	BaseState
+	ErrorState
 }
 
 func (s *EndGame) Name() string {

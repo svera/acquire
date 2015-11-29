@@ -233,20 +233,20 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
 		g.mergeCorps = mergeCorps
 		if g.isMergeTied() {
-			g.state, _ = g.state.ToUntieMerge()
+			g.state = g.state.ToUntieMerge()
 		} else {
 			g.payMergeBonuses()
-			g.state, _ = g.state.ToSellTrade()
+			g.state = g.state.ToSellTrade()
 		}
 	} else if found, tiles := g.board.TileFoundCorporation(tl); found {
-		g.state, _ = g.state.ToFoundCorp()
+		g.state = g.state.ToFoundCorp()
 		g.newCorpTiles = tiles
 	} else if grow, tiles, corp := g.board.TileGrowCorporation(tl); grow {
 		g.growCorporation(corp, tiles)
-		g.state, _ = g.state.ToBuyStock()
+		g.state = g.state.ToBuyStock()
 	} else {
 		g.board.PutTile(tl)
-		g.state, _ = g.state.ToBuyStock()
+		g.state = g.state.ToBuyStock()
 	}
 	return nil
 }
@@ -343,7 +343,7 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 	corp.Grow(len(g.newCorpTiles))
 	g.newCorpTiles = []tile.Interface{}
 	g.getFounderStockShare(g.CurrentPlayer(), corp)
-	g.state, _ = g.state.ToBuyStock()
+	g.state = g.state.ToBuyStock()
 	return nil
 }
 

@@ -12,21 +12,21 @@ func TestBuyStockToPlayTile(t *testing.T) {
 
 func TestBuyStockToSellTrade(t *testing.T) {
 	state := &BuyStock{}
-	if state.ToSellTrade().Name() != "BuyStock" {
+	if state.ToSellTrade().Name() != "ErrorState" {
 		t.Errorf("Transition from BuyStock to SellTrade must not be possible")
 	}
 }
 
 func TestBuyStockToFoundCorp(t *testing.T) {
 	state := &BuyStock{}
-	if state.ToFoundCorp().Name() != "BuyStock" {
+	if state.ToFoundCorp().Name() != "ErrorState" {
 		t.Errorf("Transition from BuyStock to FoundCorp must not be possible")
 	}
 }
 
 func TestBuyStockToUntieMerge(t *testing.T) {
 	state := &BuyStock{}
-	if state.ToUntieMerge().Name() != "BuyStock" {
+	if state.ToUntieMerge().Name() != "ErrorState" {
 		t.Errorf("Transition from BuyStock to UntieMerge must not be possible")
 	}
 }

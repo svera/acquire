@@ -10,32 +10,32 @@ type State interface {
 	ToEndGame() State
 }
 
-type BaseState struct{}
+type ErrorState struct{}
 
-func (s *BaseState) Name() string {
-	return "BaseState"
+func (s *ErrorState) Name() string {
+	return "ErrorState"
 }
 
-func (s *BaseState) ToPlayTile() State {
+func (s *ErrorState) ToPlayTile() State {
 	return s
 }
 
-func (s *BaseState) ToFoundCorp() State {
+func (s *ErrorState) ToFoundCorp() State {
 	return s
 }
 
-func (s *BaseState) ToUntieMerge() State {
+func (s *ErrorState) ToUntieMerge() State {
 	return s
 }
 
-func (s *BaseState) ToSellTrade() State {
+func (s *ErrorState) ToSellTrade() State {
 	return s
 }
 
-func (s *BaseState) ToBuyStock() State {
+func (s *ErrorState) ToBuyStock() State {
 	return s
 }
 
-func (s *BaseState) ToEndGame() State {
+func (s *ErrorState) ToEndGame() State {
 	return s
 }
