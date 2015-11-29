@@ -14,19 +14,6 @@ func TestPickTile(t *testing.T) {
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
 	}
-
-	player.tiles = []tile.Interface{
-		tile.New(7, "C", tile.Orphan{}),
-		tile.New(5, "A", tile.Orphan{}),
-		tile.New(8, "E", tile.Orphan{}),
-		tile.New(3, "D", tile.Orphan{}),
-		tile.New(1, "B", tile.Orphan{}),
-		tile.New(4, "I", tile.Orphan{}),
-	}
-	player.PickTile(tl)
-	if len(player.tiles) > 6 {
-		t.Errorf("Player can not have more than 6 tiles, got %d", len(player.tiles))
-	}
 }
 
 func TestSort(t *testing.T) {

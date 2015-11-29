@@ -2,14 +2,8 @@
 package player
 
 import (
-	"errors"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/tile"
-)
-
-const (
-	TileNotOnHand = "tile_not_on_hand"
-	TooManyTiles  = "too_many_tiles"
 )
 
 type Player struct {
@@ -43,12 +37,9 @@ func (p *Player) RemoveShares(corp corporation.Interface, amount int) Interface 
 }
 
 // Adds a new tile to the players' tileset
-func (p *Player) PickTile(tile tile.Interface) error {
-	if len(p.tiles) >= 6 {
-		return errors.New(TooManyTiles)
-	}
+func (p *Player) PickTile(tile tile.Interface) Interface {
 	p.tiles = append(p.tiles, tile)
-	return nil
+	return p
 }
 
 // Return player's tiles
@@ -56,19 +47,25 @@ func (p *Player) Tiles() []tile.Interface {
 	return p.tiles
 }
 
-func (p *Player) ReceiveBonus(amount int) {
-	p.cash += amount
-}
-
 // Discard passed tile from player's hand
-func (p *Player) DiscardTile(tile tile.Interface) error {
+func (p *Player) DiscardTile(tile tile.Interface) Interface {
 	for i, currentTile := range p.tiles {
 		if currentTile.Number() == tile.Number() && currentTile.Letter() == tile.Letter() {
 			p.tiles = append(p.tiles[:i], p.tiles[i+1:]...)
-			return nil
+			return p
 		}
 	}
-	return errors.New(TileNotOnHand)
+	return p
+}
+
+// Checks if passed tile is in player's hand
+func (p *Player) HasTile(tile tile.Interface) bool {
+	for _, currentTile := range p.tiles {
+		if currentTile.Number() == tile.Number() && currentTile.Letter() == tile.Letter() {
+			return true
+		}
+	}
+	return false
 }
 
 // Returns player cash

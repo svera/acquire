@@ -25,6 +25,7 @@ const (
 	WrongNumberPlayers              = "wrong_number_players"
 	NoCorporationSharesOwned        = "no_corporation_shares_owned"
 	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
+	TileNotOnHand                   = "tile_not_on_hand"
 )
 
 type Game struct {
@@ -223,9 +224,11 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 	if g.isTileTemporaryUnplayable(tl) {
 		return errors.New(TileTemporaryUnplayable)
 	}
-	if err := g.CurrentPlayer().DiscardTile(tl); err != nil {
-		return err
+	if !g.CurrentPlayer().HasTile(tl) {
+		return errors.New(TileNotOnHand)
 	}
+
+	g.CurrentPlayer().DiscardTile(tl)
 
 	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
 		g.mergeCorps = mergeCorps
@@ -266,10 +269,10 @@ func (g *Game) payMergeBonuses() {
 		numberMinorityHolders := len(stockHolders["minority"])
 
 		for _, majorityStockHolder := range stockHolders["majority"] {
-			majorityStockHolder.ReceiveBonus(corp.MajorityBonus() / numberMajorityHolders)
+			majorityStockHolder.AddCash(corp.MajorityBonus() / numberMajorityHolders)
 		}
 		for _, minorityStockHolder := range stockHolders["minority"] {
-			minorityStockHolder.ReceiveBonus(corp.MinorityBonus() / numberMinorityHolders)
+			minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
 		}
 	}
 }

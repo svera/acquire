@@ -154,8 +154,9 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
-	players[0].DiscardTile(playerTiles[0])
-	players[0].PickTile(tileToPlay)
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
 	if game.state.Name() != "FoundCorp" {
@@ -203,8 +204,9 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
-	players[0].DiscardTile(playerTiles[0])
-	players[0].PickTile(tileToPlay)
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
 	expectedCorpSize := 4
@@ -243,8 +245,9 @@ func TestPlayTileMergeCorporations(t *testing.T) {
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
-	players[0].DiscardTile(playerTiles[0])
-	players[0].PickTile(tileToPlay)
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
 	players[0].(*player.Stub).SetShares(corporations[0], 6)
 
 	game.PlayTile(tileToPlay)
