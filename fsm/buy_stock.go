@@ -8,10 +8,10 @@ func (s *BuyStock) Name() string {
 	return "BuyStock"
 }
 
-func (s *BuyStock) ToPlayTile() (State, error) {
-	return &PlayTile{}, nil
+func (s *BuyStock) ToPlayTile() State {
+	return &PlayTile{}
 }
 
-func (s *BuyStock) ToEndGame() (State, error) {
-	return &EndGame{}, nil
+func (s *BuyStock) ToEndGame() State {
+	return &EndGame{}
 }

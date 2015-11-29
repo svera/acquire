@@ -3,49 +3,38 @@ package fsm
 import "testing"
 
 func TestBuyStockToPlayTile(t *testing.T) {
-	var state State
-	state = &BuyStock{}
-	state, _ = state.ToPlayTile()
+	state := &BuyStock{}
 
-	if _, ok := state.(*PlayTile); !ok {
+	if state.ToPlayTile().Name() != "PlayTile" {
 		t.Errorf("Transition from BuyStock to PlayTile must be valid")
 	}
 }
 
 func TestBuyStockToSellTrade(t *testing.T) {
 	state := &BuyStock{}
-	if _, err := state.ToSellTrade(); err == nil {
-		t.Errorf("Transition from BuyStock to SellTrade must return an error, returned nil")
+	if state.ToSellTrade().Name() != "BuyStock" {
+		t.Errorf("Transition from BuyStock to SellTrade must not be possible")
 	}
 }
 
 func TestBuyStockToFoundCorp(t *testing.T) {
 	state := &BuyStock{}
-	if _, err := state.ToFoundCorp(); err == nil {
-		t.Errorf("Transition from BuyStock to SellTrade must return an error, returned nil")
+	if state.ToFoundCorp().Name() != "BuyStock" {
+		t.Errorf("Transition from BuyStock to FoundCorp must not be possible")
 	}
 }
 
 func TestBuyStockToUntieMerge(t *testing.T) {
 	state := &BuyStock{}
-	if _, err := state.ToUntieMerge(); err == nil {
-		t.Errorf("Transition from BuyStock to SellTrade must return an error, returned nil")
-	}
-}
-
-func TestBuyStockToBuyStock(t *testing.T) {
-	state := &BuyStock{}
-	if _, err := state.ToBuyStock(); err == nil {
-		t.Errorf("Transition from BuyStock to itself must return an error, returned nil")
+	if state.ToUntieMerge().Name() != "BuyStock" {
+		t.Errorf("Transition from BuyStock to UntieMerge must not be possible")
 	}
 }
 
 func TestBuyStockToEndGame(t *testing.T) {
-	var state State
-	state = &BuyStock{}
-	state, _ = state.ToEndGame()
+	state := &BuyStock{}
 
-	if _, ok := state.(*EndGame); !ok {
+	if state.ToEndGame().Name() != "EndGame" {
 		t.Errorf("Transition from BuyStock to EndGame must be valid")
 	}
 }

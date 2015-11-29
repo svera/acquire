@@ -8,10 +8,10 @@ func (s *FoundCorp) Name() string {
 	return "FoundCorp"
 }
 
-func (s *FoundCorp) ToBuyStock() (State, error) {
-	return &BuyStock{}, nil
+func (s *FoundCorp) ToBuyStock() State {
+	return &BuyStock{}
 }
 
-func (s *FoundCorp) ToEndGame() (State, error) {
-	return &EndGame{}, nil
+func (s *FoundCorp) ToEndGame() State {
+	return &EndGame{}
 }

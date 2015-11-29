@@ -2,56 +2,37 @@ package fsm
 
 import "testing"
 
-func TestPlayTileToPlayTile(t *testing.T) {
-	state := &PlayTile{}
-	if _, err := state.ToPlayTile(); err == nil {
-		t.Errorf("Transition from PlayTile to itself must return an error, returned nil")
-	}
-}
-
 func TestPlayTileToSellTrade(t *testing.T) {
 	state := &PlayTile{}
-	if _, err := state.ToSellTrade(); err == nil {
-		t.Errorf("Transition from PlayTile to SellTrade must return an error, returned nil")
+	if state.ToSellTrade().Name() != "PlayTile" {
+		t.Errorf("Transition from PlayTile to SellTrade must not be valid")
 	}
 }
 
 func TestPlayTileToFoundCorp(t *testing.T) {
-	var state State
-	state = &PlayTile{}
-	state, _ = state.ToFoundCorp()
-
-	if _, ok := state.(*FoundCorp); !ok {
-		t.Errorf("Transition from PlayTile to FoundCorp must be valid")
+	state := &PlayTile{}
+	if state.ToSellTrade().Name() != "SellTrade" {
+		t.Errorf("Transition from PlayTile to SellTrade must be valid")
 	}
 }
 
 func TestPlayTileToUntieMerge(t *testing.T) {
-	var state State
-	state = &PlayTile{}
-	state, _ = state.ToUntieMerge()
-
-	if _, ok := state.(*UntieMerge); !ok {
+	state := &PlayTile{}
+	if state.ToUntieMerge().Name() != "UntieMerge" {
 		t.Errorf("Transition from PlayTile to UntieMerge must be valid")
 	}
 }
 
 func TestPlayTileToBuyStock(t *testing.T) {
-	var state State
-	state = &PlayTile{}
-	state, _ = state.ToBuyStock()
-
-	if _, ok := state.(*BuyStock); !ok {
+	state := &PlayTile{}
+	if state.ToBuyStock().Name() != "BuyStock" {
 		t.Errorf("Transition from PlayTile to BuyStock must be valid")
 	}
 }
 
 func TestPlayTileToEndGame(t *testing.T) {
-	var state State
-	state = &PlayTile{}
-	state, _ = state.ToEndGame()
-
-	if _, ok := state.(*EndGame); !ok {
+	state := &PlayTile{}
+	if state.ToEndGame().Name() != "EndGame" {
 		t.Errorf("Transition from PlayTile to EndGame must be valid")
 	}
 }

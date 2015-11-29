@@ -4,48 +4,35 @@ import "testing"
 
 func TestSellTradeToPlayTile(t *testing.T) {
 	state := &SellTrade{}
-	if _, err := state.ToPlayTile(); err == nil {
-		t.Errorf("Transition from SellTrade to PlayTile must return an error, returned nil")
-	}
-}
-
-func TestSellTradeToSellTrade(t *testing.T) {
-	state := &SellTrade{}
-	if _, err := state.ToSellTrade(); err == nil {
-		t.Errorf("Transition from SellTrade to itself must return an error, returned nil")
+	if state.ToPlayTile().Name() != "SellTrade" {
+		t.Errorf("Transition from SellTrade to PlayTile must not be valid")
 	}
 }
 
 func TestSellTradeToFoundCorp(t *testing.T) {
 	state := &SellTrade{}
-	if _, err := state.ToFoundCorp(); err == nil {
-		t.Errorf("Transition from SellTrade to FoundCorp must return an error, returned nil")
+	if state.ToFoundCorp().Name() != "SellTrade" {
+		t.Errorf("Transition from SellTrade to FoundCorp must not be valid")
 	}
 }
 
 func TestSellTradeToUntieMerge(t *testing.T) {
 	state := &SellTrade{}
-	if _, err := state.ToUntieMerge(); err == nil {
-		t.Errorf("Transition from SellTrade to UntieMerge must return an error, returned nil")
+	if state.ToUntieMerge().Name() != "SellTrade" {
+		t.Errorf("Transition from SellTrade to UntieMerge must not be valid")
 	}
 }
 
 func TestSellTradeToBuyStock(t *testing.T) {
-	var state State
-	state = &SellTrade{}
-	state, _ = state.ToBuyStock()
-
-	if _, ok := state.(*BuyStock); !ok {
+	state := &SellTrade{}
+	if state.ToBuyStock().Name() != "BuyStock" {
 		t.Errorf("Transition from SellTrade to BuyStock must be valid")
 	}
 }
 
 func TestSellTradeToEndGame(t *testing.T) {
-	var state State
-	state = &SellTrade{}
-	state, _ = state.ToEndGame()
-
-	if _, ok := state.(*EndGame); !ok {
+	state := &SellTrade{}
+	if state.ToEndGame().Name() != "EndGame" {
 		t.Errorf("Transition from SellTrade to EndGame must be valid")
 	}
 }
