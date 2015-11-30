@@ -66,7 +66,7 @@ func TestAddStock(t *testing.T) {
 	expectedStock := 45
 	corp.AddStock(20)
 	if corp.stock != expectedStock {
-		t.Errorf("Corporation stock not set")
+		t.Errorf("Corporation stock not added, expected %d, got %d", expectedStock, corp.stock)
 	}
 }
 
@@ -75,7 +75,7 @@ func TestRemoveStock(t *testing.T) {
 	expectedStock := 5
 	corp.RemoveStock(20)
 	if corp.stock != expectedStock {
-		t.Errorf("Corporation stock not set")
+		t.Errorf("Corporation stock not removed, expected %d, got %d", expectedStock, corp.stock)
 	}
 }
 

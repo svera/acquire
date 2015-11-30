@@ -217,6 +217,7 @@ func (g *Game) CurrentPlayer() player.Interface {
 	return g.players[g.currentPlayer]
 }
 
+// Puts the given tile on board and triggers related actions
 func (g *Game) PlayTile(tl tile.Interface) error {
 	if g.state.Name() != "PlayTile" {
 		return errors.New(ActionNotAllowed)
@@ -286,6 +287,9 @@ func (g *Game) SellTrade(pl player.Interface, sell map[corporation.Interface]int
 		g.sell(pl, corp, amount)
 	}
 
+	for corp, amount := range trade {
+		g.trade(pl, corp, amount)
+	}
 	return nil
 }
 
