@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"fmt"
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
@@ -278,7 +277,6 @@ func (g *Game) payMergeBonuses() {
 			}
 		}
 		for _, minorityStockHolder := range stockHolders["minority"] {
-			fmt.Println(minorityStockHolder.Name())
 			minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
 		}
 	}

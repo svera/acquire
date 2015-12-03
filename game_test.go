@@ -231,7 +231,6 @@ func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
 func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-
 	tileToPlay := tile.New(6, "E", tile.Orphan{})
 
 	game, _ := New(bd, players, corporations, ts)
