@@ -57,7 +57,7 @@ Each player starts with $6,000.
 **Determine who goes first:** Each player draws a tile from the facedown
 cluster and puts it faceup on the matching letter/number space on
 the gameboard. The player who plays a tile closest to 1A goes first.
-(9A is closer than 18.) Leave the tiles on the gameboard.
+(9A is closer than 1B.) Leave the tiles on the gameboard.
 
 *Note:* If two or more of these tiles are adjacent, they are considered
 unincorporated tiles. If an additional tile is added later, then they
