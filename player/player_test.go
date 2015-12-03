@@ -17,7 +17,7 @@ func TestPickTile(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
-	players := []ShareInterface{
+	players := []Interface{
 		NewStub("Test1"),
 		NewStub("Test2"),
 		NewStub("Test3"),
@@ -31,10 +31,10 @@ func TestSort(t *testing.T) {
 	players[2].(*Stub).SetShares(corp, 0)
 	players[3].(*Stub).SetShares(corp, 2)
 
-	shares := func(p1, p2 ShareInterface) bool {
+	shares := func(p1, p2 Interface) bool {
 		return p1.Shares(corp) > p2.Shares(corp)
 	}
-	expectedSort := []ShareInterface{
+	expectedSort := []Interface{
 		players[0],
 		players[3],
 		players[1],

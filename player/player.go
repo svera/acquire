@@ -84,3 +84,8 @@ func (p *Player) RemoveCash(amount int) Interface {
 	p.cash -= amount
 	return p
 }
+
+// Returns player name
+func (p *Player) Name() string {
+	return p.name
+}

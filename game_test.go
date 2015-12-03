@@ -80,73 +80,6 @@ func TestAreEndConditionsReached(t *testing.T) {
 
 }
 
-func TestGetMainStockHolders(t *testing.T) {
-	players, corporations, board, tileset := setup()
-
-	players[0].(*player.Stub).SetShares(corporations[0], 8)
-
-	game, _ := New(board, players, corporations, tileset)
-	stockHolders := game.GetMainStockHolders(corporations[0])
-	expectedStockHolders := map[string][]player.ShareInterface{
-		"majority": {players[0]},
-		"minority": {players[0]},
-	}
-	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
-		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
-		t.Errorf(
-			"If there's just one player with stock in a defunct corporation, " +
-				"he/she must get both majority and minority bonuses",
-		)
-	}
-
-	players[1].(*player.Stub).SetShares(corporations[0], 5)
-
-	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]player.ShareInterface{
-		"majority": {players[0]},
-		"minority": {players[1]},
-	}
-	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
-		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
-		t.Errorf(
-			"Wrong main stock holders",
-		)
-	}
-
-	players[1].(*player.Stub).SetShares(corporations[0], 8)
-	players[2].(*player.Stub).SetShares(corporations[0], 5)
-
-	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]player.ShareInterface{
-		"majority": {players[0], players[1]},
-		"minority": {},
-	}
-	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
-		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
-		t.Errorf(
-			"If there are two or more majority stock holders in a defunct corporation, " +
-				"the majority bonus must be splitted between them (no minority bonus given)",
-		)
-	}
-
-	players[1].(*player.Stub).SetShares(corporations[0], 5)
-	players[2].(*player.Stub).SetShares(corporations[0], 5)
-
-	stockHolders = game.GetMainStockHolders(corporations[0])
-	expectedStockHolders = map[string][]player.ShareInterface{
-		"majority": {players[0]},
-		"minority": {players[1], players[2]},
-	}
-	if !slicesSameContent(stockHolders["majority"], expectedStockHolders["majority"]) ||
-		!slicesSameContent(stockHolders["minority"], expectedStockHolders["minority"]) {
-		t.Errorf(
-			"If there are two or more minority stock holders in a defunct corporation, " +
-				"the minority bonus must be splitted between them",
-		)
-	}
-
-}
-
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tile.New(6, "E", tile.Orphan{})
@@ -223,25 +156,83 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 //   4 5 6 7 8 9
 // E [][]><[][][]
 //
+// In this case, players 0 and 1 are the majority shareholders and player 2 is the minority one
+// of corporation 0, with a size of 2
+func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	setupPlayTileMerge(corporations, bd)
+	tileToPlay := tile.New(6, "E", tile.Orphan{})
+
+	game, _ := New(bd, players, corporations, ts)
+	playerTiles := players[0].Tiles()
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
+	players[0].(*player.Stub).SetShares(corporations[0], 6)
+	players[1].(*player.Stub).SetShares(corporations[0], 6)
+	players[2].(*player.Stub).SetShares(corporations[0], 4)
+
+	game.PlayTile(tileToPlay)
+	expectedPlayer0Cash := 7500
+	if players[0].Cash() != expectedPlayer0Cash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
+	}
+	expectedPlayer1Cash := 7500
+	if players[1].Cash() != expectedPlayer1Cash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer1Cash, players[1].Cash())
+	}
+	expectedPlayer2Cash := 6000
+	if players[2].Cash() != expectedPlayer2Cash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer2Cash, players[2].Cash())
+	}
+}
+
+// Testing this merge:
+//   4 5 6 7 8 9
+// E [][]><[][][]
+//
+// In this case, player 0 is the majority shareholder and players 1 and 2 are the minority ones
+// of corporation 0, with a size of 2
+func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	setupPlayTileMerge(corporations, bd)
+	tileToPlay := tile.New(6, "E", tile.Orphan{})
+
+	game, _ := New(bd, players, corporations, ts)
+	playerTiles := players[0].Tiles()
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
+	players[0].(*player.Stub).SetShares(corporations[0], 6)
+	players[1].(*player.Stub).SetShares(corporations[0], 4)
+	players[2].(*player.Stub).SetShares(corporations[0], 4)
+
+	game.PlayTile(tileToPlay)
+	expectedPlayer0Cash := 8000
+	if players[0].Cash() != expectedPlayer0Cash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
+	}
+	expectedPlayer1Cash := 6500
+	if players[1].Cash() != expectedPlayer1Cash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer1Cash, players[1].Cash())
+	}
+	expectedPlayer2Cash := 6500
+	if players[2].Cash() != expectedPlayer2Cash {
+		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer2Cash, players[2].Cash())
+	}
+}
+
+// Testing this merge:
+//   4 5 6 7 8 9
+// E [][]><[][][]
+//
 // In this case, only player 0 has shares of the defunct corp 0, which has
 // a size of 2, thus getting both majority and minority bonuses
-func TestPlayTileMergeCorporations(t *testing.T) {
+func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	players, corporations, bd, ts := setup()
+	setupPlayTileMerge(corporations, bd)
 
 	tileToPlay := tile.New(6, "E", tile.Orphan{})
-	corp0Tiles := []tile.Interface{
-		tile.New(4, "E", corporations[0]),
-		tile.New(5, "E", corporations[0]),
-	}
-	corp1Tiles := []tile.Interface{
-		tile.New(7, "E", corporations[1]),
-		tile.New(8, "E", corporations[1]),
-		tile.New(9, "E", corporations[1]),
-	}
-	corporations[0].Grow(len(corp0Tiles))
-	corporations[1].Grow(len(corp1Tiles))
-	bd.SetTiles(corporations[0], corp0Tiles)
-	bd.SetTiles(corporations[1], corp1Tiles)
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -255,6 +246,25 @@ func TestPlayTileMergeCorporations(t *testing.T) {
 	if players[0].Cash() != expectedPlayerCash {
 		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayerCash, players[0].Cash())
 	}
+}
+
+// Set ups the board this way for merge tests
+//   4 5 6 7 8 9
+// E [][]><[][][]
+func setupPlayTileMerge(corporations [7]corporation.Interface, bd board.Interface) {
+	corp0Tiles := []tile.Interface{
+		tile.New(4, "E", corporations[0]),
+		tile.New(5, "E", corporations[0]),
+	}
+	corp1Tiles := []tile.Interface{
+		tile.New(7, "E", corporations[1]),
+		tile.New(8, "E", corporations[1]),
+		tile.New(9, "E", corporations[1]),
+	}
+	corporations[0].Grow(len(corp0Tiles))
+	corporations[1].Grow(len(corp1Tiles))
+	bd.SetTiles(corporations[0], corp0Tiles)
+	bd.SetTiles(corporations[1], corp1Tiles)
 }
 
 func TestBuyStock(t *testing.T) {
@@ -335,7 +345,7 @@ func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, til
 	return players, corporations, board, tileset
 }
 
-func slicesSameContent(slice1 []player.ShareInterface, slice2 []player.ShareInterface) bool {
+func slicesSameContent(slice1 []player.Interface, slice2 []player.Interface) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}

@@ -16,9 +16,5 @@ type Interface interface {
 	Cash() int
 	AddCash(amount int) Interface
 	RemoveCash(amount int) Interface
-}
-
-type ShareInterface interface {
-	Shares(c corporation.Interface) int
-	AddCash(amount int) Interface
+	Name() string
 }
