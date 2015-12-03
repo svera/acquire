@@ -40,7 +40,7 @@ func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) 
 	adjacent := b.adjacentNonCorporationTiles(t)
 	if len(adjacent) == 4 {
 		for _, adjacentCell := range adjacent {
-			if adjacentCell.Owner().Type() == "orphan" {
+			if adjacentCell.Owner().Type() == "unincorporated" {
 				newCorporationTiles = append(newCorporationTiles, adjacentCell)
 			}
 		}
@@ -100,7 +100,7 @@ func (b *Board) TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, c
 	corporationToGrow := nullCorporation
 	adjacent := b.adjacentTiles(t)
 	for _, adjacentCell := range adjacent {
-		if adjacentCell.Owner().Type() != "orphan" {
+		if adjacentCell.Owner().Type() != "unincorporated" {
 			if corporationToGrow != nullCorporation {
 				return false, []tile.Interface{}, nullCorporation
 			}
@@ -180,7 +180,7 @@ func (b *Board) adjacentNonCorporationTiles(t tile.Interface) []tile.Interface {
 	return b.adjacentCellsWithFilter(
 		t,
 		func(t tile.Interface) bool {
-			if t.Owner().Type() == "orphan" || t.Owner().Type() == "empty" {
+			if t.Owner().Type() == "unincorporated" || t.Owner().Type() == "empty" {
 				return true
 			}
 			return false

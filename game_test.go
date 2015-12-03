@@ -82,8 +82,8 @@ func TestAreEndConditionsReached(t *testing.T) {
 
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tile.New(6, "E", tile.Orphan{})
-	bd.PutTile(tile.New(5, "E", tile.Orphan{}))
+	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
+	bd.PutTile(tile.New(5, "E", tile.Unincorporated{}))
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -105,8 +105,8 @@ func TestFoundCorporation(t *testing.T) {
 	}
 	game.state = &fsm.FoundCorp{}
 	newCorpTiles := []tile.Interface{
-		tile.New(5, "E", tile.Orphan{}),
-		tile.New(6, "E", tile.Orphan{}),
+		tile.New(5, "E", tile.Unincorporated{}),
+		tile.New(6, "E", tile.Unincorporated{}),
 	}
 	game.newCorpTiles = newCorpTiles
 	game.FoundCorporation(corporations[0])
@@ -126,14 +126,14 @@ func TestFoundCorporation(t *testing.T) {
 
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 	corpTiles := []tile.Interface{
 		tile.New(7, "E", corporations[0]),
 		tile.New(8, "E", corporations[0]),
 	}
 	corporations[0].Grow(len(corpTiles))
 	bd.SetTiles(corporations[0], corpTiles)
-	bd.PutTile(tile.New(5, "E", tile.Orphan{}))
+	bd.PutTile(tile.New(5, "E", tile.Unincorporated{}))
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -161,7 +161,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -196,7 +196,7 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -231,7 +231,7 @@ func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
 func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E", tile.Orphan{})
+	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -308,9 +308,9 @@ func TestDrawTile(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].(*corporation.Stub).SetSize(11)
 	corporations[1].(*corporation.Stub).SetSize(15)
-	unplayableTile := tile.New(6, "D", tile.Orphan{})
-	bd.SetTiles(corporations[0], []tile.Interface{tile.New(5, "D", tile.Orphan{})})
-	bd.SetTiles(corporations[1], []tile.Interface{tile.New(7, "D", tile.Orphan{})})
+	unplayableTile := tile.New(6, "D", tile.Unincorporated{})
+	bd.SetTiles(corporations[0], []tile.Interface{tile.New(5, "D", tile.Unincorporated{})})
+	bd.SetTiles(corporations[1], []tile.Interface{tile.New(7, "D", tile.Unincorporated{})})
 
 	game, _ := New(bd, players, corporations, ts)
 	players[0].(*player.Stub).SetTiles([]tile.Interface{unplayableTile})

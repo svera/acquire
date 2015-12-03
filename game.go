@@ -205,7 +205,7 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 	}
 	adjacents := g.board.AdjacentCells(tl)
 	for _, adjacent := range adjacents {
-		if adjacent.Owner().Type() == "orphan" {
+		if adjacent.Owner().Type() == "unincorporated" {
 			return true
 		}
 	}

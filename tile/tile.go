@@ -1,5 +1,5 @@
 // Model for the tile. Every tile stores its coordinates and which is its owner
-// (any implementation of the Owner interface, which can be Empty, Orphan or a
+// (any implementation of the Owner interface, which can be Empty, Unincorporated or a
 // Corporation implementation)
 package tile
 
@@ -40,8 +40,8 @@ func (e Empty) Type() string {
 	return "empty"
 }
 
-type Orphan struct{}
+type Unincorporated struct{}
 
-func (o Orphan) Type() string {
-	return "orphan"
+func (o Unincorporated) Type() string {
+	return "unincorporated"
 }
