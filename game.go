@@ -26,6 +26,8 @@ const (
 	NoCorporationSharesOwned        = "no_corporation_shares_owned"
 	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
 	TileNotOnHand                   = "tile_not_on_hand"
+
+	endGameCorporationSize = 41
 )
 
 type Game struct {
@@ -106,7 +108,7 @@ func (g *Game) AreEndConditionsReached() bool {
 		return false
 	}
 	for _, corp := range active {
-		if corp.Size() >= 41 {
+		if corp.Size() >= endGameCorporationSize {
 			return true
 		}
 		if !corp.IsSafe() {
