@@ -31,14 +31,16 @@ const (
 )
 
 type Game struct {
-	board         board.Interface
-	state         fsm.State
-	players       []player.Interface
-	corporations  [7]corporation.Interface
-	tileset       tileset.Interface
-	currentPlayer int
-	newCorpTiles  []tile.Interface
-	mergeCorps    map[string][]corporation.Interface
+	board            board.Interface
+	state            fsm.State
+	players          []player.Interface
+	corporations     [7]corporation.Interface
+	tileset          tileset.Interface
+	currentPlayer    int
+	newCorpTiles     []tile.Interface
+	mergeCorps       map[string][]corporation.Interface
+	sellTradePlayers []player.Interface
+	frozenPlayer     player.Interface
 }
 
 func New(
@@ -185,6 +187,9 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 			g.state = g.state.ToUntieMerge()
 		} else {
 			g.payMergeBonuses()
+			g.sellTradePlayers = g.shareholders(mergeCorps["defunct"])
+			g.frozenPlayer = g.CurrentPlayer()
+			g.setCurrentPlayer(g.nextSellTradePlayer())
 			g.state = g.state.ToSellTrade()
 		}
 	} else if found, tiles := g.board.TileFoundCorporation(tl); found {
@@ -198,6 +203,26 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 		g.state = g.state.ToBuyStock()
 	}
 	return nil
+}
+
+// Returns players who are shareholders of at least one of the passed companies
+func (g *Game) shareholders(corporations []corporation.Interface) []player.Interface {
+	shareholders := []player.Interface{}
+	for _, pl := range g.players {
+		for _, corp := range g.corporations {
+			if pl.Shares(corp) > 0 {
+				shareholders = append(shareholders, pl)
+				break
+			}
+		}
+	}
+	return shareholders
+}
+
+// Sets player currently in turn
+func (g *Game) setCurrentPlayer(number int) *Game {
+	g.currentPlayer = number
+	return g
 }
 
 func (g *Game) FoundCorporation(corp corporation.Interface) error {
