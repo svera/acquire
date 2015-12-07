@@ -10,7 +10,6 @@ import (
 	"github.com/svera/acquire/tileset"
 )
 
-const totalCorporations = 7
 const (
 	ActionNotAllowed                = "action_not_allowed"
 	StockSharesNotBuyable           = "stock_shares_not_buyable"
@@ -27,20 +26,23 @@ const (
 	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
 	TileNotOnHand                   = "tile_not_on_hand"
 
+	totalCorporations      = 7
 	endGameCorporationSize = 41
 )
 
 type Game struct {
-	board            board.Interface
-	state            fsm.State
-	players          []player.Interface
-	corporations     [7]corporation.Interface
-	tileset          tileset.Interface
-	currentPlayer    int
-	newCorpTiles     []tile.Interface
-	mergeCorps       map[string][]corporation.Interface
-	sellTradePlayers []player.Interface
-	frozenPlayer     player.Interface
+	board               board.Interface
+	state               fsm.State
+	players             []player.Interface
+	corporations        [7]corporation.Interface
+	tileset             tileset.Interface
+	currentPlayerNumber int
+	newCorpTiles        []tile.Interface
+	mergeCorps          map[string][]corporation.Interface
+	sellTradePlayers    []int
+	// When in sell_trade state, the current player is stored here temporary as the turn
+	// is passed to all defunct corporations stockholders
+	frozenPlayer int
 }
 
 func New(
@@ -55,15 +57,15 @@ func New(
 		return nil, errors.New(WrongNumberCorpsClass)
 	}
 	gm := Game{
-		board:         board,
-		players:       players,
-		corporations:  corporations,
-		tileset:       tileset,
-		currentPlayer: 0,
-		state:         &fsm.PlayTile{},
+		board:               board,
+		players:             players,
+		corporations:        corporations,
+		tileset:             tileset,
+		currentPlayerNumber: 0,
+		state:               &fsm.PlayTile{},
 	}
-	for _, plyr := range gm.players {
-		gm.giveInitialTileset(plyr)
+	for _, pl := range gm.players {
+		gm.giveInitialTileset(pl)
 	}
 
 	return &gm, nil
@@ -164,7 +166,7 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 
 // Returns player currently in turn
 func (g *Game) CurrentPlayer() player.Interface {
-	return g.players[g.currentPlayer]
+	return g.players[g.currentPlayerNumber]
 }
 
 // Puts the given tile on board and triggers related actions
@@ -187,8 +189,8 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 			g.state = g.state.ToUntieMerge()
 		} else {
 			g.payMergeBonuses()
-			g.sellTradePlayers = g.shareholders(mergeCorps["defunct"])
-			g.frozenPlayer = g.CurrentPlayer()
+			g.sellTradePlayers = g.stockholders(mergeCorps["defunct"])
+			g.frozenPlayer = g.currentPlayerNumber
 			g.setCurrentPlayer(g.nextSellTradePlayer())
 			g.state = g.state.ToSellTrade()
 		}
@@ -206,12 +208,12 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 }
 
 // Returns players who are shareholders of at least one of the passed companies
-func (g *Game) shareholders(corporations []corporation.Interface) []player.Interface {
-	shareholders := []player.Interface{}
-	for _, pl := range g.players {
+func (g *Game) stockholders(corporations []corporation.Interface) []int {
+	shareholders := []int{}
+	for number := range g.players {
 		for _, corp := range g.corporations {
-			if pl.Shares(corp) > 0 {
-				shareholders = append(shareholders, pl)
+			if g.players[number].Shares(corp) > 0 {
+				shareholders = append(shareholders, number)
 				break
 			}
 		}
@@ -221,7 +223,7 @@ func (g *Game) shareholders(corporations []corporation.Interface) []player.Inter
 
 // Sets player currently in turn
 func (g *Game) setCurrentPlayer(number int) *Game {
-	g.currentPlayer = number
+	g.currentPlayerNumber = number
 	return g
 }
 
@@ -258,8 +260,8 @@ func (g *Game) growCorporation(corp corporation.Interface, tiles []tile.Interfac
 
 // Increases the number which specifies the current player
 func (g *Game) nextPlayer() {
-	g.currentPlayer++
-	if g.currentPlayer == len(g.players) {
-		g.currentPlayer = 0
+	g.currentPlayerNumber++
+	if g.currentPlayerNumber == len(g.players) {
+		g.currentPlayerNumber = 0
 	}
 }

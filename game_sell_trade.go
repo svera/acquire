@@ -5,7 +5,6 @@ import (
 	"github.com/svera/acquire/corporation"
 )
 
-// TODO
 func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
 	if err := g.checkSellTrade(sell, trade); err != nil {
 		return err
@@ -27,8 +26,9 @@ func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporati
 	return nil
 }
 
-func (g *Game) nextSellTradePlayer() {
-	pl, g.sellTradePlayers = g.sellTradePlayers[len(g.sellTradePlayers)-1], g.sellTradePlayers[:len(g.sellTradePlayers)-1]
+func (g *Game) nextSellTradePlayer() int {
+	pl := g.sellTradePlayers[len(g.sellTradePlayers)-1]
+	g.sellTradePlayers = g.sellTradePlayers[:len(g.sellTradePlayers)-1]
 	return pl
 }
 
