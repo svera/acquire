@@ -19,7 +19,7 @@ func NewStub(name string) *Stub {
 	}
 }
 
-func (p *Stub) SetTiles(tiles []tile.Interface) {
+func (p *Stub) SetOwner(tiles []tile.Interface) {
 	p.tiles = tiles
 }
 

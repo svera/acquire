@@ -132,7 +132,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 		tile.New(8, "E", corporations[0]),
 	}
 	corporations[0].Grow(len(corpTiles))
-	bd.SetTiles(corporations[0], corpTiles)
+	bd.SetOwner(corporations[0], corpTiles)
 	bd.PutTile(tile.New(5, "E", tile.Unincorporated{}))
 
 	game, _ := New(bd, players, corporations, ts)
@@ -262,8 +262,8 @@ func setupPlayTileMerge(corporations [7]corporation.Interface, bd board.Interfac
 	}
 	corporations[0].Grow(len(corp0Tiles))
 	corporations[1].Grow(len(corp1Tiles))
-	bd.SetTiles(corporations[0], corp0Tiles)
-	bd.SetTiles(corporations[1], corp1Tiles)
+	bd.SetOwner(corporations[0], corp0Tiles)
+	bd.SetOwner(corporations[1], corp1Tiles)
 }
 
 func TestBuyStock(t *testing.T) {
@@ -309,11 +309,11 @@ func TestDrawTile(t *testing.T) {
 	corporations[0].(*corporation.Stub).SetSize(11)
 	corporations[1].(*corporation.Stub).SetSize(15)
 	unplayableTile := tile.New(6, "D", tile.Unincorporated{})
-	bd.SetTiles(corporations[0], []tile.Interface{tile.New(5, "D", tile.Unincorporated{})})
-	bd.SetTiles(corporations[1], []tile.Interface{tile.New(7, "D", tile.Unincorporated{})})
+	bd.SetOwner(corporations[0], []tile.Interface{tile.New(5, "D", tile.Unincorporated{})})
+	bd.SetOwner(corporations[1], []tile.Interface{tile.New(7, "D", tile.Unincorporated{})})
 
 	game, _ := New(bd, players, corporations, ts)
-	players[0].(*player.Stub).SetTiles([]tile.Interface{unplayableTile})
+	players[0].(*player.Stub).SetOwner([]tile.Interface{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
 	game.drawTile()

@@ -43,12 +43,19 @@ func (c *Corporation) Size() int {
 	return c.size
 }
 
-// Increase corporation size in tiles
-func (c *Corporation) Grow(number int) {
+// Increases corporation size in tiles
+func (c *Corporation) Grow(number int) Interface {
 	c.size += number
+	return c
 }
 
-//Fill the prices chart array with the amounts corresponding to the corporation
+// Sets corporation size to 0 (not on board)
+func (c *Corporation) Reset() Interface {
+	c.size = 0
+	return c
+}
+
+//Fills the prices chart array with the amounts corresponding to the corporation
 //class
 func initPricesChart(class int) map[int]prices {
 	initialValues := new([3]prices)
@@ -83,14 +90,16 @@ func (c *Corporation) Stock() int {
 	return c.stock
 }
 
-// Add amount of stock shares to corporation stock
-func (c *Corporation) AddStock(amount int) {
+// Adds amount of stock shares to corporation stock
+func (c *Corporation) AddStock(amount int) Interface {
 	c.stock += amount
+	return c
 }
 
-// Add amount of stock shares to corporation stock
-func (c *Corporation) RemoveStock(amount int) {
+// Removes amount of stock shares from corporation stock
+func (c *Corporation) RemoveStock(amount int) Interface {
 	c.stock -= amount
+	return c
 }
 
 // Returns company's current value per stock share
@@ -137,7 +146,7 @@ func (c *Corporation) Class() int {
 	return c.class
 }
 
-// Return type, to comply with owner interface
+// Returns type, to comply with owner interface
 func (c *Corporation) Type() string {
 	return "corporation"
 }

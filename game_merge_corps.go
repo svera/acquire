@@ -69,8 +69,8 @@ func (g *Game) isMergeTied() bool {
 	return false
 }
 
-// Resolves a tied merge selecting which corporation will be the acquirer
-// moving the rest to defunct
+// Resolves a tied merge selecting which corporation will be the acquirer,
+// marking the rest as defunct
 func (g *Game) UntieMerge(acquirer corporation.Interface) error {
 	if g.state.Name() != "UntieMerge" {
 		return errors.New(ActionNotAllowed)
@@ -111,6 +111,14 @@ func (g *Game) payMergeBonuses() {
 	}
 }
 
-// TODO
+// Adds tiles from the defunct corporations to the acquirer one
+// and set acquirer as owner of those tiles on board. Finally, resets
+// merge information
 func (g *Game) completeMerge() {
+	acquirer := g.mergeCorps["acquirer"][0]
+	for _, defunct := range g.mergeCorps["defunct"] {
+		acquirer.Grow(defunct.Size())
+		defunct.Reset()
+		g.board.ChangeOwner(defunct, acquirer)
+	}
 }

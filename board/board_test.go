@@ -247,13 +247,13 @@ func TestAdjacentCells(t *testing.T) {
 	}
 }
 
-func TestSetTiles(t *testing.T) {
+func TestSetOwner(t *testing.T) {
 	brd := New()
 	corp, _ := corporation.New("Test", 1)
 	tl1 := tile.New(1, "A", corp)
 	tl2 := tile.New(1, "B", corp)
 	tls := []tile.Interface{tl1, tl2}
-	brd.SetTiles(corp, tls)
+	brd.SetOwner(corp, tls)
 	if brd.Cell(tl1.Number(), tl1.Letter()).Owner() != corp || brd.Cell(tl2.Number(), tl2.Letter()).Owner() != corp {
 		t.Errorf(
 			"Cells %d%s and %d%s expected to belong to corporation",

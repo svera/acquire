@@ -206,9 +206,21 @@ func nextLetter(letter string) string {
 }
 
 // Set tiles on board as belonging to the passed corporation
-func (b *Board) SetTiles(cp corporation.Interface, tiles []tile.Interface) Interface {
+func (b *Board) SetOwner(cp corporation.Interface, tiles []tile.Interface) Interface {
 	for _, tl := range tiles {
 		b.grid[tl.Number()][tl.Letter()].SetOwner(cp)
+	}
+	return b
+}
+
+// Change ownership of tiles belonging to oldOrder to newOrder
+func (b *Board) ChangeOwner(oldOwner corporation.Interface, newOwner corporation.Interface) Interface {
+	for number := 1; number < 13; number++ {
+		for _, letter := range letters {
+			if b.grid[number][letter].Owner() == oldOwner {
+				b.grid[number][letter].SetOwner(newOwner)
+			}
+		}
 	}
 	return b
 }

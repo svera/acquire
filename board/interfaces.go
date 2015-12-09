@@ -12,5 +12,6 @@ type Interface interface {
 	TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, corporation.Interface)
 	PutTile(t tile.Interface) Interface
 	AdjacentCells(t tile.Interface) []tile.Interface
-	SetTiles(cp corporation.Interface, tiles []tile.Interface) Interface
+	SetOwner(cp corporation.Interface, tiles []tile.Interface) Interface
+	ChangeOwner(oldOwner corporation.Interface, newOwner corporation.Interface) Interface
 }

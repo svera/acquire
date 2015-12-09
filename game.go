@@ -235,7 +235,7 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 	if corp.IsActive() {
 		return errors.New(CorporationAlreadyOnBoard)
 	}
-	g.board.SetTiles(corp, g.newCorpTiles)
+	g.board.SetOwner(corp, g.newCorpTiles)
 	corp.Grow(len(g.newCorpTiles))
 	g.newCorpTiles = []tile.Interface{}
 	g.getFounderStockShare(g.CurrentPlayer(), corp)
@@ -255,7 +255,7 @@ func (g *Game) getFounderStockShare(pl player.Interface, corp corporation.Interf
 }
 
 func (g *Game) growCorporation(corp corporation.Interface, tiles []tile.Interface) {
-	g.board.SetTiles(corp, tiles)
+	g.board.SetOwner(corp, tiles)
 	corp.Grow(len(tiles))
 }
 
