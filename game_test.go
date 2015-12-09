@@ -277,7 +277,9 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	if game.board.Cell(6, "E").Owner() != corporations[1] {
 		t.Errorf("Wrong owner for tile %d%s, expected %s, got %s", 6, "E", "corporation", game.board.Cell(6, "E").Owner().Type())
 	}
-	if players[0].Cash() != 6000 {
+	// 6000$ (base cash) + 3000 (majority and minority bonus for class 0 corporation) + (200 * 6) (6 shares owned of the defunct corporation,
+	// 200$ per share) = 10200$
+	if players[0].Cash() != 10200 {
 		t.Errorf("Wrong cash amount for player, expected %d, got %d", 6000, players[0].Cash())
 	}
 	if players[0].Shares(game.corporations[0]) != 0 {

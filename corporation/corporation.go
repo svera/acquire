@@ -1,4 +1,4 @@
-// Model which manager corporations in game
+// Model which manages corporations in game
 package corporation
 
 import (

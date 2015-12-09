@@ -116,7 +116,7 @@ connects two (or more) corporations, a merger takes place.
 The larger corporation (the one with more tiles) survives
 and the smaller corporation becomes defunct. During the
 merger, the merging tile does not add to the size of either
-corporation for any purpose. if the corporations are the
+corporation for any purpose. If the corporations are the
 same size, then the mergemaker decides which corporation
 survives. The surviving corporation absorbs the defunct
 one. The corporation building marker of the defunct
@@ -146,7 +146,7 @@ that player gets both bonuses. If there is a tie for majority
 stockholder, add the majority and minority bonuses
 together, divide evenly and round up to the next payable
 dollar amount if necessary. (The minority shareholder
-gets no bonus.) if there is a tie for minority stockholder,
+gets no bonus.) If there is a tie for minority stockholder,
 split the minority bonus among the tied players. Round
 resulting bonuses up to the nearest $100 if necessary.
 
