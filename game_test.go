@@ -223,8 +223,8 @@ func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
 }
 
 // Testing this merge:
-//   4 5 6 7 8 9
-// E [][]><[][][]
+//    4  5 6  7  8  9
+// E [0][0]><[1][1][1]
 //
 // In this case, only player 0 has shares of the defunct corp 0, which has
 // a size of 2, thus getting both majority and minority bonuses
@@ -244,6 +244,38 @@ func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	expectedPlayerCash := 9000
 	if players[0].Cash() != expectedPlayerCash {
 		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayerCash, players[0].Cash())
+	}
+}
+
+// Same as previous test, but including the actual change of ownership of tiles on board
+// (the complete merge flow)
+func TestPlayTileMergeCorporationsComplete(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	setupPlayTileMerge(corporations, bd)
+	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
+
+	game, _ := New(bd, players, corporations, ts)
+	playerTiles := players[0].Tiles()
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
+	players[0].(*player.Stub).SetShares(corporations[0], 6)
+
+	game.PlayTile(tileToPlay)
+	sell := map[corporation.Interface]int{corporations[0]: 6}
+	trade := map[corporation.Interface]int{}
+	game.SellTrade(sell, trade)
+	if game.state.Name() != "BuyStock" {
+		t.Errorf("Wrong game state after merge, expected %s, got %s", "BuyStock", game.state.Name())
+	}
+	if game.corporations[0].Size() != 0 {
+		t.Errorf("Wrong size for corporation 0, expected %d, got %d", 0, game.corporations[0].Size())
+	}
+	if game.corporations[1].Size() != 5 {
+		t.Errorf("Wrong size for corporation 1, expected %d, got %d", 5, game.corporations[1].Size())
+	}
+	if game.board.Cell(6, "E").Owner().Type() != "corporation" {
+		t.Errorf("Wrong owner for tile %d%s, expected %s, got %s", 6, "E", "corporation", game.board.Cell(6, "E").Owner().Type())
 	}
 }
 

@@ -121,4 +121,5 @@ func (g *Game) completeMerge() {
 		defunct.Reset()
 		g.board.ChangeOwner(defunct, acquirer)
 	}
+	g.mergeCorps = map[string][]corporation.Interface{}
 }

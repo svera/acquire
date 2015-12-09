@@ -5,6 +5,7 @@ import (
 	"github.com/svera/acquire/corporation"
 )
 
+// Sells and trades stock shares from defunct corporations
 func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
 	if err := g.checkSellTrade(sell, trade); err != nil {
 		return err
@@ -35,6 +36,8 @@ func (g *Game) nextSellTradePlayer() int {
 	return pl
 }
 
+// Sells owned shares of a defunct corporation, returning them to the
+// corporation's stock
 func (g *Game) sell(corp corporation.Interface, amount int) {
 	corp.AddStock(amount)
 	g.CurrentPlayer().
@@ -42,6 +45,8 @@ func (g *Game) sell(corp corporation.Interface, amount int) {
 		AddCash(corp.StockPrice() * amount)
 }
 
+// Trades two stock shares from a defunct corporation for a
+// share of the acquiring one
 func (g *Game) trade(corp corporation.Interface, amount int) {
 	acquirer := g.mergeCorps["acquirer"][0]
 	amountSharesAcquiringCorp := amount / 2

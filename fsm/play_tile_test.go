@@ -4,8 +4,8 @@ import "testing"
 
 func TestPlayTileToSellTrade(t *testing.T) {
 	state := &PlayTile{}
-	if state.ToSellTrade().Name() != "ErrorState" {
-		t.Errorf("Transition from PlayTile to SellTrade must not be valid")
+	if state.ToSellTrade().Name() != "SellTrade" {
+		t.Errorf("Transition from PlayTile to SellTrade must be valid")
 	}
 }
 

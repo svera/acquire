@@ -8,6 +8,10 @@ func (s *PlayTile) Name() string {
 	return "PlayTile"
 }
 
+func (s *PlayTile) ToSellTrade() State {
+	return &SellTrade{}
+}
+
 func (s *PlayTile) ToFoundCorp() State {
 	return &FoundCorp{}
 }
