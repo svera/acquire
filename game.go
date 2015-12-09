@@ -25,6 +25,7 @@ const (
 	NoCorporationSharesOwned        = "no_corporation_shares_owned"
 	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
 	TileNotOnHand                   = "tile_not_on_hand"
+	NotAnAcquirerCorporation        = "not_an_acquirer_corporation"
 
 	totalCorporations      = 7
 	endGameCorporationSize = 41

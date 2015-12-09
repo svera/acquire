@@ -324,6 +324,26 @@ func TestDrawTile(t *testing.T) {
 	}
 }
 
+func TestUntieMerge(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	game, _ := New(bd, players, corporations, ts)
+	game.mergeCorps = map[string][]corporation.Interface{
+		"acquirer": []corporation.Interface{corporations[0], corporations[1], corporations[2]},
+		"defunct":  []corporation.Interface{corporations[3]},
+	}
+	game.state = &fsm.UntieMerge{}
+	game.UntieMerge(corporations[1])
+	if game.mergeCorps["acquirer"][0] != corporations[1] {
+		t.Errorf("Tied merge not untied, expected acquirer to be %s, got %s", corporations[0].Name(), game.mergeCorps["acquirer"][0].Name())
+	}
+	if len(game.mergeCorps["defunct"]) != 3 {
+		t.Errorf("Wrong number of defunct corporations after merge untie, expected %d, got %d", 3, len(game.mergeCorps["defunct"]))
+	}
+	if game.state.Name() != "SellTrade" {
+		t.Errorf("Wrong game state after merge untie, expected %s, got %s", "SellTrade", game.state.Name())
+	}
+}
+
 func setup() ([]player.Interface, [7]corporation.Interface, board.Interface, tileset.Interface) {
 	var players []player.Interface
 	players = append(players, player.NewStub("Test1"))

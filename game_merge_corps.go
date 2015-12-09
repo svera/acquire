@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/player"
 )
@@ -68,6 +69,27 @@ func (g *Game) isMergeTied() bool {
 	return false
 }
 
+// Resolves a tied merge selecting which corporation will be the acquirer
+// moving the rest to defunct
+func (g *Game) UntieMerge(acquirer corporation.Interface) error {
+	if g.state.Name() != "UntieMerge" {
+		return errors.New(ActionNotAllowed)
+	}
+	for i, corp := range g.mergeCorps["acquirer"] {
+		if corp == acquirer {
+			g.mergeCorps["defunct"] = append(
+				g.mergeCorps["defunct"],
+				append(g.mergeCorps["acquirer"][:i], g.mergeCorps["acquirer"][i+1:]...)...,
+			)
+			g.mergeCorps["acquirer"] = []corporation.Interface{corp}
+			g.state = g.state.ToSellTrade()
+			return nil
+		}
+	}
+
+	return errors.New(NotAnAcquirerCorporation)
+}
+
 // Calculates and returns bonus amounts to be paid to owners of stock of a
 // defunct corporation
 func (g *Game) payMergeBonuses() {
@@ -87,4 +109,8 @@ func (g *Game) payMergeBonuses() {
 			minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
 		}
 	}
+}
+
+// TODO
+func (g *Game) completeMerge() {
 }

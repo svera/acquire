@@ -19,6 +19,7 @@ func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporati
 
 	if len(g.sellTradePlayers) == 0 {
 		g.setCurrentPlayer(g.frozenPlayer)
+		g.completeMerge()
 		g.state = g.state.ToBuyStock()
 	} else {
 		g.setCurrentPlayer(g.nextSellTradePlayer())
@@ -26,6 +27,8 @@ func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporati
 	return nil
 }
 
+// Extract the number of the next player to sell or trade stock shares from
+// the merge's defunct corps list of stockholders
 func (g *Game) nextSellTradePlayer() int {
 	pl := g.sellTradePlayers[len(g.sellTradePlayers)-1]
 	g.sellTradePlayers = g.sellTradePlayers[:len(g.sellTradePlayers)-1]
@@ -49,6 +52,7 @@ func (g *Game) trade(corp corporation.Interface, amount int) {
 		AddShares(acquirer, amountSharesAcquiringCorp)
 }
 
+// Check that the requisites for both selling and trading stock shares are met
 func (g *Game) checkSellTrade(sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
 	if g.state.Name() != "SellTrade" {
 		return errors.New(ActionNotAllowed)
