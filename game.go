@@ -41,6 +41,7 @@ type Game struct {
 	newCorpTiles        []tile.Interface
 	mergeCorps          map[string][]corporation.Interface
 	sellTradePlayers    []int
+	lastPlayedTile      tile.Interface
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
 	frozenPlayer int
@@ -183,6 +184,7 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 	}
 
 	g.CurrentPlayer().DiscardTile(tl)
+	g.lastPlayedTile = tl
 
 	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
 		g.mergeCorps = mergeCorps
