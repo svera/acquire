@@ -123,5 +123,6 @@ func (g *Game) completeMerge() {
 	}
 	g.lastPlayedTile.SetOwner(acquirer)
 	g.board.PutTile(g.lastPlayedTile)
+	acquirer.Grow(1)
 	g.mergeCorps = map[string][]corporation.Interface{}
 }

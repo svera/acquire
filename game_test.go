@@ -271,10 +271,10 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	if game.corporations[0].Size() != 0 {
 		t.Errorf("Wrong size for corporation 0, expected %d, got %d", 0, game.corporations[0].Size())
 	}
-	if game.corporations[1].Size() != 5 {
-		t.Errorf("Wrong size for corporation 1, expected %d, got %d", 5, game.corporations[1].Size())
+	if game.corporations[1].Size() != 6 {
+		t.Errorf("Wrong size for corporation 1, expected %d, got %d", 6, game.corporations[1].Size())
 	}
-	if game.board.Cell(6, "E").Owner().Type() != "corporation" {
+	if game.board.Cell(6, "E").Owner() != corporations[1] {
 		t.Errorf("Wrong owner for tile %d%s, expected %s, got %s", 6, "E", "corporation", game.board.Cell(6, "E").Owner().Type())
 	}
 }
