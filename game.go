@@ -1,3 +1,4 @@
+// Main library package, which manages the flow and status of the game
 package game
 
 import (
@@ -26,6 +27,7 @@ const (
 	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
 	TileNotOnHand                   = "tile_not_on_hand"
 	NotAnAcquirerCorporation        = "not_an_acquirer_corporation"
+	TradeAmountNotEven              = "trade_amount_not_even"
 
 	totalCorporations      = 7
 	endGameCorporationSize = 41
@@ -42,11 +44,13 @@ type Game struct {
 	mergeCorps          map[string][]corporation.Interface
 	sellTradePlayers    []int
 	lastPlayedTile      tile.Interface
+	turn                int
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
 	frozenPlayer int
 }
 
+// Initialises a new Acquire game
 func New(
 	board board.Interface, players []player.Interface, corporations [7]corporation.Interface, tileset tileset.Interface) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
@@ -64,6 +68,7 @@ func New(
 		corporations:        corporations,
 		tileset:             tileset,
 		currentPlayerNumber: 0,
+		turn:                1,
 		state:               &fsm.PlayTile{},
 	}
 	for _, pl := range gm.players {
@@ -166,7 +171,7 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 	return false
 }
 
-// Returns player currently in turn
+// Returns player currently in play
 func (g *Game) CurrentPlayer() player.Interface {
 	return g.players[g.currentPlayerNumber]
 }
@@ -224,12 +229,13 @@ func (g *Game) stockholders(corporations []corporation.Interface) []int {
 	return shareholders
 }
 
-// Sets player currently in turn
+// Sets player currently in play
 func (g *Game) setCurrentPlayer(number int) *Game {
 	g.currentPlayerNumber = number
 	return g
 }
 
+// Founds a new corporation
 func (g *Game) FoundCorporation(corp corporation.Interface) error {
 	if g.state.Name() != "FoundCorp" {
 		return errors.New(ActionNotAllowed)
@@ -256,6 +262,7 @@ func (g *Game) getFounderStockShare(pl player.Interface, corp corporation.Interf
 	}
 }
 
+// Makes a corporation grow with the passed tiles
 func (g *Game) growCorporation(corp corporation.Interface, tiles []tile.Interface) {
 	g.board.SetOwner(corp, tiles)
 	corp.Grow(len(tiles))
@@ -266,5 +273,11 @@ func (g *Game) nextPlayer() {
 	g.currentPlayerNumber++
 	if g.currentPlayerNumber == len(g.players) {
 		g.currentPlayerNumber = 0
+		g.turn++
 	}
+}
+
+// Returns the current turn number
+func (g *Game) Turn() int {
+	return g.turn
 }

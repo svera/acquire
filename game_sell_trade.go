@@ -74,6 +74,9 @@ func (g *Game) checkSellTrade(sell map[corporation.Interface]int, trade map[corp
 		if amount > 0 && g.CurrentPlayer().Shares(corp) == 0 {
 			return errors.New(NoCorporationSharesOwned)
 		}
+		if amount%2 != 0 {
+			return errors.New(TradeAmountNotEven)
+		}
 		if corp.Stock() < (amount / 2) {
 			return errors.New(NotEnoughStockShares)
 		}
