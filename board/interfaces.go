@@ -5,6 +5,7 @@ import (
 	"github.com/svera/acquire/tile"
 )
 
+// Interface declares all methods to be implemented by a board implementation
 type Interface interface {
 	Cell(number int, letter string) tile.Interface
 	TileFoundCorporation(t tile.Interface) (bool, []tile.Interface)

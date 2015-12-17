@@ -310,8 +310,8 @@ func TestBuyStock(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].Grow(2)
 	buys := map[int]int{0: 2}
-	var expectedAvailableStock int = 23
-	var expectedPlayerStock int = 2
+	expectedAvailableStock := 23
+	expectedPlayerStock := 2
 	game, _ := New(bd, players, corporations, ts)
 	game.state = &fsm.BuyStock{}
 	game.BuyStock(buys)

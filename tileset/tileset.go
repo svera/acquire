@@ -1,3 +1,4 @@
+// Package tileset holds the Tileset struct and related methods
 package tileset
 
 import (
@@ -7,13 +8,16 @@ import (
 )
 
 const (
+	// NoTilesAvailable is an error returned when a player tries to get a tile from an empty tileset
 	NoTilesAvailable = "no_tiles_available"
 )
 
+// Tileset stores all tiles used in game
 type Tileset struct {
 	tiles []tile.Interface
 }
 
+// New initialises and returns a Tileset instance
 func New() *Tileset {
 	tileset := Tileset{}
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
@@ -26,7 +30,7 @@ func New() *Tileset {
 	return &tileset
 }
 
-// Extracts a random tile from the tileset and returns it
+// Draw extracts a random tile from the tileset and returns it
 func (t *Tileset) Draw() (tile.Interface, error) {
 	remainingTiles := len(t.tiles)
 	if remainingTiles > 0 {

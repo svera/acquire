@@ -69,7 +69,7 @@ func (g *Game) isMergeTied() bool {
 	return false
 }
 
-// Resolves a tied merge selecting which corporation will be the acquirer,
+// UntieMerge resolves a tied merge selecting which corporation will be the acquirer,
 // marking the rest as defunct
 func (g *Game) UntieMerge(acquirer corporation.Interface) error {
 	if g.state.Name() != "UntieMerge" {

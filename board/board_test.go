@@ -242,7 +242,7 @@ func TestAdjacentCells(t *testing.T) {
 	if !slicesSameCells(adjacentCells, expectedAdjacentCells) {
 		t.Errorf(
 			"Position %d%s expected to have adjacent tiles %v, got %v",
-			tl.Number, tl.Letter, expectedAdjacentCells, adjacentCells,
+			tl.Number(), tl.Letter(), expectedAdjacentCells, adjacentCells,
 		)
 	}
 }

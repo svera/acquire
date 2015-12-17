@@ -1,9 +1,12 @@
 package corporation
 
+// Stub is a struct to be used in corporation tests as a replacement of the original,
+// that includes several convenience methods for testing
 type Stub struct {
 	Corporation
 }
 
+// NewStub initialises and returns a new instance of Stub
 func NewStub(name string, class int) *Stub {
 	return &Stub{
 		Corporation: Corporation{
@@ -15,11 +18,13 @@ func NewStub(name string, class int) *Stub {
 	}
 }
 
+// SetSize sets the size of the stub
 func (c *Stub) SetSize(size int) Interface {
 	c.size = size
 	return c
 }
 
+// SetStock sets the stock amount of the stub
 func (c *Stub) SetStock(amount int) Interface {
 	c.stock = amount
 	return c

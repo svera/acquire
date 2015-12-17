@@ -5,7 +5,7 @@ import (
 	"github.com/svera/acquire/corporation"
 )
 
-// Sells and trades stock shares from defunct corporations
+// SellTrade sells and trades stock shares from defunct corporations
 func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
 	if err := g.checkSellTrade(sell, trade); err != nil {
 		return err

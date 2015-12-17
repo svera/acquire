@@ -1,4 +1,4 @@
-// Model which manages corporations in game
+// Package corporation contains the model Corporation and attahced methods which manages corporations in game
 package corporation
 
 import (
@@ -12,9 +12,11 @@ type prices struct {
 }
 
 const (
+	// WrongCorporationClass is an error returned when corporation class is not between 0 and 2
 	WrongCorporationClass = "wrong_corporation_class"
 )
 
+// Corporation holds data related to corporations
 type Corporation struct {
 	name        string
 	class       int
@@ -23,6 +25,7 @@ type Corporation struct {
 	size        int
 }
 
+// New initialises and returns a new instance of Corporation
 func New(name string, class int) (*Corporation, error) {
 	if class < 0 || class > 2 {
 		return nil, errors.New(WrongCorporationClass)
@@ -38,18 +41,18 @@ func New(name string, class int) (*Corporation, error) {
 	return corporation, nil
 }
 
-// Returns corporation size on board
+// Size returns corporation size on board
 func (c *Corporation) Size() int {
 	return c.size
 }
 
-// Increases corporation size in tiles
+// Grow increases corporation size in tiles
 func (c *Corporation) Grow(number int) Interface {
 	c.size += number
 	return c
 }
 
-// Sets corporation size to 0 (not on board)
+// Reset sets corporation size to 0 (not on board)
 func (c *Corporation) Reset() Interface {
 	c.size = 0
 	return c
@@ -85,24 +88,24 @@ func initPricesChart(class int) map[int]prices {
 	return pricesChart
 }
 
-// Returns corporation's amount of stock shares available
+// Stock returns corporation's amount of stock shares available
 func (c *Corporation) Stock() int {
 	return c.stock
 }
 
-// Adds amount of stock shares to corporation stock
+// AddStock adds amount of stock shares to corporation stock
 func (c *Corporation) AddStock(amount int) Interface {
 	c.stock += amount
 	return c
 }
 
-// Removes amount of stock shares from corporation stock
+// RemoveStock removes the passed amount of stock shares from corporation stock
 func (c *Corporation) RemoveStock(amount int) Interface {
 	c.stock -= amount
 	return c
 }
 
-// Returns company's current value per stock share
+// StockPrice returns company's current value per stock share
 func (c *Corporation) StockPrice() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].price
@@ -110,7 +113,7 @@ func (c *Corporation) StockPrice() int {
 	return c.pricesChart[c.Size()].price
 }
 
-// Returns company's current majority bonus value per stock share
+// MajorityBonus returns company's current majority bonus value per stock share
 func (c *Corporation) MajorityBonus() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].majorityBonus
@@ -118,7 +121,7 @@ func (c *Corporation) MajorityBonus() int {
 	return c.pricesChart[c.Size()].majorityBonus
 }
 
-// Returns company's current minority bonus value per stock share
+// MinorityBonus returns company's current minority bonus value per stock share
 func (c *Corporation) MinorityBonus() int {
 	if c.Size() > 41 {
 		return c.pricesChart[41].minorityBonus
@@ -126,27 +129,27 @@ func (c *Corporation) MinorityBonus() int {
 	return c.pricesChart[c.Size()].minorityBonus
 }
 
-// Returns true if the corporation is considered safe, false otherwise
+// IsSafe returns true if the corporation is considered safe, false otherwise
 func (c *Corporation) IsSafe() bool {
 	return c.Size() >= 11
 }
 
-// Returns true if the corporation is on the board, false otherwise
+// IsActive returns true if the corporation is on the board, false otherwise
 func (c *Corporation) IsActive() bool {
 	return c.Size() > 0
 }
 
-// Returns corporation name
+// Name returns corporation name
 func (c *Corporation) Name() string {
 	return c.name
 }
 
-// Returns corporation class
+// Class returns corporation class
 func (c *Corporation) Class() int {
 	return c.class
 }
 
-// Returns type, to comply with owner interface
+// Type returns type, to comply with owner interface
 func (c *Corporation) Type() string {
 	return "corporation"
 }

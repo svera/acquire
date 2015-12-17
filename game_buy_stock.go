@@ -6,7 +6,7 @@ import (
 	"github.com/svera/acquire/tile"
 )
 
-// Buys stock from corporations
+// BuyStock buys stock from corporations
 func (g *Game) BuyStock(buys map[int]int) error {
 	if g.state.Name() != "BuyStock" {
 		return errors.New(ActionNotAllowed)
@@ -16,8 +16,8 @@ func (g *Game) BuyStock(buys map[int]int) error {
 		return err
 	}
 
-	for corporationId, amount := range buys {
-		corp := g.corporations[corporationId]
+	for corporationID, amount := range buys {
+		corp := g.corporations[corporationID]
 		g.buy(corp, amount)
 	}
 
@@ -33,8 +33,8 @@ func (g *Game) buy(corp corporation.Interface, amount int) {
 
 func (g *Game) checkBuy(buys map[int]int) error {
 	var totalStock, totalPrice int = 0, 0
-	for corporationId, amount := range buys {
-		corp := g.corporations[corporationId]
+	for corporationID, amount := range buys {
+		corp := g.corporations[corporationID]
 		if corp.Size() == 0 {
 			return errors.New(StockSharesNotBuyable)
 		}

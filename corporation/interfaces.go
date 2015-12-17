@@ -1,5 +1,6 @@
 package corporation
 
+// Interface declares all methods to be implemented by a corporation implementation
 type Interface interface {
 	Grow(number int) Interface
 	Reset() Interface

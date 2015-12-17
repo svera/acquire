@@ -5,6 +5,7 @@ import (
 	"github.com/svera/acquire/tile"
 )
 
+// Interface declares all methods to be implemented by a player implementation
 type Interface interface {
 	Shares(c corporation.Interface) int
 	AddShares(corp corporation.Interface, amount int) Interface

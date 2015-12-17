@@ -1,5 +1,4 @@
-// Model for the game board, storing its state and implementing related
-// actions.
+// Package board holds the struct and related methods that model the game board
 package board
 
 import (
@@ -7,12 +6,14 @@ import (
 	"github.com/svera/acquire/tile"
 )
 
-var letters [9]string = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
+var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 
+// Board maps tiles on every position on board
 type Board struct {
 	grid *[13]map[string]tile.Interface
 }
 
+// New initialises and returns a Board instance
 func New() *Board {
 	brd := Board{
 		grid: new([13]map[string]tile.Interface),
@@ -28,12 +29,12 @@ func New() *Board {
 	return &brd
 }
 
-// Returns a board cell content
+// Cell returns a board cell content
 func (b *Board) Cell(number int, letter string) tile.Interface {
 	return b.grid[number][letter]
 }
 
-// Checks if the passed tile founds a new corporation, returns a slice of tiles
+// TileFoundCorporation checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
 func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) {
 	var newCorporationTiles []tile.Interface
@@ -52,7 +53,7 @@ func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) 
 	return false, newCorporationTiles
 }
 
-// Checks if the passed tile merges two or more corporations, returns a slice of
+// TileMergeCorporations checks if the passed tile merges two or more corporations, returns a slice of
 // corporation IDs to be merged
 func (b *Board) TileMergeCorporations(t tile.Interface) (bool, map[string][]corporation.Interface) {
 	var corporations []corporation.Interface
@@ -91,7 +92,7 @@ func categorizeMerge(corporations []corporation.Interface) map[string][]corporat
 	return merge
 }
 
-// Check if the passed tile grows a corporation
+// TileGrowCorporation checks if the passed tile grows a corporation.
 // Returns true if that's the case, the tiles to append to the corporation and
 // the ID of the corporation which grows
 func (b *Board) TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, corporation.Interface) {
@@ -115,13 +116,13 @@ func (b *Board) TileGrowCorporation(t tile.Interface) (bool, []tile.Interface, c
 	return true, tilesToAppend, corporationToGrow
 }
 
-// Puts the passed tile on the board
+// PutTile puts the passed tile on the board
 func (b *Board) PutTile(t tile.Interface) Interface {
 	b.grid[t.Number()][t.Letter()] = t
 	return b
 }
 
-// Returns all cells adjacent to the passed one
+// AdjacentCells returns all cells adjacent to the passed one
 func (b *Board) AdjacentCells(t tile.Interface) []tile.Interface {
 	var adjacent []tile.Interface
 
@@ -205,7 +206,7 @@ func nextLetter(letter string) string {
 	return adjacentLetter(letter, +1)
 }
 
-// Set tiles on board as belonging to the passed corporation
+// SetOwner sets tiles on board as belonging to the passed corporation
 func (b *Board) SetOwner(cp corporation.Interface, tiles []tile.Interface) Interface {
 	for _, tl := range tiles {
 		b.grid[tl.Number()][tl.Letter()].SetOwner(cp)
@@ -213,7 +214,7 @@ func (b *Board) SetOwner(cp corporation.Interface, tiles []tile.Interface) Inter
 	return b
 }
 
-// Change ownership of tiles belonging to oldOrder to newOrder
+// ChangeOwner changes ownership of tiles belonging to oldOrder to newOrder
 func (b *Board) ChangeOwner(oldOwner corporation.Interface, newOwner corporation.Interface) Interface {
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
