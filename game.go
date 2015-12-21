@@ -1,5 +1,5 @@
 // Package game manages the flow and status of the game
-package game
+package acquire
 
 import (
 	"errors"
@@ -186,6 +186,11 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 		}
 	}
 	return false
+}
+
+// Player returns player with passed number
+func (g *Game) Player(playerNumber int) player.Interface {
+	return g.players[playerNumber]
 }
 
 // CurrentPlayer returns player currently in play
