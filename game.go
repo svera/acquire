@@ -238,14 +238,20 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 }
 
 // Returns players who are shareholders of at least one of the passed companies
+// starting from the current one in play (mergemaker)
 func (g *Game) stockholders(corporations []corporation.Interface) []int {
 	shareholders := []int{}
-	for number := range g.players {
+	index := g.currentPlayerNumber
+	for range g.players {
 		for _, corp := range g.corporations {
-			if g.players[number].Shares(corp) > 0 {
-				shareholders = append(shareholders, number)
+			if g.players[index].Shares(corp) > 0 {
+				shareholders = append(shareholders, index)
 				break
 			}
+		}
+		index++
+		if index == len(g.players) {
+			index = 0
 		}
 	}
 	return shareholders
