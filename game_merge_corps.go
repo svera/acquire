@@ -91,23 +91,21 @@ func (g *Game) UntieMerge(acquirer corporation.Interface) error {
 }
 
 // Calculates and returns bonus amounts to be paid to owners of stock of a
-// defunct corporation
-func (g *Game) payMergeBonuses() {
-	for _, corp := range g.mergeCorps["defunct"] {
-		stockHolders := g.getMainStockHolders(corp)
-		numberMajorityHolders := len(stockHolders["majority"])
-		numberMinorityHolders := len(stockHolders["minority"])
+// corporation
+func (g *Game) payBonuses(corp corporation.Interface) {
+	stockHolders := g.getMainStockHolders(corp)
+	numberMajorityHolders := len(stockHolders["majority"])
+	numberMinorityHolders := len(stockHolders["minority"])
 
-		for _, majorityStockHolder := range stockHolders["majority"] {
-			if numberMajorityHolders > 1 {
-				majorityStockHolder.AddCash((corp.MajorityBonus() + corp.MinorityBonus()) / numberMajorityHolders)
-			} else {
-				majorityStockHolder.AddCash(corp.MajorityBonus() / numberMajorityHolders)
-			}
+	for _, majorityStockHolder := range stockHolders["majority"] {
+		if numberMajorityHolders > 1 {
+			majorityStockHolder.AddCash((corp.MajorityBonus() + corp.MinorityBonus()) / numberMajorityHolders)
+		} else {
+			majorityStockHolder.AddCash(corp.MajorityBonus() / numberMajorityHolders)
 		}
-		for _, minorityStockHolder := range stockHolders["minority"] {
-			minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
-		}
+	}
+	for _, minorityStockHolder := range stockHolders["minority"] {
+		minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
 	}
 }
 

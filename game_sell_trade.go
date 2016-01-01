@@ -3,6 +3,7 @@ package acquire
 import (
 	"errors"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/player"
 )
 
 // SellTrade sells and trades stock shares from defunct corporations
@@ -11,7 +12,7 @@ func (g *Game) SellTrade(sell map[corporation.Interface]int, trade map[corporati
 		return err
 	}
 	for corp, amount := range sell {
-		g.sell(corp, amount)
+		g.sell(g.CurrentPlayer(), corp, amount)
 	}
 
 	for corp, amount := range trade {
@@ -38,10 +39,9 @@ func (g *Game) nextSellTradePlayer() int {
 
 // Sells owned shares of a defunct corporation, returning them to the
 // corporation's stock
-func (g *Game) sell(corp corporation.Interface, amount int) {
+func (g *Game) sell(pl player.Interface, corp corporation.Interface, amount int) {
 	corp.AddStock(amount)
-	g.CurrentPlayer().
-		RemoveShares(corp, amount).
+	pl.RemoveShares(corp, amount).
 		AddCash(corp.StockPrice() * amount)
 }
 

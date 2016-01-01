@@ -25,8 +25,13 @@ func (g *Game) BuyStock(buys map[int]int) error {
 		g.state = g.state.ToEndGame()
 		return g.finish()
 	} else {
-		return g.drawTile()
+		if err := g.drawTile(); err != nil {
+			return err
+		}
+		g.state = g.state.ToPlayTile()
+		g.nextPlayer()
 	}
+	return nil
 }
 
 func (g *Game) buy(corp corporation.Interface, amount int) {
@@ -74,8 +79,6 @@ func (g *Game) drawTile() error {
 		return err
 	}
 
-	g.state = g.state.ToPlayTile()
-	g.nextPlayer()
 	return nil
 }
 

@@ -220,7 +220,9 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 		if g.isMergeTied() {
 			g.state = g.state.ToUntieMerge()
 		} else {
-			g.payMergeBonuses()
+			for _, corp := range mergeCorps["defunct"] {
+				g.payBonuses(corp)
+			}
 			g.sellTradePlayers = g.stockholders(mergeCorps["defunct"])
 			g.frozenPlayer = g.currentPlayerNumber
 			g.setCurrentPlayer(g.nextSellTradePlayer())
