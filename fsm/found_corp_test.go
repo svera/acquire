@@ -29,10 +29,3 @@ func TestFoundCorpToBuyStock(t *testing.T) {
 		t.Errorf("Transition from FoundCorp to BuyStock must be valid")
 	}
 }
-
-func TestFoundCorpToEndGame(t *testing.T) {
-	state := &FoundCorp{}
-	if state.ToEndGame().Name() != "EndGame" {
-		t.Errorf("Transition from FoundCorp to EndGame must be valid")
-	}
-}

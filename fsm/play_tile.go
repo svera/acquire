@@ -23,7 +23,3 @@ func (s *PlayTile) ToUntieMerge() State {
 func (s *PlayTile) ToBuyStock() State {
 	return &BuyStock{}
 }
-
-func (s *PlayTile) ToEndGame() State {
-	return &EndGame{}
-}

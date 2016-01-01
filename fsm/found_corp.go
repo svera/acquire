@@ -11,7 +11,3 @@ func (s *FoundCorp) Name() string {
 func (s *FoundCorp) ToBuyStock() State {
 	return &BuyStock{}
 }
-
-func (s *FoundCorp) ToEndGame() State {
-	return &EndGame{}
-}

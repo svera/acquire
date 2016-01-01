@@ -62,6 +62,7 @@ type Game struct {
 	sellTradePlayers    []int
 	lastPlayedTile      tile.Interface
 	turn                int
+	endGameClaimed      bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
 	frozenPlayer int
@@ -87,6 +88,7 @@ func New(
 		currentPlayerNumber: 0,
 		turn:                1,
 		state:               &fsm.PlayTile{},
+		endGameClaimed:      false,
 	}
 	for _, pl := range gm.players {
 		gm.giveInitialTileset(pl)
@@ -242,7 +244,7 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 func (g *Game) stockholders(corporations []corporation.Interface) []int {
 	shareholders := []int{}
 	index := g.currentPlayerNumber
-	for range g.players {
+	for _ = range g.players {
 		for _, corp := range g.corporations {
 			if g.players[index].Shares(corp) > 0 {
 				shareholders = append(shareholders, index)
@@ -308,4 +310,14 @@ func (g *Game) nextPlayer() {
 // Turn returns the current turn number
 func (g *Game) Turn() int {
 	return g.turn
+}
+
+// claimEndGame allows the current player to claim end game
+// This can be done at any time. After announcing that the game is over,
+// the player may finish the turn.
+func (g *Game) ClaimEndGame() *Game {
+	if g.AreEndConditionsReached() {
+		g.endGameClaimed = true
+	}
+	return g
 }

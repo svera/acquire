@@ -11,7 +11,3 @@ func (s *SellTrade) Name() string {
 func (s *SellTrade) ToBuyStock() State {
 	return &BuyStock{}
 }
-
-func (s *SellTrade) ToEndGame() State {
-	return &EndGame{}
-}

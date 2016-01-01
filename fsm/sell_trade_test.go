@@ -29,10 +29,3 @@ func TestSellTradeToBuyStock(t *testing.T) {
 		t.Errorf("Transition from SellTrade to BuyStock must be valid")
 	}
 }
-
-func TestSellTradeToEndGame(t *testing.T) {
-	state := &SellTrade{}
-	if state.ToEndGame().Name() != "EndGame" {
-		t.Errorf("Transition from SellTrade to EndGame must be valid")
-	}
-}

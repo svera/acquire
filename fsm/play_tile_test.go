@@ -29,10 +29,3 @@ func TestPlayTileToBuyStock(t *testing.T) {
 		t.Errorf("Transition from PlayTile to BuyStock must be valid")
 	}
 }
-
-func TestPlayTileToEndGame(t *testing.T) {
-	state := &PlayTile{}
-	if state.ToEndGame().Name() != "EndGame" {
-		t.Errorf("Transition from PlayTile to EndGame must be valid")
-	}
-}

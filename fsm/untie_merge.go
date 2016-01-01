@@ -11,7 +11,3 @@ func (s *UntieMerge) Name() string {
 func (s *UntieMerge) ToSellTrade() State {
 	return &SellTrade{}
 }
-
-func (s *UntieMerge) ToEndGame() State {
-	return &EndGame{}
-}

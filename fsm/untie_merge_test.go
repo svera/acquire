@@ -29,10 +29,3 @@ func TestUntieMergeToBuyStock(t *testing.T) {
 		t.Errorf("Transition from UntieMerge to BuyStock must return not be valid")
 	}
 }
-
-func TestUntieMergeToEndGame(t *testing.T) {
-	state := &UntieMerge{}
-	if state.ToEndGame().Name() != "EndGame" {
-		t.Errorf("Transition from UntieMerge to EndGame must be valid")
-	}
-}
