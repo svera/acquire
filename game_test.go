@@ -338,6 +338,27 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	}
 }
 
+func TestBuyStockAndEndGame(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	corporations[0].Grow(42)
+	buys := map[int]int{}
+	// Remember, every active corporation has always at least one shareholder
+	players[0].AddShares(corporations[0], 2)
+	game, _ := New(bd, players, corporations, ts)
+	game.ClaimEndGame()
+	game.state = &fsm.BuyStock{}
+	game.BuyStock(buys)
+
+	if game.state.Name() != "EndGame" {
+		t.Errorf("End game was rightly claimed and game state must be %s, got %s", "EndGame", game.state.Name())
+	}
+	// 6000$ (base cash) + 15000 (majority and minority bonus for class 0 corporation) + (1000 * 2) (2 shares owned of the defunct corporation,
+	// 1000$ per share) = 23000$
+	if players[0].Cash() != 23000 {
+		t.Errorf("Player final cash must be %d, got %d", 23000, players[0].Cash())
+	}
+}
+
 // Testing that if player has an permanently unplayable tile, this is exchanged:
 // In the following example, tile 6D is unplayable because it would merge safe
 // corporations 0 and 1
