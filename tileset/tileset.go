@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/svera/acquire/tile"
 	"math/rand"
+	"time"
 )
 
 const (
@@ -32,9 +33,11 @@ func New() *Tileset {
 
 // Draw extracts a random tile from the tileset and returns it
 func (t *Tileset) Draw() (tile.Interface, error) {
+	source := rand.NewSource(time.Now().UnixNano())
+	rn := rand.New(source)
 	remainingTiles := len(t.tiles)
 	if remainingTiles > 0 {
-		pos := rand.Intn(remainingTiles - 1)
+		pos := rn.Intn(remainingTiles - 1)
 		tile := t.tiles[pos]
 		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
 		return tile, nil
