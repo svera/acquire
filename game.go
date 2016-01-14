@@ -323,3 +323,19 @@ func (g *Game) ClaimEndGame() *Game {
 	}
 	return g
 }
+
+// Classification returns the players list ordered by cash,
+// which is the metric used to know game's final classification
+func (g *Game) Classification() []player.Interface {
+	var classification []player.Interface
+
+	cashDesc := func(pl1, pl2 player.Interface) bool {
+		return pl1.Cash() > pl2.Cash()
+	}
+
+	for _, pl := range g.players {
+		classification = append(classification, pl)
+	}
+	player.By(cashDesc).Sort(classification)
+	return classification
+}
