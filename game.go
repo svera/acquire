@@ -339,3 +339,7 @@ func (g *Game) Classification() []player.Interface {
 	player.By(cashDesc).Sort(classification)
 	return classification
 }
+
+func (g *Game) StatusName() string {
+	return g.state.Name()
+}
