@@ -340,6 +340,6 @@ func (g *Game) Classification() []player.Interface {
 	return classification
 }
 
-func (g *Game) StatusName() string {
-	return g.state.Name()
+func (g *Game) Board() board.Interface {
+	return g.board
 }
