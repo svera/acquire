@@ -131,7 +131,7 @@ func (g *Game) giveInitialTileset(plyr player.Interface) {
 	}
 }
 
-// AreEndConditionsReached check if game end conditions are reached
+// AreEndConditionsReached checks if game end conditions are reached
 func (g *Game) AreEndConditionsReached() bool {
 	active := g.getActiveCorporations()
 	if len(active) == 0 {
@@ -340,6 +340,7 @@ func (g *Game) Classification() []player.Interface {
 	return classification
 }
 
+// Board returns game's board instance
 func (g *Game) Board() board.Interface {
 	return g.board
 }
