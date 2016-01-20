@@ -248,6 +248,9 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 		if g.existActiveCorporations() {
 			g.state = g.state.ToBuyStock()
 		} else {
+			if err := g.drawTile(); err != nil {
+				return err
+			}
 			g.nextPlayer()
 		}
 	}
