@@ -159,6 +159,15 @@ func (g *Game) getActiveCorporations() []corporation.Interface {
 	return active
 }
 
+func (g *Game) existActiveCorporations() bool {
+	for _, corp := range g.corporations {
+		if corp.IsActive() {
+			return true
+		}
+	}
+	return false
+}
+
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
 func (g *Game) isTileUnplayable(tl tile.Interface) bool {
@@ -236,7 +245,11 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 		g.state = g.state.ToBuyStock()
 	} else {
 		g.board.PutTile(tl)
-		g.state = g.state.ToBuyStock()
+		if g.existActiveCorporations() {
+			g.state = g.state.ToBuyStock()
+		} else {
+			g.nextPlayer()
+		}
 	}
 	return nil
 }
