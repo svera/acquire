@@ -133,7 +133,7 @@ func (g *Game) giveInitialTileset(plyr player.Interface) {
 
 // AreEndConditionsReached checks if game end conditions are reached
 func (g *Game) AreEndConditionsReached() bool {
-	active := g.getActiveCorporations()
+	active := g.ActiveCorporations()
 	if len(active) == 0 {
 		return false
 	}
@@ -149,7 +149,7 @@ func (g *Game) AreEndConditionsReached() bool {
 }
 
 // Returns all corporations on the board
-func (g *Game) getActiveCorporations() []corporation.Interface {
+func (g *Game) ActiveCorporations() []corporation.Interface {
 	active := []corporation.Interface{}
 	for _, corp := range g.corporations {
 		if corp.IsActive() {
@@ -157,6 +157,17 @@ func (g *Game) getActiveCorporations() []corporation.Interface {
 		}
 	}
 	return active
+}
+
+// Returns all corporations not on the board
+func (g *Game) InactiveCorporations() []corporation.Interface {
+	inactive := []corporation.Interface{}
+	for _, corp := range g.corporations {
+		if !corp.IsActive() {
+			inactive = append(inactive, corp)
+		}
+	}
+	return inactive
 }
 
 func (g *Game) existActiveCorporations() bool {
@@ -187,7 +198,7 @@ func (g *Game) isTileUnplayable(tl tile.Interface) bool {
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
 func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
-	if len(g.getActiveCorporations()) < totalCorporations {
+	if len(g.ActiveCorporations()) < totalCorporations {
 		return false
 	}
 	adjacents := g.board.AdjacentCells(tl)
@@ -238,6 +249,7 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 			g.state = g.state.ToSellTrade()
 		}
 	} else if found, tiles := g.board.TileFoundCorporation(tl); found {
+		g.board.PutTile(tl)
 		g.state = g.state.ToFoundCorp()
 		g.newCorpTiles = tiles
 	} else if grow, tiles, corp := g.board.TileGrowCorporation(tl); grow {
