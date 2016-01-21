@@ -38,17 +38,17 @@ func (b *Board) Cell(number int, letter string) tile.Interface {
 // composing this corporation
 func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) {
 	var newCorporationTiles []tile.Interface
-	adjacent := b.adjacentNonCorporationTiles(t)
-	if len(adjacent) == 4 {
-		for _, adjacentCell := range adjacent {
-			if adjacentCell.Owner().Type() == "unincorporated" {
-				newCorporationTiles = append(newCorporationTiles, adjacentCell)
-			}
+	adjacent := b.adjacentTiles(t)
+	for _, adjacentTile := range adjacent {
+		if adjacentTile.Owner().Type() == "corporation" {
+			return false, []tile.Interface{}
+		} else {
+			newCorporationTiles = append(newCorporationTiles, adjacentTile)
 		}
-		if len(newCorporationTiles) > 0 {
-			newCorporationTiles = append(newCorporationTiles, t)
-			return true, newCorporationTiles
-		}
+	}
+	if len(newCorporationTiles) > 0 {
+		newCorporationTiles = append(newCorporationTiles, t)
+		return true, newCorporationTiles
 	}
 	return false, newCorporationTiles
 }
@@ -170,18 +170,6 @@ func (b *Board) adjacentCorporationTiles(t tile.Interface) []tile.Interface {
 		t,
 		func(t tile.Interface) bool {
 			if t.Owner().Type() == "corporation" {
-				return true
-			}
-			return false
-		},
-	)
-}
-
-func (b *Board) adjacentNonCorporationTiles(t tile.Interface) []tile.Interface {
-	return b.adjacentCellsWithFilter(
-		t,
-		func(t tile.Interface) bool {
-			if t.Owner().Type() == "unincorporated" || t.Owner().Type() == "empty" {
 				return true
 			}
 			return false

@@ -44,7 +44,7 @@ func TestTileFoundCorporation(t *testing.T) {
 	}
 }
 
-func TestTileNotFoundCorporation(t *testing.T) {
+func TestTileDoesNotFoundCorporation(t *testing.T) {
 	board := New()
 	corp, _ := corporation.New("Test 1", 0)
 	found, corporationTiles := board.TileFoundCorporation(tile.New(6, "D", tile.Unincorporated{}))

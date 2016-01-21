@@ -82,8 +82,8 @@ func TestAreEndConditionsReached(t *testing.T) {
 
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
-	bd.PutTile(tile.New(5, "E", tile.Unincorporated{}))
+	tileToPlay := tile.New(5, "A", tile.Unincorporated{})
+	bd.PutTile(tile.New(5, "B", tile.Unincorporated{}))
 
 	game, _ := New(bd, players, corporations, ts)
 	playerTiles := players[0].Tiles()
@@ -124,6 +124,7 @@ func TestFoundCorporation(t *testing.T) {
 	}
 }
 
+// TODO the bd.SetOwner is weird because the corptiles already have an owner...
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
