@@ -3,7 +3,6 @@ package acquire
 
 import (
 	"errors"
-	//"fmt"
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
@@ -372,4 +371,8 @@ func (g *Game) Classification() []player.Interface {
 // Board returns game's board instance
 func (g *Game) Board() board.Interface {
 	return g.board
+}
+
+func (g *Game) GameStateName() string {
+	return g.state.Name()
 }
