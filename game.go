@@ -373,6 +373,13 @@ func (g *Game) Board() board.Interface {
 	return g.board
 }
 
+// GameStateName returns game's current state
 func (g *Game) GameStateName() string {
 	return g.state.Name()
+}
+
+// Corporations returns game's corporations slice
+// TODO We can probably get rid of this
+func (g *Game) Corporations() [7]corporation.Interface {
+	return g.corporations
 }
