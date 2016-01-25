@@ -92,7 +92,7 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 		PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
-	if game.state.Name() != "FoundCorp" {
+	if game.state.Name() != fsm.FoundCorpStateName {
 		t.Errorf("Game must be in state FoundCorp, got %s", game.state.Name())
 	}
 }
@@ -110,7 +110,7 @@ func TestFoundCorporation(t *testing.T) {
 	}
 	game.newCorpTiles = newCorpTiles
 	game.FoundCorporation(corporations[0])
-	if game.state.Name() != "BuyStock" {
+	if game.state.Name() != fsm.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
 	}
 	if players[0].Shares(corporations[0]) != 1 {
@@ -145,7 +145,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 
 	expectedCorpSize := 4
 
-	if game.state.Name() != "BuyStock" {
+	if game.state.Name() != fsm.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
 	}
 	if corporations[0].Size() != expectedCorpSize {
@@ -266,8 +266,8 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	sell := map[corporation.Interface]int{corporations[0]: 6}
 	trade := map[corporation.Interface]int{}
 	game.SellTrade(sell, trade)
-	if game.state.Name() != "BuyStock" {
-		t.Errorf("Wrong game state after merge, expected %s, got %s", "BuyStock", game.state.Name())
+	if game.state.Name() != fsm.BuyStockStateName {
+		t.Errorf("Wrong game state after merge, expected %s, got %s", fsm.BuyStockStateName, game.state.Name())
 	}
 	if game.corporations[0].Size() != 0 {
 		t.Errorf("Wrong size for corporation 0, expected %d, got %d", 0, game.corporations[0].Size())
@@ -350,8 +350,8 @@ func TestBuyStockAndEndGame(t *testing.T) {
 	game.state = &fsm.BuyStock{}
 	game.BuyStock(buys)
 
-	if game.state.Name() != "EndGame" {
-		t.Errorf("End game was rightly claimed and game state must be %s, got %s", "EndGame", game.state.Name())
+	if game.state.Name() != fsm.EndGameStateName {
+		t.Errorf("End game was rightly claimed and game state must be %s, got %s", fsm.EndGameStateName, game.state.Name())
 	}
 	// 6000$ (base cash) + 15000 (majority and minority bonus for class 0 corporation) + (1000 * 2) (2 shares owned of the defunct corporation,
 	// 1000$ per share) = 23000$
@@ -401,7 +401,7 @@ func TestUntieMerge(t *testing.T) {
 	if len(game.mergeCorps["defunct"]) != 3 {
 		t.Errorf("Wrong number of defunct corporations after merge untie, expected %d, got %d", 3, len(game.mergeCorps["defunct"]))
 	}
-	if game.state.Name() != "SellTrade" {
+	if game.state.Name() != fsm.SellTradeStateName {
 		t.Errorf("Wrong game state after merge untie, expected %s, got %s", "SellTrade", game.state.Name())
 	}
 }

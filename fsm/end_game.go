@@ -5,5 +5,5 @@ type EndGame struct {
 }
 
 func (s *EndGame) Name() string {
-	return "EndGame"
+	return EndGameStateName
 }

@@ -10,32 +10,12 @@ type State interface {
 	ToEndGame() State
 }
 
-type ErrorState struct{}
-
-func (s *ErrorState) Name() string {
-	return "ErrorState"
-}
-
-func (s *ErrorState) ToPlayTile() State {
-	return s
-}
-
-func (s *ErrorState) ToFoundCorp() State {
-	return s
-}
-
-func (s *ErrorState) ToUntieMerge() State {
-	return s
-}
-
-func (s *ErrorState) ToSellTrade() State {
-	return s
-}
-
-func (s *ErrorState) ToBuyStock() State {
-	return s
-}
-
-func (s *ErrorState) ToEndGame() State {
-	return s
-}
+const (
+	ErrorStateName      = "Error"
+	EndGameStateName    = "EndGame"
+	BuyStockStateName   = "BuyStock"
+	FoundCorpStateName  = "FoundCorp"
+	PlayTileStateName   = "PlayTile"
+	SellTradeStateName  = "SellTrade"
+	UntieMergeStateName = "UntieMerge"
+)

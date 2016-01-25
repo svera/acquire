@@ -3,12 +3,13 @@ package acquire
 import (
 	"errors"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/tile"
 )
 
 // BuyStock buys stock from corporations
 func (g *Game) BuyStock(buys map[int]int) error {
-	if g.state.Name() != "BuyStock" {
+	if g.state.Name() != fsm.BuyStockStateName {
 		return errors.New(ActionNotAllowed)
 	}
 

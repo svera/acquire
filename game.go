@@ -148,26 +148,25 @@ func (g *Game) AreEndConditionsReached() bool {
 	return true
 }
 
-// Returns all corporations on the board
-func (g *Game) ActiveCorporations() []corporation.Interface {
-	active := []corporation.Interface{}
+// ActiveCorporations returns all corporations on the board
+func (g *Game) findCorporationsByActiveState(value bool) []corporation.Interface {
+	result := []corporation.Interface{}
 	for _, corp := range g.corporations {
-		if corp.IsActive() {
-			active = append(active, corp)
+		if corp.IsActive() == value {
+			result = append(result, corp)
 		}
 	}
-	return active
+	return result
 }
 
-// Returns all corporations not on the board
+// ActiveCorporations returns all corporations on the board
+func (g *Game) ActiveCorporations() []corporation.Interface {
+	return g.findCorporationsByActiveState(true)
+}
+
+// InactiveCorporations returns all corporations not on the board
 func (g *Game) InactiveCorporations() []corporation.Interface {
-	inactive := []corporation.Interface{}
-	for _, corp := range g.corporations {
-		if !corp.IsActive() {
-			inactive = append(inactive, corp)
-		}
-	}
-	return inactive
+	return g.findCorporationsByActiveState(false)
 }
 
 func (g *Game) existActiveCorporations() bool {
@@ -222,7 +221,7 @@ func (g *Game) CurrentPlayer() player.Interface {
 
 // PlayTile puts the given tile on board and triggers related actions
 func (g *Game) PlayTile(tl tile.Interface) error {
-	if g.state.Name() != "PlayTile" {
+	if g.state.Name() != fsm.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
@@ -297,7 +296,7 @@ func (g *Game) setCurrentPlayer(number int) *Game {
 
 // FoundCorporation founds a new corporation
 func (g *Game) FoundCorporation(corp corporation.Interface) error {
-	if g.state.Name() != "FoundCorp" {
+	if g.state.Name() != fsm.FoundCorpStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if corp.IsActive() {

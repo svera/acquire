@@ -5,7 +5,7 @@ type FoundCorp struct {
 }
 
 func (s *FoundCorp) Name() string {
-	return "FoundCorp"
+	return FoundCorpStateName
 }
 
 func (s *FoundCorp) ToBuyStock() State {

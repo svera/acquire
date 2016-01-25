@@ -3,6 +3,7 @@ package acquire
 import (
 	"errors"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
 )
 
@@ -59,7 +60,7 @@ func (g *Game) trade(corp corporation.Interface, amount int) {
 
 // Check that the requisites for both selling and trading stock shares are met
 func (g *Game) checkSellTrade(sell map[corporation.Interface]int, trade map[corporation.Interface]int) error {
-	if g.state.Name() != "SellTrade" {
+	if g.state.Name() != fsm.SellTradeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for corp, amount := range sell {

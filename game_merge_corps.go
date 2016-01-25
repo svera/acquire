@@ -3,6 +3,7 @@ package acquire
 import (
 	"errors"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
 )
 
@@ -72,7 +73,7 @@ func (g *Game) isMergeTied() bool {
 // UntieMerge resolves a tied merge selecting which corporation will be the acquirer,
 // marking the rest as defunct
 func (g *Game) UntieMerge(acquirer corporation.Interface) error {
-	if g.state.Name() != "UntieMerge" {
+	if g.state.Name() != fsm.UntieMergeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for i, corp := range g.mergeCorps["acquirer"] {

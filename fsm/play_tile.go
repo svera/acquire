@@ -5,7 +5,7 @@ type PlayTile struct {
 }
 
 func (s *PlayTile) Name() string {
-	return "PlayTile"
+	return PlayTileStateName
 }
 
 func (s *PlayTile) ToSellTrade() State {

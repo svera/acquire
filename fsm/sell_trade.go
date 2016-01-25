@@ -5,7 +5,7 @@ type SellTrade struct {
 }
 
 func (s *SellTrade) Name() string {
-	return "SellTrade"
+	return SellTradeStateName
 }
 
 func (s *SellTrade) ToBuyStock() State {

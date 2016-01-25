@@ -5,7 +5,7 @@ type UntieMerge struct {
 }
 
 func (s *UntieMerge) Name() string {
-	return "UntieMerge"
+	return UntieMergeStateName
 }
 
 func (s *UntieMerge) ToSellTrade() State {

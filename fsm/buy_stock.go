@@ -7,7 +7,7 @@ type BuyStock struct {
 
 // Name returns state's name
 func (s *BuyStock) Name() string {
-	return "BuyStock"
+	return BuyStockStateName
 }
 
 func (s *BuyStock) ToPlayTile() State {
