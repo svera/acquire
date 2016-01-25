@@ -14,7 +14,7 @@ func TestNewGameWrongNumberPlayers(t *testing.T) {
 	players, corporations, board, tileset := setup()
 	players = players[:1]
 
-	if _, err := New(board, players, corporations, tileset); err.Error() != WrongNumberPlayers {
+	if _, err := New(board, players, corporations, tileset, &fsm.PlayTile{}); err.Error() != WrongNumberPlayers {
 		t.Errorf("Game must not be created with less than 3 players, got %d", len(players))
 	}
 }
@@ -25,7 +25,7 @@ func TestNewGameNotUniqueCorpNames(t *testing.T) {
 	corporations[0] = corporation.NewStub("A", 0)
 	corporations[1] = corporation.NewStub("A", 0)
 
-	if _, err := New(board, players, corporations, tileset); err.Error() != CorpNamesNotUnique {
+	if _, err := New(board, players, corporations, tileset, &fsm.PlayTile{}); err.Error() != CorpNamesNotUnique {
 		t.Errorf("Corporations must have unique names, expecting %s error, got %s", CorpNamesNotUnique, err.Error())
 	}
 }
@@ -35,14 +35,14 @@ func TestNewGameWrongNumberOfCorpsPerClass(t *testing.T) {
 
 	corporations[2] = corporation.NewStub("C", 0)
 
-	if _, err := New(board, players, corporations, tileset); err.Error() != WrongNumberCorpsClass {
+	if _, err := New(board, players, corporations, tileset, &fsm.PlayTile{}); err.Error() != WrongNumberCorpsClass {
 		t.Errorf("Game must catch wrong number of corporations per class")
 	}
 }
 
 func TestNewGameInitsPlayersTilesets(t *testing.T) {
 	players, corporations, board, tileset := setup()
-	New(board, players, corporations, tileset)
+	New(board, players, corporations, tileset, &fsm.PlayTile{})
 
 	for i, player := range players {
 		if len(player.Tiles()) != 6 {
@@ -53,7 +53,7 @@ func TestNewGameInitsPlayersTilesets(t *testing.T) {
 
 func TestAreEndConditionsReached(t *testing.T) {
 	players, corporations, board, tileset := setup()
-	game, _ := New(board, players, corporations, tileset)
+	game, _ := New(board, players, corporations, tileset, &fsm.PlayTile{})
 
 	if game.AreEndConditionsReached() {
 		t.Errorf("End game conditions not reached (no active corporations) but detected as it were")
@@ -85,7 +85,7 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 	tileToPlay := tile.New(5, "A", tile.Unincorporated{})
 	bd.PutTile(tile.New(5, "B", tile.Unincorporated{}))
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	playerTiles := players[0].Tiles()
 	players[0].
 		DiscardTile(playerTiles[0]).
@@ -99,7 +99,7 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 
 func TestFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	if err := game.FoundCorporation(corporations[0]); err == nil {
 		t.Errorf("Game in a state different than FoundCorp must not execute FoundCorporation()")
 	}
@@ -136,7 +136,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	bd.SetOwner(corporations[0], corpTiles)
 	bd.PutTile(tile.New(5, "E", tile.Unincorporated{}))
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	playerTiles := players[0].Tiles()
 	players[0].
 		DiscardTile(playerTiles[0]).
@@ -164,7 +164,7 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 	setupPlayTileMerge(corporations, bd)
 	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	playerTiles := players[0].Tiles()
 	players[0].
 		DiscardTile(playerTiles[0]).
@@ -199,7 +199,7 @@ func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
 	setupPlayTileMerge(corporations, bd)
 	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	playerTiles := players[0].Tiles()
 	players[0].
 		DiscardTile(playerTiles[0]).
@@ -234,7 +234,7 @@ func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	setupPlayTileMerge(corporations, bd)
 	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	playerTiles := players[0].Tiles()
 	players[0].
 		DiscardTile(playerTiles[0]).
@@ -255,7 +255,7 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	setupPlayTileMerge(corporations, bd)
 	tileToPlay := tile.New(6, "E", tile.Unincorporated{})
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	playerTiles := players[0].Tiles()
 	players[0].
 		DiscardTile(playerTiles[0]).
@@ -313,7 +313,7 @@ func TestBuyStock(t *testing.T) {
 	buys := map[int]int{0: 2}
 	expectedAvailableStock := 23
 	expectedPlayerStock := 2
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	game.state = &fsm.BuyStock{}
 	game.BuyStock(buys)
 
@@ -332,7 +332,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	corporations[0].Grow(2)
 
 	buys := map[int]int{0: 2}
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	err := game.BuyStock(buys)
 	if err == nil {
 		t.Errorf("Trying to buy stock shares without enough money must throw error")
@@ -345,7 +345,7 @@ func TestBuyStockAndEndGame(t *testing.T) {
 	buys := map[int]int{}
 	// Remember, every active corporation has always at least one shareholder
 	players[0].AddShares(corporations[0], 2)
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	game.ClaimEndGame()
 	game.state = &fsm.BuyStock{}
 	game.BuyStock(buys)
@@ -374,7 +374,7 @@ func TestDrawTile(t *testing.T) {
 	bd.SetOwner(corporations[0], []tile.Interface{tile.New(5, "D", tile.Unincorporated{})})
 	bd.SetOwner(corporations[1], []tile.Interface{tile.New(7, "D", tile.Unincorporated{})})
 
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	players[0].(*player.Stub).SetOwner([]tile.Interface{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
@@ -388,7 +388,7 @@ func TestDrawTile(t *testing.T) {
 
 func TestUntieMerge(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	game, _ := New(bd, players, corporations, ts)
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	game.mergeCorps = map[string][]corporation.Interface{
 		"acquirer": []corporation.Interface{corporations[0], corporations[1], corporations[2]},
 		"defunct":  []corporation.Interface{corporations[3]},

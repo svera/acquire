@@ -70,7 +70,12 @@ type Game struct {
 
 // New initialises a new Acquire game
 func New(
-	board board.Interface, players []player.Interface, corporations [7]corporation.Interface, tileset tileset.Interface) (*Game, error) {
+	board board.Interface,
+	players []player.Interface,
+	corporations [7]corporation.Interface,
+	tileset tileset.Interface,
+	state fsm.State,
+) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
 	}
@@ -87,7 +92,7 @@ func New(
 		tileset:             tileset,
 		currentPlayerNumber: 0,
 		turn:                1,
-		state:               &fsm.PlayTile{},
+		state:               state,
 		endGameClaimed:      false,
 	}
 	for _, pl := range gm.players {
