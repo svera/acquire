@@ -310,7 +310,7 @@ func setupPlayTileMerge(corporations [7]corporation.Interface, bd board.Interfac
 func TestBuyStock(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].Grow(2)
-	buys := map[int]int{0: 2}
+	buys := map[corporation.Interface]int{corporations[0]: 2}
 	expectedAvailableStock := 23
 	expectedPlayerStock := 2
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
@@ -331,7 +331,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 
 	corporations[0].Grow(2)
 
-	buys := map[int]int{0: 2}
+	buys := map[corporation.Interface]int{corporations[0]: 2}
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	err := game.BuyStock(buys)
 	if err == nil {
@@ -342,7 +342,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 func TestBuyStockAndEndGame(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].Grow(42)
-	buys := map[int]int{}
+	buys := map[corporation.Interface]int{}
 	// Remember, every active corporation has always at least one shareholder
 	players[0].AddShares(corporations[0], 2)
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})

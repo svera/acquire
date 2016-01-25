@@ -8,7 +8,7 @@ import (
 )
 
 // BuyStock buys stock from corporations
-func (g *Game) BuyStock(buys map[int]int) error {
+func (g *Game) BuyStock(buys map[corporation.Interface]int) error {
 	if g.state.Name() != fsm.BuyStockStateName {
 		return errors.New(ActionNotAllowed)
 	}
@@ -17,8 +17,7 @@ func (g *Game) BuyStock(buys map[int]int) error {
 		return err
 	}
 
-	for corporationID, amount := range buys {
-		corp := g.corporations[corporationID]
+	for corp, amount := range buys {
 		g.buy(corp, amount)
 	}
 
@@ -42,10 +41,9 @@ func (g *Game) buy(corp corporation.Interface, amount int) {
 		RemoveCash(corp.StockPrice() * amount)
 }
 
-func (g *Game) checkBuy(buys map[int]int) error {
+func (g *Game) checkBuy(buys map[corporation.Interface]int) error {
 	var totalStock, totalPrice int = 0, 0
-	for corporationID, amount := range buys {
-		corp := g.corporations[corporationID]
+	for corp, amount := range buys {
 		if corp.Size() == 0 {
 			return errors.New(StockSharesNotBuyable)
 		}
@@ -83,7 +81,7 @@ func (g *Game) drawTile() error {
 	return nil
 }
 
-// if a player has any permanently
+// If a player has any permanently
 // unplayable tiles that player discard the unplayable tiles
 // and draws an equal number of replacement tiles. This can
 // only be done once per turn.
