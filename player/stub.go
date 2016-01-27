@@ -22,8 +22,8 @@ func NewStub(name string) *Stub {
 	}
 }
 
-// SetOwner sets the owner to the passed tiles
-func (p *Stub) SetOwner(tiles []tile.Interface) {
+// SetTiles sets player tiles
+func (p *Stub) SetTiles(tiles []tile.Interface) {
 	p.tiles = tiles
 }
 

@@ -375,7 +375,7 @@ func TestDrawTile(t *testing.T) {
 	bd.SetOwner(corporations[1], []tile.Interface{tile.New(7, "D", tile.Unincorporated{})})
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	players[0].(*player.Stub).SetOwner([]tile.Interface{unplayableTile})
+	players[0].(*player.Stub).SetTiles([]tile.Interface{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
 	game.drawTile()
