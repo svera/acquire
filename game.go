@@ -1,4 +1,6 @@
-// Package game manages the flow and status of the game
+// Package acquire manages the flow and status of an acquire game. It acts
+// like a finite state machine (FSM), in which received inputs modify
+// machine state
 package acquire
 
 import (
@@ -346,7 +348,7 @@ func (g *Game) Turn() int {
 	return g.turn
 }
 
-// claimEndGame allows the current player to claim end game
+// ClaimEndGame allows the current player to claim end game
 // This can be done at any time. After announcing that the game is over,
 // the player may finish the turn.
 func (g *Game) ClaimEndGame() *Game {

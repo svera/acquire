@@ -1,5 +1,6 @@
 package fsm
 
+// State is an interface that defines the needed state transitions to be inplemented for this FSM
 type State interface {
 	Name() string
 	ToPlayTile() State
@@ -10,6 +11,7 @@ type State interface {
 	ToEndGame() State
 }
 
+// State names
 const (
 	ErrorStateName      = "Error"
 	EndGameStateName    = "EndGame"

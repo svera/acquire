@@ -42,9 +42,8 @@ func (b *Board) TileFoundCorporation(t tile.Interface) (bool, []tile.Interface) 
 	for _, adjacentTile := range adjacent {
 		if adjacentTile.Owner().Type() == "corporation" {
 			return false, []tile.Interface{}
-		} else {
-			newCorporationTiles = append(newCorporationTiles, adjacentTile)
 		}
+		newCorporationTiles = append(newCorporationTiles, adjacentTile)
 	}
 	if len(newCorporationTiles) > 0 {
 		newCorporationTiles = append(newCorporationTiles, t)

@@ -24,13 +24,13 @@ func (g *Game) BuyStock(buys map[corporation.Interface]int) error {
 	if g.endGameClaimed {
 		g.state = g.state.ToEndGame()
 		return g.finish()
-	} else {
-		if err := g.drawTile(); err != nil {
-			return err
-		}
-		g.state = g.state.ToPlayTile()
-		g.nextPlayer()
 	}
+	if err := g.drawTile(); err != nil {
+		return err
+	}
+	g.state = g.state.ToPlayTile()
+	g.nextPlayer()
+
 	return nil
 }
 
