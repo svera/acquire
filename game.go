@@ -188,10 +188,10 @@ func (g *Game) existActiveCorporations() bool {
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
 func (g *Game) isTileUnplayable(tl tile.Interface) bool {
-	adjacents := g.board.AdjacentCells(tl)
+	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Owner().Type() == "corporation" && adjacent.Owner().(corporation.Interface).IsSafe() {
+		if adjacent.Type() == "corporation" && adjacent.(corporation.Interface).IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -207,9 +207,9 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 	if len(g.ActiveCorporations()) < totalCorporations {
 		return false
 	}
-	adjacents := g.board.AdjacentCells(tl)
+	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
 	for _, adjacent := range adjacents {
-		if adjacent.Owner().Type() == "unincorporated" {
+		if adjacent.Type() == "unincorporated" {
 			return true
 		}
 	}

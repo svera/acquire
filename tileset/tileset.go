@@ -24,7 +24,7 @@ func New() *Tileset {
 	letters := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
-			tileset.tiles = append(tileset.tiles, tile.New(number, letter, tile.Unincorporated{}))
+			tileset.tiles = append(tileset.tiles, tile.New(number, letter))
 		}
 	}
 

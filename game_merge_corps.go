@@ -5,6 +5,7 @@ import (
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
+	"github.com/svera/acquire/tile"
 )
 
 // Taken from the game rules:
@@ -120,8 +121,7 @@ func (g *Game) completeMerge() {
 		defunct.Reset()
 		g.board.ChangeOwner(defunct, acquirer)
 	}
-	g.lastPlayedTile.SetOwner(acquirer)
-	g.board.PutTile(g.lastPlayedTile)
+	g.board.SetOwner(acquirer, []tile.Interface{g.lastPlayedTile})
 	acquirer.Grow(1)
 	g.mergeCorps = map[string][]corporation.Interface{}
 }
