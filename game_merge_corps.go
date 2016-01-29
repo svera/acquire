@@ -8,6 +8,25 @@ import (
 	"github.com/svera/acquire/tile"
 )
 
+// Calculates and returns bonus amounts to be paid to owners of stock of a
+// corporation
+func (g *Game) payBonuses(corp corporation.Interface) {
+	stockHolders := g.getMainStockHolders(corp)
+	numberMajorityHolders := len(stockHolders["majority"])
+	numberMinorityHolders := len(stockHolders["minority"])
+
+	for _, majorityStockHolder := range stockHolders["majority"] {
+		if numberMajorityHolders > 1 {
+			majorityStockHolder.AddCash((corp.MajorityBonus() + corp.MinorityBonus()) / numberMajorityHolders)
+		} else {
+			majorityStockHolder.AddCash(corp.MajorityBonus() / numberMajorityHolders)
+		}
+	}
+	for _, minorityStockHolder := range stockHolders["minority"] {
+		minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
+	}
+}
+
 // Taken from the game rules:
 // "If only one player owns stock in the defunct corporation, that player gets both bonuses. If there's
 // a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
@@ -32,19 +51,6 @@ func (g *Game) getMainStockHolders(corp corporation.Interface) map[string][]play
 	return mainStockHolders
 }
 
-// Loop stockHolders from start to get all stock holders with the same amount of shares for
-// the passed corporation
-func stockHoldersWithSameAmount(start int, stockHolders []player.Interface, corp corporation.Interface) []player.Interface {
-	group := []player.Interface{stockHolders[start]}
-
-	i := start + 1
-	for i < len(stockHolders) && stockHolders[start].Shares(corp) == stockHolders[i].Shares(corp) {
-		group = append(group, stockHolders[i])
-		i++
-	}
-	return group
-}
-
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
 // of that corporation
 func (g *Game) getStockHolders(corp corporation.Interface) []player.Interface {
@@ -58,8 +64,23 @@ func (g *Game) getStockHolders(corp corporation.Interface) []player.Interface {
 			stockHolders = append(stockHolders, pl)
 		}
 	}
-	player.By(sharesDesc).Sort(stockHolders)
+	if len(stockHolders) > 0 {
+		player.By(sharesDesc).Sort(stockHolders)
+	}
 	return stockHolders
+}
+
+// Loop stockHolders from start to get all stock holders with the same amount of shares for
+// the passed corporation
+func stockHoldersWithSameAmount(start int, stockHolders []player.Interface, corp corporation.Interface) []player.Interface {
+	group := []player.Interface{stockHolders[start]}
+
+	i := start + 1
+	for i < len(stockHolders) && stockHolders[start].Shares(corp) == stockHolders[i].Shares(corp) {
+		group = append(group, stockHolders[i])
+		i++
+	}
+	return group
 }
 
 // Checks if two ore more corps are tied for be the acquirer in a merge
@@ -90,25 +111,6 @@ func (g *Game) UntieMerge(acquirer corporation.Interface) error {
 	}
 
 	return errors.New(NotAnAcquirerCorporation)
-}
-
-// Calculates and returns bonus amounts to be paid to owners of stock of a
-// corporation
-func (g *Game) payBonuses(corp corporation.Interface) {
-	stockHolders := g.getMainStockHolders(corp)
-	numberMajorityHolders := len(stockHolders["majority"])
-	numberMinorityHolders := len(stockHolders["minority"])
-
-	for _, majorityStockHolder := range stockHolders["majority"] {
-		if numberMajorityHolders > 1 {
-			majorityStockHolder.AddCash((corp.MajorityBonus() + corp.MinorityBonus()) / numberMajorityHolders)
-		} else {
-			majorityStockHolder.AddCash(corp.MajorityBonus() / numberMajorityHolders)
-		}
-	}
-	for _, minorityStockHolder := range stockHolders["minority"] {
-		minorityStockHolder.AddCash(corp.MinorityBonus() / numberMinorityHolders)
-	}
 }
 
 // Adds tiles from the defunct corporations to the acquirer one

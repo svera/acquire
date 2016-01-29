@@ -249,7 +249,7 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 			for _, corp := range mergeCorps["defunct"] {
 				g.payBonuses(corp)
 			}
-			g.sellTradePlayers = g.stockholders(mergeCorps["defunct"])
+			g.sellTradePlayers = g.stockHolders(mergeCorps["defunct"])
 			g.frozenPlayer = g.currentPlayerNumber
 			g.setCurrentPlayer(g.nextSellTradePlayer())
 			g.state = g.state.ToSellTrade()
@@ -277,7 +277,7 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 
 // Returns players who are shareholders of at least one of the passed companies
 // starting from the current one in play (mergemaker)
-func (g *Game) stockholders(corporations []corporation.Interface) []int {
+func (g *Game) stockHolders(corporations []corporation.Interface) []int {
 	shareholders := []int{}
 	index := g.currentPlayerNumber
 	for _ = range g.players {
