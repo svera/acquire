@@ -1,5 +1,9 @@
 package corporation
 
+import (
+	"github.com/svera/acquire/interfaces"
+)
+
 // Stub is a struct to be used in corporation tests as a replacement of the original,
 // that includes several convenience methods for testing
 type Stub struct {
@@ -19,13 +23,13 @@ func NewStub(name string, class int) *Stub {
 }
 
 // SetSize sets the size of the stub
-func (c *Stub) SetSize(size int) Interface {
+func (c *Stub) SetSize(size int) interfaces.Corporation {
 	c.size = size
 	return c
 }
 
 // SetStock sets the stock amount of the stub
-func (c *Stub) SetStock(amount int) Interface {
+func (c *Stub) SetStock(amount int) interfaces.Corporation {
 	c.stock = amount
 	return c
 }

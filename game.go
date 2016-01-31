@@ -5,12 +5,9 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/board"
-	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/player"
-	"github.com/svera/acquire/tile"
-	"github.com/svera/acquire/tileset"
 )
 
 const (
@@ -53,16 +50,16 @@ const (
 
 // Game stores state of game elements and provides methods to control game flow
 type Game struct {
-	board               board.Interface
-	state               fsm.State
-	players             []player.Interface
-	corporations        [7]corporation.Interface
-	tileset             tileset.Interface
+	board               interfaces.Board
+	state               interfaces.State
+	players             []interfaces.Player
+	corporations        [7]interfaces.Corporation
+	tileset             interfaces.Tileset
 	currentPlayerNumber int
-	newCorpTiles        []tile.Interface
-	mergeCorps          map[string][]corporation.Interface
+	newCorpTiles        []interfaces.Tile
+	mergeCorps          map[string][]interfaces.Corporation
 	sellTradePlayers    []int
-	lastPlayedTile      tile.Interface
+	lastPlayedTile      interfaces.Tile
 	turn                int
 	endGameClaimed      bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
@@ -72,11 +69,11 @@ type Game struct {
 
 // New initialises a new Acquire game
 func New(
-	board board.Interface,
-	players []player.Interface,
-	corporations [7]corporation.Interface,
-	tileset tileset.Interface,
-	state fsm.State,
+	board interfaces.Board,
+	players []interfaces.Player,
+	corporations [7]interfaces.Corporation,
+	tileset interfaces.Tileset,
+	state interfaces.State,
 ) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
@@ -105,7 +102,7 @@ func New(
 }
 
 // Check that the passed corporations have unique names
-func areNamesUnique(corporations [7]corporation.Interface) bool {
+func areNamesUnique(corporations [7]interfaces.Corporation) bool {
 	for i, corp1 := range corporations {
 		if i < len(corporations)-1 {
 			for _, corp2 := range corporations[i+1:] {
@@ -119,7 +116,7 @@ func areNamesUnique(corporations [7]corporation.Interface) bool {
 }
 
 // Check that the number of corporations per class is right
-func isNumberOfCorpsPerClassRight(corporations [7]corporation.Interface) bool {
+func isNumberOfCorpsPerClassRight(corporations [7]interfaces.Corporation) bool {
 	corpsPerClass := [3]int{0, 0, 0}
 	for _, corp := range corporations {
 		corpsPerClass[corp.Class()]++
@@ -131,7 +128,7 @@ func isNumberOfCorpsPerClassRight(corporations [7]corporation.Interface) bool {
 }
 
 // Initialises player hand of tiles
-func (g *Game) giveInitialTileset(plyr player.Interface) {
+func (g *Game) giveInitialTileset(plyr interfaces.Player) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
 		plyr.PickTile(tile)
@@ -156,8 +153,8 @@ func (g *Game) AreEndConditionsReached() bool {
 }
 
 // ActiveCorporations returns all corporations on the board
-func (g *Game) findCorporationsByActiveState(value bool) []corporation.Interface {
-	result := []corporation.Interface{}
+func (g *Game) findCorporationsByActiveState(value bool) []interfaces.Corporation {
+	result := []interfaces.Corporation{}
 	for _, corp := range g.corporations {
 		if corp.IsActive() == value {
 			result = append(result, corp)
@@ -167,12 +164,12 @@ func (g *Game) findCorporationsByActiveState(value bool) []corporation.Interface
 }
 
 // ActiveCorporations returns all corporations on the board
-func (g *Game) ActiveCorporations() []corporation.Interface {
+func (g *Game) ActiveCorporations() []interfaces.Corporation {
 	return g.findCorporationsByActiveState(true)
 }
 
 // InactiveCorporations returns all corporations not on the board
-func (g *Game) InactiveCorporations() []corporation.Interface {
+func (g *Game) InactiveCorporations() []interfaces.Corporation {
 	return g.findCorporationsByActiveState(false)
 }
 
@@ -187,11 +184,11 @@ func (g *Game) existActiveCorporations() bool {
 
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
-func (g *Game) isTileUnplayable(tl tile.Interface) bool {
+func (g *Game) isTileUnplayable(tl interfaces.Tile) bool {
 	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Type() == "corporation" && adjacent.(corporation.Interface).IsSafe() {
+		if adjacent.Type() == "corporation" && adjacent.(interfaces.Corporation).IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -203,7 +200,7 @@ func (g *Game) isTileUnplayable(tl tile.Interface) bool {
 
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
-func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
+func (g *Game) isTileTemporaryUnplayable(tl interfaces.Tile) bool {
 	if len(g.ActiveCorporations()) < totalCorporations {
 		return false
 	}
@@ -217,17 +214,17 @@ func (g *Game) isTileTemporaryUnplayable(tl tile.Interface) bool {
 }
 
 // Player returns player with passed number
-func (g *Game) Player(playerNumber int) player.Interface {
+func (g *Game) Player(playerNumber int) interfaces.Player {
 	return g.players[playerNumber]
 }
 
 // CurrentPlayer returns player currently in play
-func (g *Game) CurrentPlayer() player.Interface {
+func (g *Game) CurrentPlayer() interfaces.Player {
 	return g.players[g.currentPlayerNumber]
 }
 
 // PlayTile puts the given tile on board and triggers related actions
-func (g *Game) PlayTile(tl tile.Interface) error {
+func (g *Game) PlayTile(tl interfaces.Tile) error {
 	if g.state.Name() != fsm.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
@@ -277,7 +274,7 @@ func (g *Game) PlayTile(tl tile.Interface) error {
 
 // Returns players who are shareholders of at least one of the passed companies
 // starting from the current one in play (mergemaker)
-func (g *Game) stockHolders(corporations []corporation.Interface) []int {
+func (g *Game) stockHolders(corporations []interfaces.Corporation) []int {
 	shareholders := []int{}
 	index := g.currentPlayerNumber
 	for _ = range g.players {
@@ -302,7 +299,7 @@ func (g *Game) setCurrentPlayer(number int) *Game {
 }
 
 // FoundCorporation founds a new corporation
-func (g *Game) FoundCorporation(corp corporation.Interface) error {
+func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
 	if g.state.Name() != fsm.FoundCorpStateName {
 		return errors.New(ActionNotAllowed)
 	}
@@ -311,7 +308,7 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 	}
 	g.board.SetOwner(corp, g.newCorpTiles)
 	corp.Grow(len(g.newCorpTiles))
-	g.newCorpTiles = []tile.Interface{}
+	g.newCorpTiles = []interfaces.Tile{}
 	g.getFounderStockShare(g.CurrentPlayer(), corp)
 	g.state = g.state.ToBuyStock()
 	return nil
@@ -321,7 +318,7 @@ func (g *Game) FoundCorporation(corp corporation.Interface) error {
 // remaining shares available
 // TODO this should trigger an event warning that no founder stock share will be given
 // of the founded corporation has no stock shares left
-func (g *Game) getFounderStockShare(pl player.Interface, corp corporation.Interface) {
+func (g *Game) getFounderStockShare(pl interfaces.Player, corp interfaces.Corporation) {
 	if corp.Stock() > 0 {
 		corp.RemoveStock(1)
 		pl.AddShares(corp, 1)
@@ -329,7 +326,7 @@ func (g *Game) getFounderStockShare(pl player.Interface, corp corporation.Interf
 }
 
 // Makes a corporation grow with the passed tiles
-func (g *Game) growCorporation(corp corporation.Interface, tiles []tile.Interface) {
+func (g *Game) growCorporation(corp interfaces.Corporation, tiles []interfaces.Tile) {
 	g.board.SetOwner(corp, tiles)
 	corp.Grow(len(tiles))
 }
@@ -360,10 +357,10 @@ func (g *Game) ClaimEndGame() *Game {
 
 // Classification returns the players list ordered by cash,
 // which is the metric used to know game's final classification
-func (g *Game) Classification() []player.Interface {
-	var classification []player.Interface
+func (g *Game) Classification() []interfaces.Player {
+	var classification []interfaces.Player
 
-	cashDesc := func(pl1, pl2 player.Interface) bool {
+	cashDesc := func(pl1, pl2 interfaces.Player) bool {
 		return pl1.Cash() > pl2.Cash()
 	}
 
@@ -375,7 +372,7 @@ func (g *Game) Classification() []player.Interface {
 }
 
 // Board returns game's board instance
-func (g *Game) Board() board.Interface {
+func (g *Game) Board() interfaces.Board {
 	return g.board
 }
 
@@ -386,6 +383,6 @@ func (g *Game) GameStateName() string {
 
 // Corporations returns game's corporations slice
 // TODO We can probably get rid of this
-func (g *Game) Corporations() [7]corporation.Interface {
+func (g *Game) Corporations() [7]interfaces.Corporation {
 	return g.corporations
 }

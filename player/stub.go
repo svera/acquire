@@ -1,8 +1,7 @@
 package player
 
 import (
-	"github.com/svera/acquire/corporation"
-	"github.com/svera/acquire/tile"
+	"github.com/svera/acquire/interfaces"
 )
 
 // Stub is a struct to be used in player tests as a replacement of the original,
@@ -17,24 +16,24 @@ func NewStub(name string) *Stub {
 		Player{
 			name:   name,
 			cash:   6000,
-			shares: map[string]int{},
+			shares: map[interfaces.Corporation]int{},
 		},
 	}
 }
 
 // SetTiles sets player tiles
-func (p *Stub) SetTiles(tiles []tile.Interface) {
+func (p *Stub) SetTiles(tiles []interfaces.Tile) {
 	p.tiles = tiles
 }
 
 // SetShares sets the shares the player has of a certain corporation
-func (p *Stub) SetShares(corp corporation.Interface, amount int) Interface {
-	p.shares[corp.Name()] = amount
+func (p *Stub) SetShares(corp interfaces.Corporation, amount int) interfaces.Player {
+	p.shares[corp] = amount
 	return p
 }
 
 // SetCash sets the amount of cash of the player
-func (p *Stub) SetCash(amount int) Interface {
+func (p *Stub) SetCash(amount int) interfaces.Player {
 	p.cash = amount
 	return p
 }
