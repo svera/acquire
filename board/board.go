@@ -2,8 +2,8 @@
 package board
 
 import (
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/interfaces"
 )
 
 var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
@@ -52,8 +52,8 @@ func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile
 	return false, newCorporationTiles
 }
 
-// TileMergeCorporations checks if the passed tile merges two or more corporations, returns a slice of
-// corporation IDs to be merged
+// TileMergeCorporations checks if the passed tile merges two or more corporations, returns a map of
+// corporations categorized between "acquirer" and "defunct"
 func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]interfaces.Corporation) {
 	var corporations []interfaces.Corporation
 

@@ -246,6 +246,7 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 			for _, corp := range mergeCorps["defunct"] {
 				g.payBonuses(corp)
 			}
+			g.board.PutTile(tl)
 			g.sellTradePlayers = g.stockHolders(mergeCorps["defunct"])
 			g.frozenPlayer = g.currentPlayerNumber
 			g.setCurrentPlayer(g.nextSellTradePlayer())
