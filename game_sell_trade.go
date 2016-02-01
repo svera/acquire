@@ -2,8 +2,8 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
 )
 
 // SellTrade sells and trades stock shares from defunct corporations
@@ -32,8 +32,8 @@ func (g *Game) SellTrade(sell map[interfaces.Corporation]int, trade map[interfac
 // Extract the number of the next player to sell or trade stock shares from
 // the merge's defunct corps list of stockholders
 func (g *Game) nextSellTradePlayer() int {
-	pl := g.sellTradePlayers[len(g.sellTradePlayers)-1]
-	g.sellTradePlayers = g.sellTradePlayers[:len(g.sellTradePlayers)-1]
+	pl := g.sellTradePlayers[0]
+	g.sellTradePlayers = append(g.sellTradePlayers[:0], g.sellTradePlayers[1:]...)
 	return pl
 }
 

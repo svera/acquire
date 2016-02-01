@@ -5,8 +5,8 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/player"
 )
 
