@@ -3,10 +3,10 @@ package acquire
 import (
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/player"
-	"github.com/svera/acquire/tile"	
+	"github.com/svera/acquire/tile"
 	"github.com/svera/acquire/tileset"
 	"testing"
 )
@@ -285,6 +285,32 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	}
 	if players[0].Shares(game.corporations[0]) != 0 {
 		t.Errorf("Wrong stock shares amount for player, expected %d, got %d", 0, players[0].Shares(game.corporations[0]))
+	}
+}
+
+func TestSellTradeTurnPassing(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	setupPlayTileMerge(corporations, bd)
+	tileToPlay := tile.New(6, "E")
+
+	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
+	playerTiles := players[0].Tiles()
+	players[0].
+		DiscardTile(playerTiles[0]).
+		PickTile(tileToPlay)
+	players[0].(*player.Stub).SetShares(corporations[0], 6)
+	players[2].(*player.Stub).SetShares(corporations[0], 4)
+
+	game.PlayTile(tileToPlay)
+	sell := map[interfaces.Corporation]int{corporations[0]: 6}
+	trade := map[interfaces.Corporation]int{}
+	game.SellTrade(sell, trade)
+
+	if game.state.Name() != fsm.SellTradeStateName {
+		t.Errorf("Wrong game state after merge, expected %s, got %s", fsm.SellTradeStateName, game.state.Name())
+	}
+	if game.CurrentPlayer() != players[2] {
+		t.Errorf("Wrong active player, expected %s, got %s", players[2].Name(), game.CurrentPlayer().Name())
 	}
 }
 
