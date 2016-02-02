@@ -225,6 +225,31 @@ func (g *Game) CurrentPlayer() interfaces.Player {
 
 // PlayTile puts the given tile on board and triggers related actions
 func (g *Game) PlayTile(tl interfaces.Tile) error {
+	if err := g.checkTile(tl); err != nil {
+		return err
+	}
+
+	g.CurrentPlayer().DiscardTile(tl)
+	g.lastPlayedTile = tl
+
+	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
+		g.startMerge(tl, mergeCorps)
+	} else if corpFounded, tiles := g.board.TileFoundCorporation(tl); corpFounded {
+		g.board.PutTile(tl)
+		g.state = g.state.ToFoundCorp()
+		g.newCorpTiles = tiles
+	} else if grow, tiles, corp := g.board.TileGrowCorporation(tl); grow {
+		g.growCorporation(corp, tiles)
+		g.state = g.state.ToBuyStock()
+	} else {
+		if err := g.putUnincorporatedTile(tl); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (g *Game) checkTile(tl interfaces.Tile) error {
 	if g.state.Name() != fsm.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
@@ -234,41 +259,18 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 	if !g.CurrentPlayer().HasTile(tl) {
 		return errors.New(TileNotOnHand)
 	}
+	return nil
+}
 
-	g.CurrentPlayer().DiscardTile(tl)
-	g.lastPlayedTile = tl
-
-	if merge, mergeCorps := g.board.TileMergeCorporations(tl); merge {
-		g.mergeCorps = mergeCorps
-		if g.isMergeTied() {
-			g.state = g.state.ToUntieMerge()
-		} else {
-			for _, corp := range mergeCorps["defunct"] {
-				g.payBonuses(corp)
-			}
-			g.board.PutTile(tl)
-			g.sellTradePlayers = g.stockHolders(mergeCorps["defunct"])
-			g.frozenPlayer = g.currentPlayerNumber
-			g.setCurrentPlayer(g.nextSellTradePlayer())
-			g.state = g.state.ToSellTrade()
-		}
-	} else if found, tiles := g.board.TileFoundCorporation(tl); found {
-		g.board.PutTile(tl)
-		g.state = g.state.ToFoundCorp()
-		g.newCorpTiles = tiles
-	} else if grow, tiles, corp := g.board.TileGrowCorporation(tl); grow {
-		g.growCorporation(corp, tiles)
+func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
+	g.board.PutTile(tl)
+	if g.existActiveCorporations() {
 		g.state = g.state.ToBuyStock()
 	} else {
-		g.board.PutTile(tl)
-		if g.existActiveCorporations() {
-			g.state = g.state.ToBuyStock()
-		} else {
-			if err := g.drawTile(); err != nil {
-				return err
-			}
-			g.nextPlayer()
+		if err := g.drawTile(); err != nil {
+			return err
 		}
+		g.nextPlayer()
 	}
 	return nil
 }

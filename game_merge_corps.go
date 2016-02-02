@@ -2,10 +2,26 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/player"
 )
+
+func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces.Corporation) {
+	g.mergeCorps = mergeCorps
+	if g.isMergeTied() {
+		g.state = g.state.ToUntieMerge()
+	} else {
+		for _, corp := range mergeCorps["defunct"] {
+			g.payBonuses(corp)
+		}
+		g.board.PutTile(tl)
+		g.sellTradePlayers = g.stockHolders(mergeCorps["defunct"])
+		g.frozenPlayer = g.currentPlayerNumber
+		g.setCurrentPlayer(g.nextSellTradePlayer())
+		g.state = g.state.ToSellTrade()
+	}
+}
 
 // Calculates and returns bonus amounts to be paid to owners of stock of a
 // corporation
