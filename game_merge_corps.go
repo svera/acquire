@@ -107,6 +107,15 @@ func (g *Game) isMergeTied() bool {
 	return false
 }
 
+// TiedCorps returns all corporations that are tied in a merge
+func (g *Game) TiedCorps() []interfaces.Corporation {
+	corps := []interfaces.Corporation{}
+	if g.isMergeTied() {
+		corps = g.mergeCorps["acquirer"]
+	}
+	return corps
+}
+
 // UntieMerge resolves a tied merge selecting which corporation will be the acquirer,
 // marking the rest as defunct
 func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
