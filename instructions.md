@@ -197,7 +197,7 @@ corporation. This is optional. A player may decide to buy
 none or up to three stock cards on a turn. For example,
 a player can buy one stock card in three different active
 corporations - or one in one corporation and two in another
-a or three stock cards in one corporation.
+- or three stock cards in one corporation.
 
 **Price per share:** This is determined by first finding the name
 of the corporation on any information card, looking down
@@ -212,7 +212,7 @@ the majority stockholder in a corporation can be risky.
 Invest wisely in corporations that are small and close to
 bigger ones. A player who runs out of money cannot buy
 stock. A player with no money still places a tile on each of
-his/her turns, if possibie, but must wait for a corporation in
+his/her turns, if possible, but must wait for a corporation in
 which he/she owns stock to go defunct in order to get money.
 Remember, a player can sell a corporation’s stock only
 after the corporation has gone defunct, and at the end of
