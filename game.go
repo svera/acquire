@@ -182,6 +182,14 @@ func (g *Game) existActiveCorporations() bool {
 	return false
 }
 
+// DefunctCorporations returns all defunct corporations in a merge
+func (g *Game) DefunctCorporations() []interfaces.Corporation {
+	if g.state.Name() == fsm.SellTradeStateName {
+		return g.mergeCorps["defunct"]
+	}
+	return []interfaces.Corporation{}
+}
+
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
 func (g *Game) isTileUnplayable(tl interfaces.Tile) bool {
@@ -273,26 +281,6 @@ func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 		g.nextPlayer()
 	}
 	return nil
-}
-
-// Returns players who are shareholders of at least one of the passed companies
-// starting from the current one in play (mergemaker)
-func (g *Game) stockHolders(corporations []interfaces.Corporation) []int {
-	shareholders := []int{}
-	index := g.currentPlayerNumber
-	for _ = range g.players {
-		for _, corp := range g.corporations {
-			if g.players[index].Shares(corp) > 0 {
-				shareholders = append(shareholders, index)
-				break
-			}
-		}
-		index++
-		if index == len(g.players) {
-			index = 0
-		}
-	}
-	return shareholders
 }
 
 // Sets player currently in play

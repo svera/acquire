@@ -8,6 +8,7 @@ import (
 )
 
 func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces.Corporation) {
+	g.board.PutTile(tl)
 	g.mergeCorps = mergeCorps
 	if g.isMergeTied() {
 		g.state = g.state.ToUntieMerge()
@@ -15,8 +16,7 @@ func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces
 		for _, corp := range mergeCorps["defunct"] {
 			g.payBonuses(corp)
 		}
-		g.board.PutTile(tl)
-		g.sellTradePlayers = g.stockHolders(mergeCorps["defunct"])
+		g.sellTradePlayers = g.setSellTradePlayers(mergeCorps["defunct"])
 		g.frozenPlayer = g.currentPlayerNumber
 		g.setCurrentPlayer(g.nextSellTradePlayer())
 		g.state = g.state.ToSellTrade()
@@ -58,12 +58,34 @@ func (g *Game) getMainStockHolders(corp interfaces.Corporation) map[string][]int
 		}
 	}
 
-	mainStockHolders["majority"] = stockHoldersWithSameAmount(0, stockHolders, corp)
-	if len(mainStockHolders["majority"]) > 1 {
-		return mainStockHolders
+	if len(stockHolders) > 0 {
+		mainStockHolders["majority"] = stockHoldersWithSameAmount(0, stockHolders, corp)
+		if len(mainStockHolders["majority"]) > 1 {
+			return mainStockHolders
+		}
+		mainStockHolders["minority"] = stockHoldersWithSameAmount(1, stockHolders, corp)
 	}
-	mainStockHolders["minority"] = stockHoldersWithSameAmount(1, stockHolders, corp)
 	return mainStockHolders
+}
+
+// Returns players who are shareholders of at least one of the passed companies
+// starting from the current one in play (mergemaker)
+func (g *Game) setSellTradePlayers(corporations []interfaces.Corporation) []int {
+	shareholders := []int{}
+	index := g.currentPlayerNumber
+	for _ = range g.players {
+		for _, corp := range g.corporations {
+			if g.players[index].Shares(corp) > 0 {
+				shareholders = append(shareholders, index)
+				break
+			}
+		}
+		index++
+		if index == len(g.players) {
+			index = 0
+		}
+	}
+	return shareholders
 }
 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
@@ -129,7 +151,7 @@ func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
 				append(g.mergeCorps["acquirer"][:i], g.mergeCorps["acquirer"][i+1:]...)...,
 			)
 			g.mergeCorps["acquirer"] = []interfaces.Corporation{corp}
-			g.state = g.state.ToSellTrade()
+			g.startMerge(g.lastPlayedTile, g.mergeCorps)
 			return nil
 		}
 	}

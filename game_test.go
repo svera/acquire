@@ -420,9 +420,14 @@ func TestUntieMerge(t *testing.T) {
 		"defunct":  []interfaces.Corporation{corporations[3]},
 	}
 	game.state = &fsm.UntieMerge{}
+	game.lastPlayedTile = tile.New(5, "E")
+	players[0].(*player.Stub).SetShares(corporations[0], 6)
+	players[0].(*player.Stub).SetShares(corporations[2], 6)
+	players[0].(*player.Stub).SetShares(corporations[3], 6)
+
 	game.UntieMerge(corporations[1])
 	if game.mergeCorps["acquirer"][0] != corporations[1] {
-		t.Errorf("Tied merge not untied, expected acquirer to be %s, got %s", corporations[0].Name(), game.mergeCorps["acquirer"][0].Name())
+		t.Errorf("Tied merge not untied, expected acquirer to be %s, got %s", corporations[1].Name(), game.mergeCorps["acquirer"][0].Name())
 	}
 	if len(game.mergeCorps["defunct"]) != 3 {
 		t.Errorf("Wrong number of defunct corporations after merge untie, expected %d, got %d", 3, len(game.mergeCorps["defunct"]))
