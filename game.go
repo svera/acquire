@@ -231,6 +231,11 @@ func (g *Game) CurrentPlayer() interfaces.Player {
 	return g.players[g.currentPlayerNumber]
 }
 
+// CurrentPlayerNumber returns the number of the player currently in play
+func (g *Game) CurrentPlayerNumber() int {
+	return g.currentPlayerNumber
+}
+
 // PlayTile puts the given tile on board and triggers related actions
 func (g *Game) PlayTile(tl interfaces.Tile) error {
 	if err := g.checkTile(tl); err != nil {
