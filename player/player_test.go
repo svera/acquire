@@ -3,13 +3,13 @@ package player
 import (
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/interfaces"
-	"github.com/svera/acquire/tile"	
+	"github.com/svera/acquire/tile"
 	"reflect"
 	"testing"
 )
 
 func TestPickTile(t *testing.T) {
-	player := New("Test")
+	player := New()
 	tl := tile.New(2, "C")
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
@@ -19,10 +19,10 @@ func TestPickTile(t *testing.T) {
 
 func TestSort(t *testing.T) {
 	players := []interfaces.Player{
-		NewStub("Test1"),
-		NewStub("Test2"),
-		NewStub("Test3"),
-		NewStub("Test4"),
+		NewStub(),
+		NewStub(),
+		NewStub(),
+		NewStub(),
 	}
 
 	corp, _ := corporation.New("Test", 0)
@@ -48,7 +48,7 @@ func TestSort(t *testing.T) {
 }
 
 func TestUseTile(t *testing.T) {
-	player := New("Test")
+	player := New()
 
 	player.tiles = []interfaces.Tile{
 		tile.New(7, "C"),

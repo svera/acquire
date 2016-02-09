@@ -12,5 +12,4 @@ type Player interface {
 	Cash() int
 	AddCash(amount int) Player
 	RemoveCash(amount int) Player
-	Name() string
 }

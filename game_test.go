@@ -310,7 +310,7 @@ func TestSellTradeTurnPassing(t *testing.T) {
 		t.Errorf("Wrong game state after merge, expected %s, got %s", fsm.SellTradeStateName, game.state.Name())
 	}
 	if game.CurrentPlayer() != players[2] {
-		t.Errorf("Wrong active player, expected %s, got %s", players[2].Name(), game.CurrentPlayer().Name())
+		t.Errorf("Wrong active player, expected %d, got %d", 2, game.currentPlayerNumber)
 	}
 }
 
@@ -439,9 +439,9 @@ func TestUntieMerge(t *testing.T) {
 
 func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, interfaces.Tileset) {
 	var players []interfaces.Player
-	players = append(players, player.NewStub("Test1"))
-	players = append(players, player.NewStub("Test2"))
-	players = append(players, player.NewStub("Test3"))
+	players = append(players, player.NewStub())
+	players = append(players, player.NewStub())
+	players = append(players, player.NewStub())
 
 	var corporations [7]interfaces.Corporation
 	corporations[0] = corporation.NewStub("A", 0)

@@ -11,10 +11,9 @@ type Stub struct {
 }
 
 // NewStub initialises and returns a new instance of Stub
-func NewStub(name string) *Stub {
+func NewStub() *Stub {
 	return &Stub{
 		Player{
-			name:   name,
 			cash:   6000,
 			shares: map[interfaces.Corporation]int{},
 		},

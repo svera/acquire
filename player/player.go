@@ -7,16 +7,14 @@ import (
 
 // Player stores the status of a player
 type Player struct {
-	name   string
 	cash   int
 	tiles  []interfaces.Tile
 	shares map[interfaces.Corporation]int
 }
 
 // New initialises and returns a Player instance
-func New(name string) *Player {
+func New() *Player {
 	return &Player{
-		name:   name,
 		cash:   6000,
 		shares: map[interfaces.Corporation]int{},
 	}
@@ -86,9 +84,4 @@ func (p *Player) AddCash(amount int) interfaces.Player {
 func (p *Player) RemoveCash(amount int) interfaces.Player {
 	p.cash -= amount
 	return p
-}
-
-// Name returns player name
-func (p *Player) Name() string {
-	return p.name
 }

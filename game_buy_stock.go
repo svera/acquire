@@ -2,8 +2,9 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
+	"fmt"
 	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
 )
 
 // BuyStock buys stock from corporations
@@ -52,6 +53,7 @@ func (g *Game) checkBuy(buys map[interfaces.Corporation]int) error {
 		totalStock += amount
 		totalPrice += corp.StockPrice() * amount
 	}
+	fmt.Println("Totalstock: %d", totalStock)
 	if totalStock > 3 {
 		return errors.New(TooManyStockSharesToBuy)
 	}
