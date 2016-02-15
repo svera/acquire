@@ -87,7 +87,7 @@ func (g *Game) drawTile() error {
 // only be done once per turn.
 func (g *Game) replaceUnplayableTiles() error {
 	for _, tile := range g.CurrentPlayer().Tiles() {
-		if g.isTileUnplayable(tile) {
+		if g.isTilePermanentlyUnplayable(tile) {
 
 			g.CurrentPlayer().DiscardTile(tile)
 			if newTile, err := g.tileset.Draw(); err == nil {

@@ -137,7 +137,7 @@ func (g *Game) giveInitialTileset(plyr interfaces.Player) {
 
 // AreEndConditionsReached checks if game end conditions are reached
 func (g *Game) AreEndConditionsReached() bool {
-	active := g.ActiveCorporations()
+	active := g.activeCorporations()
 	if len(active) == 0 {
 		return false
 	}
@@ -153,6 +153,10 @@ func (g *Game) AreEndConditionsReached() bool {
 }
 
 // ActiveCorporations returns all corporations on the board
+func (g *Game) activeCorporations() []interfaces.Corporation {
+	return g.findCorporationsByActiveState(true)
+}
+
 func (g *Game) findCorporationsByActiveState(value bool) []interfaces.Corporation {
 	result := []interfaces.Corporation{}
 	for _, corp := range g.corporations {
@@ -163,36 +167,27 @@ func (g *Game) findCorporationsByActiveState(value bool) []interfaces.Corporatio
 	return result
 }
 
-// ActiveCorporations returns all corporations on the board
-func (g *Game) ActiveCorporations() []interfaces.Corporation {
-	return g.findCorporationsByActiveState(true)
-}
-
-// InactiveCorporations returns all corporations not on the board
-func (g *Game) InactiveCorporations() []interfaces.Corporation {
-	return g.findCorporationsByActiveState(false)
-}
-
-func (g *Game) existActiveCorporations() bool {
-	for _, corp := range g.corporations {
-		if corp.IsActive() {
+func (g *Game) IsCorporationDefunct(corp interfaces.Corporation) bool {
+	for _, defunct := range g.mergeCorps["defunct"] {
+		if corp == defunct {
 			return true
 		}
 	}
 	return false
 }
 
-// DefunctCorporations returns all defunct corporations in a merge
-func (g *Game) DefunctCorporations() []interfaces.Corporation {
-	if g.state.Name() == fsm.SellTradeStateName {
-		return g.mergeCorps["defunct"]
+// IsTilePlayable returns false if the passed tile is either
+// temporary or permanently unplayable, true otherwise
+func (g *Game) IsTilePlayable(tl interfaces.Tile) bool {
+	if g.isTileTemporaryUnplayable(tl) || g.isTilePermanentlyUnplayable(tl) {
+		return false
 	}
-	return []interfaces.Corporation{}
+	return true
 }
 
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
-func (g *Game) isTileUnplayable(tl interfaces.Tile) bool {
+func (g *Game) isTilePermanentlyUnplayable(tl interfaces.Tile) bool {
 	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
@@ -209,7 +204,7 @@ func (g *Game) isTileUnplayable(tl interfaces.Tile) bool {
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
 func (g *Game) isTileTemporaryUnplayable(tl interfaces.Tile) bool {
-	if len(g.ActiveCorporations()) < totalCorporations {
+	if len(g.activeCorporations()) < totalCorporations {
 		return false
 	}
 	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
@@ -286,6 +281,15 @@ func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 		g.nextPlayer()
 	}
 	return nil
+}
+
+func (g *Game) existActiveCorporations() bool {
+	for _, corp := range g.corporations {
+		if corp.IsActive() {
+			return true
+		}
+	}
+	return false
 }
 
 // Sets player currently in play
@@ -375,10 +379,4 @@ func (g *Game) Board() interfaces.Board {
 // GameStateName returns game's current state
 func (g *Game) GameStateName() string {
 	return g.state.Name()
-}
-
-// Corporations returns game's corporations slice
-// TODO We can probably get rid of this
-func (g *Game) Corporations() [7]interfaces.Corporation {
-	return g.corporations
 }

@@ -12,7 +12,7 @@ func (g *Game) finish() error {
 	if g.state.Name() != fsm.EndGameStateName {
 		return errors.New(ActionNotAllowed)
 	}
-	for _, corp := range g.ActiveCorporations() {
+	for _, corp := range g.activeCorporations() {
 		g.payBonuses(corp)
 		for _, pl := range g.players {
 			if pl.Shares(corp) > 0 {
