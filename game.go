@@ -61,7 +61,7 @@ type Game struct {
 	sellTradePlayers    []int
 	lastPlayedTile      interfaces.Tile
 	turn                int
-	endGameClaimed      bool
+	lastTurn            bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
 	frozenPlayer int
@@ -92,7 +92,7 @@ func New(
 		currentPlayerNumber: 0,
 		turn:                1,
 		state:               state,
-		endGameClaimed:      false,
+		lastTurn:            false,
 	}
 	for _, pl := range gm.players {
 		gm.giveInitialTileset(pl)
@@ -350,9 +350,14 @@ func (g *Game) Turn() int {
 // the player may finish the turn.
 func (g *Game) ClaimEndGame() *Game {
 	if g.AreEndConditionsReached() {
-		g.endGameClaimed = true
+		g.lastTurn = true
 	}
 	return g
+}
+
+// LastTurn returns if the current turn will be the last one or not
+func (g *Game) LastTurn() bool {
+	return g.lastTurn
 }
 
 // Classification returns the players list ordered by cash,

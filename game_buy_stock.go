@@ -20,7 +20,7 @@ func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
 		g.buy(corp, amount)
 	}
 
-	if g.endGameClaimed {
+	if g.lastTurn {
 		g.state = g.state.ToEndGame()
 		return g.finish()
 	}
