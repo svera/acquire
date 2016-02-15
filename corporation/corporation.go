@@ -3,7 +3,7 @@ package corporation
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"	
+	"github.com/svera/acquire"
 )
 
 type prices struct {
@@ -48,13 +48,13 @@ func (c *Corporation) Size() int {
 }
 
 // Grow increases corporation size in tiles
-func (c *Corporation) Grow(number int) interfaces.Corporation {
+func (c *Corporation) Grow(number int) acquire.Corporation {
 	c.size += number
 	return c
 }
 
 // Reset sets corporation size to 0 (not on board)
-func (c *Corporation) Reset() interfaces.Corporation {
+func (c *Corporation) Reset() acquire.Corporation {
 	c.size = 0
 	return c
 }
@@ -95,13 +95,13 @@ func (c *Corporation) Stock() int {
 }
 
 // AddStock adds amount of stock shares to corporation stock
-func (c *Corporation) AddStock(amount int) interfaces.Corporation {
+func (c *Corporation) AddStock(amount int) acquire.Corporation {
 	c.stock += amount
 	return c
 }
 
 // RemoveStock removes the passed amount of stock shares from corporation stock
-func (c *Corporation) RemoveStock(amount int) interfaces.Corporation {
+func (c *Corporation) RemoveStock(amount int) acquire.Corporation {
 	c.stock -= amount
 	return c
 }

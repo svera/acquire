@@ -2,12 +2,10 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/fsm"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/player"
 )
 
-func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces.Corporation) {
+func (g *Game) startMerge(tl Tile, mergeCorps map[string][]Corporation) {
 	g.board.PutTile(tl)
 	g.mergeCorps = mergeCorps
 	if g.isMergeTied() {
@@ -25,7 +23,7 @@ func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces
 
 // Calculates and returns bonus amounts to be paid to owners of stock of a
 // corporation
-func (g *Game) payBonuses(corp interfaces.Corporation) {
+func (g *Game) payBonuses(corp Corporation) {
 	stockHolders := g.getMainStockHolders(corp)
 	numberMajorityHolders := len(stockHolders["majority"])
 	numberMinorityHolders := len(stockHolders["minority"])
@@ -47,12 +45,12 @@ func (g *Game) payBonuses(corp interfaces.Corporation) {
 // a tie for majority stockholder, add the majority and minority bonuses and divide evenly (the minority
 // shareholder gets no bonus. If there's a tie for minority stockholder, split the minority bonus among
 // the tied players"
-func (g *Game) getMainStockHolders(corp interfaces.Corporation) map[string][]interfaces.Player {
-	mainStockHolders := map[string][]interfaces.Player{"majority": {}, "minority": {}}
+func (g *Game) getMainStockHolders(corp Corporation) map[string][]Player {
+	mainStockHolders := map[string][]Player{"majority": {}, "minority": {}}
 	stockHolders := g.getStockHolders(corp)
 
 	if len(stockHolders) == 1 {
-		return map[string][]interfaces.Player{
+		return map[string][]Player{
 			"majority": {stockHolders[0]},
 			"minority": {stockHolders[0]},
 		}
@@ -70,7 +68,7 @@ func (g *Game) getMainStockHolders(corp interfaces.Corporation) map[string][]int
 
 // Returns players who are shareholders of at least one of the passed companies
 // starting from the current one in play (mergemaker)
-func (g *Game) setSellTradePlayers(corporations []interfaces.Corporation) []int {
+func (g *Game) setSellTradePlayers(corporations []Corporation) []int {
 	shareholders := []int{}
 	index := g.currentPlayerNumber
 	for _ = range g.players {
@@ -90,9 +88,9 @@ func (g *Game) setSellTradePlayers(corporations []interfaces.Corporation) []int 
 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
 // of that corporation
-func (g *Game) getStockHolders(corp interfaces.Corporation) []interfaces.Player {
-	var stockHolders []interfaces.Player
-	sharesDesc := func(pl1, pl2 interfaces.Player) bool {
+func (g *Game) getStockHolders(corp Corporation) []Player {
+	var stockHolders []Player
+	sharesDesc := func(pl1, pl2 Player) bool {
 		return pl1.Shares(corp) > pl2.Shares(corp)
 	}
 
@@ -109,8 +107,8 @@ func (g *Game) getStockHolders(corp interfaces.Corporation) []interfaces.Player 
 
 // Loop stockHolders from start to get all stock holders with the same amount of shares for
 // the passed corporation
-func stockHoldersWithSameAmount(start int, stockHolders []interfaces.Player, corp interfaces.Corporation) []interfaces.Player {
-	group := []interfaces.Player{stockHolders[start]}
+func stockHoldersWithSameAmount(start int, stockHolders []Player, corp Corporation) []Player {
+	group := []Player{stockHolders[start]}
 
 	i := start + 1
 	for i < len(stockHolders) && stockHolders[start].Shares(corp) == stockHolders[i].Shares(corp) {
@@ -130,8 +128,8 @@ func (g *Game) isMergeTied() bool {
 }
 
 // TiedCorps returns all corporations that are tied in a merge
-func (g *Game) TiedCorps() []interfaces.Corporation {
-	corps := []interfaces.Corporation{}
+func (g *Game) TiedCorps() []Corporation {
+	corps := []Corporation{}
 	if g.isMergeTied() {
 		corps = g.mergeCorps["acquirer"]
 	}
@@ -140,8 +138,8 @@ func (g *Game) TiedCorps() []interfaces.Corporation {
 
 // UntieMerge resolves a tied merge selecting which corporation will be the acquirer,
 // marking the rest as defunct
-func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
-	if g.state.Name() != fsm.UntieMergeStateName {
+func (g *Game) UntieMerge(acquirer Corporation) error {
+	if g.state.Name() != UntieMergeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for i, corp := range g.mergeCorps["acquirer"] {
@@ -150,7 +148,7 @@ func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
 				g.mergeCorps["defunct"],
 				append(g.mergeCorps["acquirer"][:i], g.mergeCorps["acquirer"][i+1:]...)...,
 			)
-			g.mergeCorps["acquirer"] = []interfaces.Corporation{corp}
+			g.mergeCorps["acquirer"] = []Corporation{corp}
 			g.startMerge(g.lastPlayedTile, g.mergeCorps)
 			return nil
 		}
@@ -169,7 +167,7 @@ func (g *Game) completeMerge() {
 		defunct.Reset()
 		g.board.ChangeOwner(defunct, acquirer)
 	}
-	g.board.SetOwner(acquirer, []interfaces.Tile{g.lastPlayedTile})
+	g.board.SetOwner(acquirer, []Tile{g.lastPlayedTile})
 	acquirer.Grow(1)
-	g.mergeCorps = map[string][]interfaces.Corporation{}
+	g.mergeCorps = map[string][]Corporation{}
 }

@@ -1,5 +1,4 @@
-// Package interfaces holds the declaration of all the interfaces used throught the Acquire library.
-package interfaces
+package acquire
 
 // Owner interface declares all methods to be implemented by an owner implementation.
 // Owner acts as a "marker" for board, because each board cell can contain an

@@ -4,7 +4,6 @@ import (
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/player"
 	"github.com/svera/acquire/tile"
 	"github.com/svera/acquire/tileset"
@@ -105,7 +104,7 @@ func TestFoundCorporation(t *testing.T) {
 		t.Errorf("Game in a state different than FoundCorp must not execute FoundCorporation()")
 	}
 	game.state = &fsm.FoundCorp{}
-	newCorpTiles := []interfaces.Tile{
+	newCorpTiles := []Tile{
 		tile.New(5, "E"),
 		tile.New(6, "E"),
 	}
@@ -128,7 +127,7 @@ func TestFoundCorporation(t *testing.T) {
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	tileToPlay := tile.New(6, "E")
-	corpTiles := []interfaces.Tile{
+	corpTiles := []Tile{
 		tile.New(7, "E"),
 		tile.New(8, "E"),
 	}
@@ -263,8 +262,8 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	players[0].(*player.Stub).SetShares(corporations[0], 6)
 
 	game.PlayTile(tileToPlay)
-	sell := map[interfaces.Corporation]int{corporations[0]: 6}
-	trade := map[interfaces.Corporation]int{}
+	sell := map[Corporation]int{corporations[0]: 6}
+	trade := map[Corporation]int{}
 	game.SellTrade(sell, trade)
 	if game.state.Name() != fsm.BuyStockStateName {
 		t.Errorf("Wrong game state after merge, expected %s, got %s", fsm.BuyStockStateName, game.state.Name())
@@ -302,8 +301,8 @@ func TestSellTradeTurnPassing(t *testing.T) {
 	players[2].(*player.Stub).SetShares(corporations[0], 4)
 
 	game.PlayTile(tileToPlay)
-	sell := map[interfaces.Corporation]int{corporations[0]: 6}
-	trade := map[interfaces.Corporation]int{}
+	sell := map[Corporation]int{corporations[0]: 6}
+	trade := map[Corporation]int{}
 	game.SellTrade(sell, trade)
 
 	if game.state.Name() != fsm.SellTradeStateName {
@@ -317,12 +316,12 @@ func TestSellTradeTurnPassing(t *testing.T) {
 // Set ups the board this way for merge tests
 //   4 5 6 7 8 9
 // E [][]><[][][]
-func setupPlayTileMerge(corporations [7]interfaces.Corporation, bd interfaces.Board) {
-	corp0Tiles := []interfaces.Tile{
+func setupPlayTileMerge(corporations [7]Corporation, bd Board) {
+	corp0Tiles := []Tile{
 		tile.New(4, "E"),
 		tile.New(5, "E"),
 	}
-	corp1Tiles := []interfaces.Tile{
+	corp1Tiles := []Tile{
 		tile.New(7, "E"),
 		tile.New(8, "E"),
 		tile.New(9, "E"),
@@ -336,7 +335,7 @@ func setupPlayTileMerge(corporations [7]interfaces.Corporation, bd interfaces.Bo
 func TestBuyStock(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].Grow(2)
-	buys := map[interfaces.Corporation]int{corporations[0]: 2}
+	buys := map[Corporation]int{corporations[0]: 2}
 	expectedAvailableStock := 23
 	expectedPlayerStock := 2
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
@@ -357,7 +356,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 
 	corporations[0].Grow(2)
 
-	buys := map[interfaces.Corporation]int{corporations[0]: 2}
+	buys := map[Corporation]int{corporations[0]: 2}
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 	err := game.BuyStock(buys)
 	if err == nil {
@@ -368,7 +367,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 func TestBuyStockAndEndGame(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	corporations[0].Grow(42)
-	buys := map[interfaces.Corporation]int{}
+	buys := map[Corporation]int{}
 	// Remember, every active corporation has always at least one shareholder
 	players[0].AddShares(corporations[0], 2)
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
@@ -397,11 +396,11 @@ func TestDrawTile(t *testing.T) {
 	corporations[0].(*corporation.Stub).SetSize(11)
 	corporations[1].(*corporation.Stub).SetSize(15)
 	unplayableTile := tile.New(6, "D")
-	bd.SetOwner(corporations[0], []interfaces.Tile{tile.New(5, "D")})
-	bd.SetOwner(corporations[1], []interfaces.Tile{tile.New(7, "D")})
+	bd.SetOwner(corporations[0], []Tile{tile.New(5, "D")})
+	bd.SetOwner(corporations[1], []Tile{tile.New(7, "D")})
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	players[0].(*player.Stub).SetTiles([]interfaces.Tile{unplayableTile})
+	players[0].(*player.Stub).SetTiles([]Tile{unplayableTile})
 	game.tileset.(*tileset.Stub).DiscardTile(unplayableTile)
 	game.state = &fsm.BuyStock{}
 	game.drawTile()
@@ -415,9 +414,9 @@ func TestDrawTile(t *testing.T) {
 func TestUntieMerge(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	game.mergeCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[0], corporations[1], corporations[2]},
-		"defunct":  []interfaces.Corporation{corporations[3]},
+	game.mergeCorps = map[string][]Corporation{
+		"acquirer": []Corporation{corporations[0], corporations[1], corporations[2]},
+		"defunct":  []Corporation{corporations[3]},
 	}
 	game.state = &fsm.UntieMerge{}
 	game.lastPlayedTile = tile.New(5, "E")
@@ -437,13 +436,13 @@ func TestUntieMerge(t *testing.T) {
 	}
 }
 
-func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, interfaces.Tileset) {
-	var players []interfaces.Player
+func setup() ([]Player, [7]Corporation, Board, Tileset) {
+	var players []Player
 	players = append(players, player.NewStub())
 	players = append(players, player.NewStub())
 	players = append(players, player.NewStub())
 
-	var corporations [7]interfaces.Corporation
+	var corporations [7]Corporation
 	corporations[0] = corporation.NewStub("A", 0)
 	corporations[1] = corporation.NewStub("B", 0)
 	corporations[2] = corporation.NewStub("C", 1)
@@ -457,7 +456,7 @@ func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, 
 	return players, corporations, board, tileset
 }
 
-func slicesSameContent(slice1 []interfaces.Player, slice2 []interfaces.Player) bool {
+func slicesSameContent(slice1 []Player, slice2 []Player) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}
