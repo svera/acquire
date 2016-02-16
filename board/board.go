@@ -3,7 +3,6 @@ package board
 
 import (
 	"github.com/svera/acquire/acquire"
-	"github.com/svera/acquire/corporation"
 )
 
 var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
@@ -73,7 +72,7 @@ func categorizeMerge(corporations []acquire.Corporation) map[string][]acquire.Co
 	sizeDesc := func(corp1, corp2 acquire.Corporation) bool {
 		return corp1.Size() > corp2.Size()
 	}
-	corporation.By(sizeDesc).Sort(corporations)
+	CorporationBy(sizeDesc).Sort(corporations)
 
 	merge := map[string][]acquire.Corporation{
 		"acquirer": []acquire.Corporation{corporations[0]},

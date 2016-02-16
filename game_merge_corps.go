@@ -2,7 +2,6 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/player"
 )
 
 func (g *Game) startMerge(tl Tile, mergeCorps map[string][]Corporation) {
@@ -100,7 +99,7 @@ func (g *Game) getStockHolders(corp Corporation) []Player {
 		}
 	}
 	if len(stockHolders) > 0 {
-		player.By(sharesDesc).Sort(stockHolders)
+		PlayerBy(sharesDesc).Sort(stockHolders)
 	}
 	return stockHolders
 }

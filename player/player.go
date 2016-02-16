@@ -85,17 +85,3 @@ func (p *Player) RemoveCash(amount int) acquire.Player {
 	p.cash -= amount
 	return p
 }
-
-func (p *Player) OrderByCashDesc(players []acquire.Player) []acquire.Player {
-	var classification []acquire.Player
-
-	cashDesc := func(pl1, pl2 acquire.Player) bool {
-		return pl1.Cash() > pl2.Cash()
-	}
-
-	for _, pl := range players {
-		classification = append(classification, pl)
-	}
-	By(cashDesc).Sort(classification)
-	return classification
-}

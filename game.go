@@ -255,7 +255,7 @@ func (g *Game) PlayTile(tl Tile) error {
 }
 
 func (g *Game) checkTile(tl Tile) error {
-	if g.state.Name() != .PlayTileStateName {
+	if g.state.Name() != PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
@@ -297,7 +297,7 @@ func (g *Game) setCurrentPlayer(number int) *Game {
 
 // FoundCorporation founds a new corporation
 func (g *Game) FoundCorporation(corp Corporation) error {
-	if g.state.Name() != .FoundCorpStateName {
+	if g.state.Name() != FoundCorpStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if corp.IsActive() {
@@ -359,7 +359,6 @@ func (g *Game) LastTurn() bool {
 
 // Classification returns the players list ordered by cash,
 // which is the metric used to know game's final classification
-/*
 func (g *Game) Classification() []Player {
 	var classification []Player
 
@@ -370,10 +369,9 @@ func (g *Game) Classification() []Player {
 	for _, pl := range g.players {
 		classification = append(classification, pl)
 	}
-	player.By(cashDesc).Sort(classification)
+	PlayerBy(cashDesc).Sort(classification)
 	return classification
 }
-*/
 
 // Board returns game's board instance
 func (g *Game) Board() Board {

@@ -1,15 +1,14 @@
-package player
+package acquire
 
 import (
-	"github.com/svera/acquire"
 	"sort"
 )
 
 // By is the type of a "less" function that defines the ordering of its Player arguments.
-type By func(p1, p2 acquire.Player) bool
+type PlayerBy func(p1, p2 Player) bool
 
 // Sort is a method on the function type, By, that sorts the argument slice according to the function.
-func (by By) Sort(players []acquire.Player) {
+func (by PlayerBy) Sort(players []Player) {
 	ps := &playerSorter{
 		players: players,
 		by:      by, // The Sort method's receiver is the function (closure) that defines the sort order.
@@ -19,8 +18,8 @@ func (by By) Sort(players []acquire.Player) {
 
 // playerSorter joins a By function and a slice of Players to be sorted.
 type playerSorter struct {
-	players []acquire.Player
-	by      func(p1, p2 acquire.Player) bool // Closure used in the Less method.
+	players []Player
+	by      func(p1, p2 Player) bool // Closure used in the Less method.
 }
 
 // Len is part of sort.acquire.Player.

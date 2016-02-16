@@ -1,15 +1,14 @@
-package corporation
+package acquire
 
 import (
-	"github.com/svera/acquire"
 	"sort"
 )
 
 // By is the type of a "less" function that defines the ordering of its Player arguments.
-type By func(c1, c2 acquire.Corporation) bool
+type CorporationBy func(c1, c2 Corporation) bool
 
 // Sort is a method on the function type, By, that sorts the argument slice according to the function.
-func (by By) Sort(corporations []acquire.Corporation) {
+func (by CorporationBy) Sort(corporations []Corporation) {
 	ps := &corporationSorter{
 		corporations: corporations,
 		by:           by, // The Sort method's receiver is the function (closure) that defines the sort order.
@@ -19,8 +18,8 @@ func (by By) Sort(corporations []acquire.Corporation) {
 
 // corporationSorter joins a By function and a slice of corporations to be sorted.
 type corporationSorter struct {
-	corporations []acquire.Corporation
-	by           func(c1, c2 acquire.Corporation) bool // Closure used in the Less method.
+	corporations []Corporation
+	by           func(c1, c2 Corporation) bool // Closure used in the Less method.
 }
 
 // Len is part of sort.acquire.Corporation.
