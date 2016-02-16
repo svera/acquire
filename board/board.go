@@ -2,25 +2,24 @@
 package board
 
 import (
-	"github.com/svera/acquire/corporation"
-	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire/acquire"
 )
 
 var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 
 // Board maps tiles on every position on board
 type Board struct {
-	grid *[13]map[string]interfaces.Owner
+	grid *[13]map[string]acquire.Owner
 }
 
 // New initialises and returns a Board instance
 func New() *Board {
 	brd := Board{
-		grid: new([13]map[string]interfaces.Owner),
+		grid: new([13]map[string]acquire.Owner),
 	}
 
 	for number := 1; number < 13; number++ {
-		brd.grid[number] = make(map[string]interfaces.Owner)
+		brd.grid[number] = make(map[string]acquire.Owner)
 		for _, letter := range letters {
 			brd.grid[number][letter] = Empty{}
 		}
@@ -30,20 +29,20 @@ func New() *Board {
 }
 
 // Cell returns a board cell content
-func (b *Board) Cell(number int, letter string) interfaces.Owner {
+func (b *Board) Cell(number int, letter string) acquire.Owner {
 	return b.grid[number][letter]
 }
 
 // TileFoundCorporation checks if the passed tile founds a new corporation, returns a slice of tiles
 // composing this corporation
-func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile) {
-	var newCorporationTiles []interfaces.Tile
+func (b *Board) TileFoundCorporation(t acquire.Tile) (bool, []acquire.Tile) {
+	var newCorporationTiles []acquire.Tile
 	adjacent := b.adjacentTiles(t.Number(), t.Letter())
 	for _, adjacentTile := range adjacent {
 		if adjacentTile.Type() == "corporation" {
-			return false, []interfaces.Tile{}
+			return false, []acquire.Tile{}
 		}
-		newCorporationTiles = append(newCorporationTiles, adjacentTile.(interfaces.Tile))
+		newCorporationTiles = append(newCorporationTiles, adjacentTile.(acquire.Tile))
 	}
 	if len(newCorporationTiles) > 0 {
 		newCorporationTiles = append(newCorporationTiles, t)
@@ -54,30 +53,30 @@ func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile
 
 // TileMergeCorporations checks if the passed tile merges two or more corporations, returns a map of
 // corporations categorized between "acquirer" and "defunct"
-func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]interfaces.Corporation) {
-	var corporations []interfaces.Corporation
+func (b *Board) TileMergeCorporations(t acquire.Tile) (bool, map[string][]acquire.Corporation) {
+	var corporations []acquire.Corporation
 
 	adjacent := b.adjacentCorporationTiles(t.Number(), t.Letter())
 	for _, adjacentCell := range adjacent {
-		corp, _ := adjacentCell.(interfaces.Corporation)
+		corp, _ := adjacentCell.(acquire.Corporation)
 		corporations = append(corporations, corp)
 	}
 	if len(corporations) > 1 {
 		return true, categorizeMerge(corporations)
 	}
-	return false, map[string][]interfaces.Corporation{}
+	return false, map[string][]acquire.Corporation{}
 }
 
 // Distributes the corporation in a merge between acquirers and defuncts
-func categorizeMerge(corporations []interfaces.Corporation) map[string][]interfaces.Corporation {
-	sizeDesc := func(corp1, corp2 interfaces.Corporation) bool {
+func categorizeMerge(corporations []acquire.Corporation) map[string][]acquire.Corporation {
+	sizeDesc := func(corp1, corp2 acquire.Corporation) bool {
 		return corp1.Size() > corp2.Size()
 	}
-	corporation.By(sizeDesc).Sort(corporations)
+	CorporationBy(sizeDesc).Sort(corporations)
 
-	merge := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[0]},
-		"defunct":  []interfaces.Corporation{},
+	merge := map[string][]acquire.Corporation{
+		"acquirer": []acquire.Corporation{corporations[0]},
+		"defunct":  []acquire.Corporation{},
 	}
 
 	for i := 1; i < len(corporations); i++ {
@@ -94,36 +93,36 @@ func categorizeMerge(corporations []interfaces.Corporation) map[string][]interfa
 // TileGrowCorporation checks if the passed tile grows a corporation.
 // Returns true if that's the case, the tiles to append to the corporation and
 // the ID of the corporation which grows
-func (b *Board) TileGrowCorporation(tl interfaces.Tile) (bool, []interfaces.Tile, interfaces.Corporation) {
-	tilesToAppend := []interfaces.Tile{tl}
-	var nullCorporation interfaces.Corporation
+func (b *Board) TileGrowCorporation(tl acquire.Tile) (bool, []acquire.Tile, acquire.Corporation) {
+	tilesToAppend := []acquire.Tile{tl}
+	var nullCorporation acquire.Corporation
 	corporationToGrow := nullCorporation
 	adjacent := b.adjacentTiles(tl.Number(), tl.Letter())
 	for _, adjacentCell := range adjacent {
 		if adjacentCell.Type() != "unincorporated" {
 			if corporationToGrow != nullCorporation {
-				return false, []interfaces.Tile{}, nullCorporation
+				return false, []acquire.Tile{}, nullCorporation
 			}
-			corporationToGrow = adjacentCell.(interfaces.Corporation)
+			corporationToGrow = adjacentCell.(acquire.Corporation)
 		} else {
-			tilesToAppend = append(tilesToAppend, adjacentCell.(interfaces.Tile))
+			tilesToAppend = append(tilesToAppend, adjacentCell.(acquire.Tile))
 		}
 	}
 	if corporationToGrow == nullCorporation {
-		return false, []interfaces.Tile{}, nullCorporation
+		return false, []acquire.Tile{}, nullCorporation
 	}
 	return true, tilesToAppend, corporationToGrow
 }
 
 // PutTile puts the passed tile on the board
-func (b *Board) PutTile(t interfaces.Tile) interfaces.Board {
+func (b *Board) PutTile(t acquire.Tile) acquire.Board {
 	b.grid[t.Number()][t.Letter()] = t
 	return b
 }
 
 // AdjacentCells returns all cells adjacent to the passed one
-func (b *Board) AdjacentCells(number int, letter string) []interfaces.Owner {
-	var adjacent []interfaces.Owner
+func (b *Board) AdjacentCells(number int, letter string) []acquire.Owner {
+	var adjacent []acquire.Owner
 
 	if letter > "A" {
 		adjacent = append(adjacent, b.grid[number][previousLetter(letter)])
@@ -140,8 +139,8 @@ func (b *Board) AdjacentCells(number int, letter string) []interfaces.Owner {
 	return adjacent
 }
 
-func (b *Board) adjacentCellsWithFilter(number int, letter string, filter func(interfaces.Owner) bool) []interfaces.Owner {
-	var adjacentFilteredCells []interfaces.Owner
+func (b *Board) adjacentCellsWithFilter(number int, letter string, filter func(acquire.Owner) bool) []acquire.Owner {
+	var adjacentFilteredCells []acquire.Owner
 	adjacent := b.AdjacentCells(number, letter)
 
 	for _, adjacentCell := range adjacent {
@@ -152,11 +151,11 @@ func (b *Board) adjacentCellsWithFilter(number int, letter string, filter func(i
 	return adjacentFilteredCells
 }
 
-func (b *Board) adjacentTiles(number int, letter string) []interfaces.Owner {
+func (b *Board) adjacentTiles(number int, letter string) []acquire.Owner {
 	return b.adjacentCellsWithFilter(
 		number,
 		letter,
-		func(o interfaces.Owner) bool {
+		func(o acquire.Owner) bool {
 			if o.Type() != "empty" {
 				return true
 			}
@@ -165,11 +164,11 @@ func (b *Board) adjacentTiles(number int, letter string) []interfaces.Owner {
 	)
 }
 
-func (b *Board) adjacentCorporationTiles(number int, letter string) []interfaces.Owner {
+func (b *Board) adjacentCorporationTiles(number int, letter string) []acquire.Owner {
 	return b.adjacentCellsWithFilter(
 		number,
 		letter,
-		func(o interfaces.Owner) bool {
+		func(o acquire.Owner) bool {
 			if o.Type() == "corporation" {
 				return true
 			}
@@ -196,7 +195,7 @@ func nextLetter(letter string) string {
 }
 
 // SetOwner sets tiles on board as belonging to the passed corporation
-func (b *Board) SetOwner(cp interfaces.Corporation, tiles []interfaces.Tile) interfaces.Board {
+func (b *Board) SetOwner(cp acquire.Corporation, tiles []acquire.Tile) acquire.Board {
 	for _, tl := range tiles {
 		b.grid[tl.Number()][tl.Letter()] = cp
 	}
@@ -204,7 +203,7 @@ func (b *Board) SetOwner(cp interfaces.Corporation, tiles []interfaces.Tile) int
 }
 
 // ChangeOwner changes ownership of tiles belonging to oldOrder to newOrder
-func (b *Board) ChangeOwner(oldOwner interfaces.Corporation, newOwner interfaces.Corporation) interfaces.Board {
+func (b *Board) ChangeOwner(oldOwner acquire.Corporation, newOwner acquire.Corporation) acquire.Board {
 	for number := 1; number < 13; number++ {
 		for _, letter := range letters {
 			if b.grid[number][letter] == oldOwner {

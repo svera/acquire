@@ -1,8 +1,8 @@
 package board
 
 import (
+	"github.com/svera/acquire"
 	"github.com/svera/acquire/corporation"
-	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/tile"
 	"reflect"
 	//"sort"
@@ -29,12 +29,12 @@ func TestTileFoundCorporation(t *testing.T) {
 		foundingTile,
 	)
 
-	expectedCorporationTiles := []interfaces.Tile{
+	expectedCorporationTiles := []acquire.Tile{
 		foundingTile,
-		board.grid[5]["D"].(interfaces.Tile),
-		board.grid[6]["C"].(interfaces.Tile),
-		board.grid[6]["E"].(interfaces.Tile),
-		board.grid[7]["D"].(interfaces.Tile),
+		board.grid[5]["D"].(acquire.Tile),
+		board.grid[6]["C"].(acquire.Tile),
+		board.grid[6]["E"].(acquire.Tile),
+		board.grid[7]["D"].(acquire.Tile),
 	}
 
 	if !found {
@@ -98,9 +98,9 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	board.grid[6]["F"] = corp4
 	board.grid[6]["G"] = corp4
 
-	expectedCorporations := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corp2},
-		"defunct":  []interfaces.Corporation{corp1, corp3, corp4},
+	expectedCorporations := map[string][]acquire.Corporation{
+		"acquirer": []acquire.Corporation{corp2},
+		"defunct":  []acquire.Corporation{corp1, corp3, corp4},
 	}
 	merge, corporations := board.TileMergeCorporations(tile.New(6, "E"))
 
@@ -140,9 +140,9 @@ func TestTileQuadrupleMergeTie(t *testing.T) {
 	board.grid[6]["F"] = corp4
 	board.grid[6]["G"] = corp4
 
-	expectedCorporations := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corp1, corp2, corp3, corp4},
-		"defunct":  []interfaces.Corporation{},
+	expectedCorporations := map[string][]acquire.Corporation{
+		"acquirer": []acquire.Corporation{corp1, corp2, corp3, corp4},
+		"defunct":  []acquire.Corporation{},
 	}
 	merge, corporations := board.TileMergeCorporations(tile.New(6, "E"))
 
@@ -165,7 +165,7 @@ func TestTileDontMerge(t *testing.T) {
 	board.grid[5]["E"] = corp2
 	board.grid[6]["E"] = corp2
 
-	expectedCorporationsMerged := map[string][]interfaces.Corporation{}
+	expectedCorporationsMerged := map[string][]acquire.Corporation{}
 	merge, corporations := board.TileMergeCorporations(tile.New(4, "E"))
 	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
 		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
@@ -190,11 +190,11 @@ func TestTileGrowCorporation(t *testing.T) {
 	board.PutTile(tile.New(6, "F"))
 	growerTile := tile.New(6, "E")
 
-	expectedTilesToAppend := []interfaces.Tile{
-		board.grid[5]["E"].(interfaces.Tile),
-		board.grid[6]["D"].(interfaces.Tile),
+	expectedTilesToAppend := []acquire.Tile{
+		board.grid[5]["E"].(acquire.Tile),
+		board.grid[6]["D"].(acquire.Tile),
 		growerTile,
-		board.grid[6]["F"].(interfaces.Tile),
+		board.grid[6]["F"].(acquire.Tile),
 	}
 	expectedCorporationToGrow := corp2
 	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(growerTile)
@@ -249,7 +249,7 @@ func TestSetOwner(t *testing.T) {
 	corp, _ := corporation.New("Test", 1)
 	tl1 := tile.New(1, "A")
 	tl2 := tile.New(1, "B")
-	tls := []interfaces.Tile{tl1, tl2}
+	tls := []acquire.Tile{tl1, tl2}
 	brd.SetOwner(corp, tls)
 	if brd.Cell(tl1.Number(), tl1.Letter()) != corp || brd.Cell(tl2.Number(), tl2.Letter()) != corp {
 		t.Errorf(
@@ -260,7 +260,7 @@ func TestSetOwner(t *testing.T) {
 }
 
 // Compare coordinates of tiles from two slices, order independent
-func slicesSameCells(slice1 []interfaces.Tile, slice2 []interfaces.Tile) bool {
+func slicesSameCells(slice1 []acquire.Tile, slice2 []acquire.Tile) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}
@@ -281,7 +281,7 @@ func slicesSameCells(slice1 []interfaces.Tile, slice2 []interfaces.Tile) bool {
 }
 
 // Compare corporations from two slices, order independent
-func slicesSameCorporations(slice1 []interfaces.Corporation, slice2 []interfaces.Corporation) bool {
+func slicesSameCorporations(slice1 []acquire.Corporation, slice2 []acquire.Corporation) bool {
 	if len(slice1) != len(slice2) {
 		return false
 	}

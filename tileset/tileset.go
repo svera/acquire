@@ -3,7 +3,7 @@ package tileset
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire"
 	"github.com/svera/acquire/tile"
 	"math/rand"
 	"time"
@@ -16,7 +16,7 @@ const (
 
 // Tileset stores all tiles used in game
 type Tileset struct {
-	tiles []interfaces.Tile
+	tiles []acquire.Tile
 }
 
 // New initialises and returns a Tileset instance
@@ -33,7 +33,7 @@ func New() *Tileset {
 }
 
 // Draw extracts a random tile from the tileset and returns it
-func (t *Tileset) Draw() (interfaces.Tile, error) {
+func (t *Tileset) Draw() (acquire.Tile, error) {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	remainingTiles := len(t.tiles)

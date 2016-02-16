@@ -1,4 +1,4 @@
-package interfaces
+package acquire
 
 // Corporation declares all methods to be implemented by a corporation implementation
 type Corporation interface {

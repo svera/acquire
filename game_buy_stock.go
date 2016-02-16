@@ -2,13 +2,11 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/fsm"
-	"github.com/svera/acquire/interfaces"
 )
 
 // BuyStock buys stock from corporations
-func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
-	if g.state.Name() != fsm.BuyStockStateName {
+func (g *Game) BuyStock(buys map[Corporation]int) error {
+	if g.state.Name() != BuyStockStateName {
 		return errors.New(ActionNotAllowed)
 	}
 
@@ -33,14 +31,14 @@ func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
 	return nil
 }
 
-func (g *Game) buy(corp interfaces.Corporation, amount int) {
+func (g *Game) buy(corp Corporation, amount int) {
 	corp.RemoveStock(amount)
 	g.CurrentPlayer().
 		AddShares(corp, amount).
 		RemoveCash(corp.StockPrice() * amount)
 }
 
-func (g *Game) checkBuy(buys map[interfaces.Corporation]int) error {
+func (g *Game) checkBuy(buys map[Corporation]int) error {
 	var totalStock, totalPrice int = 0, 0
 	for corp, amount := range buys {
 		if corp.Size() == 0 {
@@ -67,7 +65,7 @@ func (g *Game) checkBuy(buys map[interfaces.Corporation]int) error {
 // the one he/she played. This is not done until the end of
 // the turn.
 func (g *Game) drawTile() error {
-	var tile interfaces.Tile
+	var tile Tile
 	var err error
 	if tile, err = g.tileset.Draw(); err != nil {
 		return err

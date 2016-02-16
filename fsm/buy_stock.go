@@ -1,7 +1,7 @@
 package fsm
 
 import (
-	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire"
 )
 
 // BuyStock is a struct representing a finite state machine's state
@@ -15,11 +15,11 @@ func (s *BuyStock) Name() string {
 }
 
 // ToPlayTile returns a PlayTile instance because it's an allowed state transition
-func (s *BuyStock) ToPlayTile() interfaces.State {
+func (s *BuyStock) ToPlayTile() acquire.State {
 	return &PlayTile{}
 }
 
 // ToEndGame returns an EndGame instance because it's an allowed state transition
-func (s *BuyStock) ToEndGame() interfaces.State {
+func (s *BuyStock) ToEndGame() acquire.State {
 	return &EndGame{}
 }
