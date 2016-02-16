@@ -164,6 +164,8 @@ func (g *Game) findCorporationsByActiveState(value bool) []Corporation {
 	return result
 }
 
+// IsCorporationDefunct return true if the passed corporation is in a merge process
+// and will dissapear from the board after that merge is complete, false otherwise
 func (g *Game) IsCorporationDefunct(corp Corporation) bool {
 	for _, defunct := range g.mergeCorps["defunct"] {
 		if corp == defunct {

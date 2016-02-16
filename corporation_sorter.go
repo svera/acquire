@@ -4,7 +4,7 @@ import (
 	"sort"
 )
 
-// By is the type of a "less" function that defines the ordering of its Player arguments.
+// CorporationBy is the type of a "less" function that defines the ordering of its Player arguments.
 type CorporationBy func(c1, c2 Corporation) bool
 
 // Sort is a method on the function type, By, that sorts the argument slice according to the function.
