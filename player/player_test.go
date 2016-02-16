@@ -1,8 +1,8 @@
 package player
 
 import (
-	"github.com/svera/acquire"
 	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/tile"
 	"reflect"
 	"testing"
@@ -18,7 +18,7 @@ func TestPickTile(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
-	players := []acquire.Player{
+	players := []interfaces.Player{
 		NewStub(),
 		NewStub(),
 		NewStub(),
@@ -32,10 +32,10 @@ func TestSort(t *testing.T) {
 	players[2].(*Stub).SetShares(corp, 0)
 	players[3].(*Stub).SetShares(corp, 2)
 
-	shares := func(p1, p2 acquire.Player) bool {
+	shares := func(p1, p2 interfaces.Player) bool {
 		return p1.Shares(corp) > p2.Shares(corp)
 	}
-	expectedSort := []acquire.Player{
+	expectedSort := []interfaces.Player{
 		players[0],
 		players[3],
 		players[1],
@@ -50,7 +50,7 @@ func TestSort(t *testing.T) {
 func TestUseTile(t *testing.T) {
 	player := New()
 
-	player.tiles = []acquire.Tile{
+	player.tiles = []interfaces.Tile{
 		tile.New(7, "C"),
 		tile.New(5, "A"),
 		tile.New(8, "E"),

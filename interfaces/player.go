@@ -1,4 +1,4 @@
-package acquire
+package interfaces
 
 // Player is an interface that declares all methods to be implemented by a player implementation
 type Player interface {

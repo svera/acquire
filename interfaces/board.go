@@ -1,4 +1,4 @@
-package acquire
+package interfaces
 
 // Board is an interface that declares all methods to be implemented by a board implementation
 type Board interface {

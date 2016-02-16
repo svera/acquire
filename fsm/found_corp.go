@@ -1,7 +1,7 @@
 package fsm
 
 import (
-	"github.com/svera/acquire"
+	"github.com/svera/acquire/interfaces"
 )
 
 // FoundCorp is a struct representing a finite state machine's state
@@ -15,6 +15,6 @@ func (s *FoundCorp) Name() string {
 }
 
 // ToBuyStock returns a BuyStock instance because it's an allowed state transition
-func (s *FoundCorp) ToBuyStock() acquire.State {
+func (s *FoundCorp) ToBuyStock() interfaces.State {
 	return &BuyStock{}
 }

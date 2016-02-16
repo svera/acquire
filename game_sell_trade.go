@@ -2,10 +2,12 @@ package acquire
 
 import (
 	"errors"
+	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
 )
 
 // SellTrade sells and trades stock shares from defunct corporations
-func (g *Game) SellTrade(sell map[Corporation]int, trade map[Corporation]int) error {
+func (g *Game) SellTrade(sell map[interfaces.Corporation]int, trade map[interfaces.Corporation]int) error {
 	if err := g.checkSellTrade(sell, trade); err != nil {
 		return err
 	}
@@ -37,7 +39,7 @@ func (g *Game) nextSellTradePlayer() int {
 
 // Sells owned shares of a defunct corporation, returning them to the
 // corporation's stock
-func (g *Game) sell(pl Player, corp Corporation, amount int) {
+func (g *Game) sell(pl interfaces.Player, corp interfaces.Corporation, amount int) {
 	corp.AddStock(amount)
 	pl.RemoveShares(corp, amount).
 		AddCash(corp.StockPrice() * amount)
@@ -45,7 +47,7 @@ func (g *Game) sell(pl Player, corp Corporation, amount int) {
 
 // Trades two stock shares from a defunct corporation for a
 // share of the acquiring one
-func (g *Game) trade(corp Corporation, amount int) {
+func (g *Game) trade(corp interfaces.Corporation, amount int) {
 	acquirer := g.mergeCorps["acquirer"][0]
 	amountSharesAcquiringCorp := amount / 2
 	corp.AddStock(amount)
@@ -56,8 +58,8 @@ func (g *Game) trade(corp Corporation, amount int) {
 }
 
 // Check that the requisites for both selling and trading stock shares are met
-func (g *Game) checkSellTrade(sell map[Corporation]int, trade map[Corporation]int) error {
-	if g.state.Name() != SellTradeStateName {
+func (g *Game) checkSellTrade(sell map[interfaces.Corporation]int, trade map[interfaces.Corporation]int) error {
+	if g.state.Name() != fsm.SellTradeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for corp, amount := range sell {

@@ -1,10 +1,13 @@
 // Package acquire manages the flow and status of an acquire game. It acts
-// like a finite state machine (), in which received inputs modify
+// like a finite state machine (FSM), in which received inputs modify
 // machine state
 package acquire
 
 import (
 	"errors"
+	"github.com/svera/acquire/fsm"
+	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire/player"
 )
 
 const (
@@ -47,16 +50,16 @@ const (
 
 // Game stores state of game elements and provides methods to control game flow
 type Game struct {
-	board               Board
-	state               State
-	players             []Player
-	corporations        [7]Corporation
-	tileset             Tileset
+	board               interfaces.Board
+	state               interfaces.State
+	players             []interfaces.Player
+	corporations        [7]interfaces.Corporation
+	tileset             interfaces.Tileset
 	currentPlayerNumber int
-	newCorpTiles        []Tile
-	mergeCorps          map[string][]Corporation
+	newCorpTiles        []interfaces.Tile
+	mergeCorps          map[string][]interfaces.Corporation
 	sellTradePlayers    []int
-	lastPlayedTile      Tile
+	lastPlayedTile      interfaces.Tile
 	turn                int
 	lastTurn            bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
@@ -66,11 +69,11 @@ type Game struct {
 
 // New initialises a new Acquire game
 func New(
-	board Board,
-	players []Player,
-	corporations [7]Corporation,
-	tileset Tileset,
-	state State,
+	board interfaces.Board,
+	players []interfaces.Player,
+	corporations [7]interfaces.Corporation,
+	tileset interfaces.Tileset,
+	state interfaces.State,
 ) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
@@ -99,7 +102,7 @@ func New(
 }
 
 // Check that the passed corporations have unique names
-func areNamesUnique(corporations [7]Corporation) bool {
+func areNamesUnique(corporations [7]interfaces.Corporation) bool {
 	for i, corp1 := range corporations {
 		if i < len(corporations)-1 {
 			for _, corp2 := range corporations[i+1:] {
@@ -113,7 +116,7 @@ func areNamesUnique(corporations [7]Corporation) bool {
 }
 
 // Check that the number of corporations per class is right
-func isNumberOfCorpsPerClassRight(corporations [7]Corporation) bool {
+func isNumberOfCorpsPerClassRight(corporations [7]interfaces.Corporation) bool {
 	corpsPerClass := [3]int{0, 0, 0}
 	for _, corp := range corporations {
 		corpsPerClass[corp.Class()]++
@@ -125,7 +128,7 @@ func isNumberOfCorpsPerClassRight(corporations [7]Corporation) bool {
 }
 
 // Initialises player hand of tiles
-func (g *Game) giveInitialTileset(plyr Player) {
+func (g *Game) giveInitialTileset(plyr interfaces.Player) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
 		plyr.PickTile(tile)
@@ -150,12 +153,12 @@ func (g *Game) AreEndConditionsReached() bool {
 }
 
 // ActiveCorporations returns all corporations on the board
-func (g *Game) activeCorporations() []Corporation {
+func (g *Game) activeCorporations() []interfaces.Corporation {
 	return g.findCorporationsByActiveState(true)
 }
 
-func (g *Game) findCorporationsByActiveState(value bool) []Corporation {
-	result := []Corporation{}
+func (g *Game) findCorporationsByActiveState(value bool) []interfaces.Corporation {
+	result := []interfaces.Corporation{}
 	for _, corp := range g.corporations {
 		if corp.IsActive() == value {
 			result = append(result, corp)
@@ -166,7 +169,7 @@ func (g *Game) findCorporationsByActiveState(value bool) []Corporation {
 
 // IsCorporationDefunct return true if the passed corporation is in a merge process
 // and will dissapear from the board after that merge is complete, false otherwise
-func (g *Game) IsCorporationDefunct(corp Corporation) bool {
+func (g *Game) IsCorporationDefunct(corp interfaces.Corporation) bool {
 	for _, defunct := range g.mergeCorps["defunct"] {
 		if corp == defunct {
 			return true
@@ -177,7 +180,7 @@ func (g *Game) IsCorporationDefunct(corp Corporation) bool {
 
 // IsTilePlayable returns false if the passed tile is either
 // temporary or permanently unplayable, true otherwise
-func (g *Game) IsTilePlayable(tl Tile) bool {
+func (g *Game) IsTilePlayable(tl interfaces.Tile) bool {
 	if g.isTileTemporaryUnplayable(tl) || g.isTilePermanentlyUnplayable(tl) {
 		return false
 	}
@@ -186,11 +189,11 @@ func (g *Game) IsTilePlayable(tl Tile) bool {
 
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
-func (g *Game) isTilePermanentlyUnplayable(tl Tile) bool {
+func (g *Game) isTilePermanentlyUnplayable(tl interfaces.Tile) bool {
 	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Type() == "corporation" && adjacent.(Corporation).IsSafe() {
+		if adjacent.Type() == "corporation" && adjacent.(interfaces.Corporation).IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -202,7 +205,7 @@ func (g *Game) isTilePermanentlyUnplayable(tl Tile) bool {
 
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
-func (g *Game) isTileTemporaryUnplayable(tl Tile) bool {
+func (g *Game) isTileTemporaryUnplayable(tl interfaces.Tile) bool {
 	if len(g.activeCorporations()) < totalCorporations {
 		return false
 	}
@@ -216,12 +219,12 @@ func (g *Game) isTileTemporaryUnplayable(tl Tile) bool {
 }
 
 // Player returns player with passed number
-func (g *Game) Player(playerNumber int) Player {
+func (g *Game) Player(playerNumber int) interfaces.Player {
 	return g.players[playerNumber]
 }
 
 // CurrentPlayer returns player currently in play
-func (g *Game) CurrentPlayer() Player {
+func (g *Game) CurrentPlayer() interfaces.Player {
 	return g.players[g.currentPlayerNumber]
 }
 
@@ -231,7 +234,7 @@ func (g *Game) CurrentPlayerNumber() int {
 }
 
 // PlayTile puts the given tile on board and triggers related actions
-func (g *Game) PlayTile(tl Tile) error {
+func (g *Game) PlayTile(tl interfaces.Tile) error {
 	if err := g.checkTile(tl); err != nil {
 		return err
 	}
@@ -256,8 +259,8 @@ func (g *Game) PlayTile(tl Tile) error {
 	return nil
 }
 
-func (g *Game) checkTile(tl Tile) error {
-	if g.state.Name() != PlayTileStateName {
+func (g *Game) checkTile(tl interfaces.Tile) error {
+	if g.state.Name() != fsm.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
@@ -269,7 +272,7 @@ func (g *Game) checkTile(tl Tile) error {
 	return nil
 }
 
-func (g *Game) putUnincorporatedTile(tl Tile) error {
+func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 	g.board.PutTile(tl)
 	if g.existActiveCorporations() {
 		g.state = g.state.ToBuyStock()
@@ -298,8 +301,8 @@ func (g *Game) setCurrentPlayer(number int) *Game {
 }
 
 // FoundCorporation founds a new corporation
-func (g *Game) FoundCorporation(corp Corporation) error {
-	if g.state.Name() != FoundCorpStateName {
+func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
+	if g.state.Name() != fsm.FoundCorpStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if corp.IsActive() {
@@ -307,7 +310,7 @@ func (g *Game) FoundCorporation(corp Corporation) error {
 	}
 	g.board.SetOwner(corp, g.newCorpTiles)
 	corp.Grow(len(g.newCorpTiles))
-	g.newCorpTiles = []Tile{}
+	g.newCorpTiles = []interfaces.Tile{}
 	g.getFounderStockShare(g.CurrentPlayer(), corp)
 	g.state = g.state.ToBuyStock()
 	return nil
@@ -317,7 +320,7 @@ func (g *Game) FoundCorporation(corp Corporation) error {
 // remaining shares available
 // TODO this should trigger an event warning that no founder stock share will be given
 // of the founded corporation has no stock shares left
-func (g *Game) getFounderStockShare(pl Player, corp Corporation) {
+func (g *Game) getFounderStockShare(pl interfaces.Player, corp interfaces.Corporation) {
 	if corp.Stock() > 0 {
 		corp.RemoveStock(1)
 		pl.AddShares(corp, 1)
@@ -325,7 +328,7 @@ func (g *Game) getFounderStockShare(pl Player, corp Corporation) {
 }
 
 // Makes a corporation grow with the passed tiles
-func (g *Game) growCorporation(corp Corporation, tiles []Tile) {
+func (g *Game) growCorporation(corp interfaces.Corporation, tiles []interfaces.Tile) {
 	g.board.SetOwner(corp, tiles)
 	corp.Grow(len(tiles))
 }
@@ -361,22 +364,22 @@ func (g *Game) LastTurn() bool {
 
 // Classification returns the players list ordered by cash,
 // which is the metric used to know game's final classification
-func (g *Game) Classification() []Player {
-	var classification []Player
+func (g *Game) Classification() []interfaces.Player {
+	var classification []interfaces.Player
 
-	cashDesc := func(pl1, pl2 Player) bool {
+	cashDesc := func(pl1, pl2 interfaces.Player) bool {
 		return pl1.Cash() > pl2.Cash()
 	}
 
 	for _, pl := range g.players {
 		classification = append(classification, pl)
 	}
-	PlayerBy(cashDesc).Sort(classification)
+	player.By(cashDesc).Sort(classification)
 	return classification
 }
 
 // Board returns game's board instance
-func (g *Game) Board() Board {
+func (g *Game) Board() interfaces.Board {
 	return g.board
 }
 

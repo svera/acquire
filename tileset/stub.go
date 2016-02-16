@@ -1,7 +1,7 @@
 package tileset
 
 import (
-	"github.com/svera/acquire"
+	"github.com/svera/acquire/interfaces"
 )
 
 // Stub is a struct to be used in tileset tests as a replacement of the original,
@@ -18,7 +18,7 @@ func NewStub() *Stub {
 }
 
 // DiscardTile removes passed tile from the tileset
-func (t *Stub) DiscardTile(tl acquire.Tile) {
+func (t *Stub) DiscardTile(tl interfaces.Tile) {
 	for i, currentTile := range t.tiles {
 		if currentTile.Number() == tl.Number() && currentTile.Letter() == tl.Letter() {
 			t.tiles = append(t.tiles[:i], t.tiles[i+1:]...)
