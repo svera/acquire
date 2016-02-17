@@ -2,8 +2,8 @@
 package board
 
 import (
-	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/interfaces"
+	"sort"
 )
 
 var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
@@ -12,6 +12,12 @@ var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 type Board struct {
 	grid *[13]map[string]interfaces.Owner
 }
+
+type sortableCorporations []interfaces.Corporation
+
+func (s sortableCorporations) Len() int           { return len(s) }
+func (s sortableCorporations) Less(i, j int) bool { return s[i].Size() < s[j].Size() }
+func (s sortableCorporations) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 // New initialises and returns a Board instance
 func New() *Board {
@@ -70,21 +76,20 @@ func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]int
 
 // Distributes the corporation in a merge between acquirers and defuncts
 func categorizeMerge(corporations []interfaces.Corporation) map[string][]interfaces.Corporation {
-	sizeDesc := func(corp1, corp2 interfaces.Corporation) bool {
-		return corp1.Size() > corp2.Size()
-	}
-	corporation.By(sizeDesc).Sort(corporations)
+	var sortedCorps sortableCorporations
+	sortedCorps = corporations
+	sort.Sort(sort.Reverse(sortedCorps))
 
 	merge := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[0]},
+		"acquirer": []interfaces.Corporation{sortedCorps[0]},
 		"defunct":  []interfaces.Corporation{},
 	}
 
-	for i := 1; i < len(corporations); i++ {
-		if corporations[i].Size() == corporations[0].Size() {
-			merge["acquirer"] = append(merge["acquirer"], corporations[i])
+	for i := 1; i < len(sortedCorps); i++ {
+		if sortedCorps[i].Size() == sortedCorps[0].Size() {
+			merge["acquirer"] = append(merge["acquirer"], sortedCorps[i])
 		} else {
-			merge["defunct"] = append(merge["defunct"], corporations[i])
+			merge["defunct"] = append(merge["defunct"], sortedCorps[i])
 		}
 	}
 

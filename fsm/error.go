@@ -9,7 +9,7 @@ type ErrorState struct{}
 
 // Name returns state's name
 func (s *ErrorState) Name() string {
-	return ErrorStateName
+	return interfaces.ErrorStateName
 }
 
 // ToPlayTile is not a valid state transition

@@ -2,9 +2,8 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
-	"github.com/svera/acquire/player"
+	"sort"
 )
 
 func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces.Corporation) {
@@ -91,20 +90,18 @@ func (g *Game) setSellTradePlayers(corporations []interfaces.Corporation) []int 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
 // of that corporation
 func (g *Game) getStockHolders(corp interfaces.Corporation) []interfaces.Player {
-	var stockHolders []interfaces.Player
-	sharesDesc := func(pl1, pl2 interfaces.Player) bool {
-		return pl1.Shares(corp) > pl2.Shares(corp)
-	}
+	var stockHolders sortablePlayers
 
 	for _, pl := range g.players {
 		if pl.Shares(corp) > 0 {
-			stockHolders = append(stockHolders, pl)
+			stockHolders.players = append(stockHolders.players, pl)
 		}
 	}
-	if len(stockHolders) > 0 {
-		player.By(sharesDesc).Sort(stockHolders)
+	stockHolders.corp = corp
+	if len(stockHolders.players) > 0 {
+		sort.Sort(sort.Reverse(stockHolders))
 	}
-	return stockHolders
+	return stockHolders.players
 }
 
 // Loop stockHolders from start to get all stock holders with the same amount of shares for
@@ -141,7 +138,7 @@ func (g *Game) TiedCorps() []interfaces.Corporation {
 // UntieMerge resolves a tied merge selecting which corporation will be the acquirer,
 // marking the rest as defunct
 func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
-	if g.state.Name() != fsm.UntieMergeStateName {
+	if g.state.Name() != interfaces.UntieMergeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for i, corp := range g.mergeCorps["acquirer"] {

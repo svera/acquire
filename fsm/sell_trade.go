@@ -11,7 +11,7 @@ type SellTrade struct {
 
 // Name returns state's name
 func (s *SellTrade) Name() string {
-	return SellTradeStateName
+	return interfaces.SellTradeStateName
 }
 
 // ToBuyStock returns a BuyStock instance because it's an allowed state transition

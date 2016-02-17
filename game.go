@@ -5,9 +5,7 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
-	"github.com/svera/acquire/player"
 )
 
 const (
@@ -47,6 +45,17 @@ const (
 	totalCorporations      = 7
 	endGameCorporationSize = 41
 )
+
+type sortablePlayers struct {
+	players []interfaces.Player
+	corp    interfaces.Corporation
+}
+
+func (s sortablePlayers) Len() int { return len(s.players) }
+func (s sortablePlayers) Less(i, j int) bool {
+	return s.players[i].Shares(s.corp) < s.players[j].Shares(s.corp)
+}
+func (s sortablePlayers) Swap(i, j int) { s.players[i], s.players[j] = s.players[j], s.players[i] }
 
 // Game stores state of game elements and provides methods to control game flow
 type Game struct {
@@ -260,7 +269,7 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 }
 
 func (g *Game) checkTile(tl interfaces.Tile) error {
-	if g.state.Name() != fsm.PlayTileStateName {
+	if g.state.Name() != interfaces.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
@@ -302,7 +311,7 @@ func (g *Game) setCurrentPlayer(number int) *Game {
 
 // FoundCorporation founds a new corporation
 func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
-	if g.state.Name() != fsm.FoundCorpStateName {
+	if g.state.Name() != interfaces.FoundCorpStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if corp.IsActive() {
@@ -364,6 +373,7 @@ func (g *Game) LastTurn() bool {
 
 // Classification returns the players list ordered by cash,
 // which is the metric used to know game's final classification
+/*
 func (g *Game) Classification() []interfaces.Player {
 	var classification []interfaces.Player
 
@@ -377,6 +387,7 @@ func (g *Game) Classification() []interfaces.Player {
 	player.By(cashDesc).Sort(classification)
 	return classification
 }
+*/
 
 // Board returns game's board instance
 func (g *Game) Board() interfaces.Board {

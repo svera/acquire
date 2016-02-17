@@ -2,13 +2,12 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
 )
 
 // BuyStock buys stock from corporations
 func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
-	if g.state.Name() != fsm.BuyStockStateName {
+	if g.state.Name() != interfaces.BuyStockStateName {
 		return errors.New(ActionNotAllowed)
 	}
 

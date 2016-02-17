@@ -93,7 +93,7 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 		PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
 
-	if game.state.Name() != fsm.FoundCorpStateName {
+	if game.state.Name() != interfaces.FoundCorpStateName {
 		t.Errorf("Game must be in state FoundCorp, got %s", game.state.Name())
 	}
 }
@@ -111,7 +111,7 @@ func TestFoundCorporation(t *testing.T) {
 	}
 	game.newCorpTiles = newCorpTiles
 	game.FoundCorporation(corporations[0])
-	if game.state.Name() != fsm.BuyStockStateName {
+	if game.state.Name() != interfaces.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
 	}
 	if players[0].Shares(corporations[0]) != 1 {
@@ -145,7 +145,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 
 	expectedCorpSize := 4
 
-	if game.state.Name() != fsm.BuyStockStateName {
+	if game.state.Name() != interfaces.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
 	}
 	if corporations[0].Size() != expectedCorpSize {
@@ -266,8 +266,8 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	sell := map[interfaces.Corporation]int{corporations[0]: 6}
 	trade := map[interfaces.Corporation]int{}
 	game.SellTrade(sell, trade)
-	if game.state.Name() != fsm.BuyStockStateName {
-		t.Errorf("Wrong game state after merge, expected %s, got %s", fsm.BuyStockStateName, game.state.Name())
+	if game.state.Name() != interfaces.BuyStockStateName {
+		t.Errorf("Wrong game state after merge, expected %s, got %s", interfaces.BuyStockStateName, game.state.Name())
 	}
 	if game.corporations[0].Size() != 0 {
 		t.Errorf("Wrong size for corporation 0, expected %d, got %d", 0, game.corporations[0].Size())
@@ -306,8 +306,8 @@ func TestSellTradeTurnPassing(t *testing.T) {
 	trade := map[interfaces.Corporation]int{}
 	game.SellTrade(sell, trade)
 
-	if game.state.Name() != fsm.SellTradeStateName {
-		t.Errorf("Wrong game state after merge, expected %s, got %s", fsm.SellTradeStateName, game.state.Name())
+	if game.state.Name() != interfaces.SellTradeStateName {
+		t.Errorf("Wrong game state after merge, expected %s, got %s", interfaces.SellTradeStateName, game.state.Name())
 	}
 	if game.CurrentPlayer() != players[2] {
 		t.Errorf("Wrong active player, expected %d, got %d", 2, game.currentPlayerNumber)
@@ -376,8 +376,8 @@ func TestBuyStockAndEndGame(t *testing.T) {
 	game.state = &fsm.BuyStock{}
 	game.BuyStock(buys)
 
-	if game.state.Name() != fsm.EndGameStateName {
-		t.Errorf("End game was rightly claimed and game state must be %s, got %s", fsm.EndGameStateName, game.state.Name())
+	if game.state.Name() != interfaces.EndGameStateName {
+		t.Errorf("End game was rightly claimed and game state must be %s, got %s", interfaces.EndGameStateName, game.state.Name())
 	}
 	// 6000$ (base cash) + 15000 (majority and minority bonus for class 0 corporation) + (1000 * 2) (2 shares owned of the defunct corporation,
 	// 1000$ per share) = 23000$
@@ -432,7 +432,7 @@ func TestUntieMerge(t *testing.T) {
 	if len(game.mergeCorps["defunct"]) != 3 {
 		t.Errorf("Wrong number of defunct corporations after merge untie, expected %d, got %d", 3, len(game.mergeCorps["defunct"]))
 	}
-	if game.state.Name() != fsm.SellTradeStateName {
+	if game.state.Name() != interfaces.SellTradeStateName {
 		t.Errorf("Wrong game state after merge untie, expected %s, got %s", "SellTrade", game.state.Name())
 	}
 }
