@@ -1,6 +1,7 @@
 package player
 
 import (
+	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/tile"
 	"testing"
@@ -34,5 +35,18 @@ func TestUseTile(t *testing.T) {
 	}
 	if tl.Number() != 5 || tl.Letter() != "A" {
 		t.Errorf("DiscardTile() must return tile 5A")
+	}
+}
+
+func TestShares(t *testing.T) {
+	corp, _ := corporation.New("Test corp", 0)
+	expected := 5
+	player := &Player{
+		shares: map[interfaces.Corporation]int{
+			corp: expected,
+		},
+	}
+	if player.Shares(corp) != expected {
+		t.Errorf("Shares() must return that the player has exactly %d stock shares in corporation %s, got %d", expected, corp.Name(), player.Shares(corp))
 	}
 }
