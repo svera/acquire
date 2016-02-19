@@ -76,20 +76,18 @@ func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]int
 
 // Distributes the corporation in a merge between acquirers and defuncts
 func categorizeMerge(corporations []interfaces.Corporation) map[string][]interfaces.Corporation {
-	var sortedCorps sortableCorporations
-	sortedCorps = corporations
-	sort.Sort(sort.Reverse(sortedCorps))
+	sort.Sort(sort.Reverse(corporations))
 
 	merge := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{sortedCorps[0]},
+		"acquirer": []interfaces.Corporation{corporations[0]},
 		"defunct":  []interfaces.Corporation{},
 	}
 
-	for i := 1; i < len(sortedCorps); i++ {
-		if sortedCorps[i].Size() == sortedCorps[0].Size() {
-			merge["acquirer"] = append(merge["acquirer"], sortedCorps[i])
+	for i := 1; i < len(corporations); i++ {
+		if corporations[i].Size() == corporations[0].Size() {
+			merge["acquirer"] = append(merge["acquirer"], corporations[i])
 		} else {
-			merge["defunct"] = append(merge["defunct"], sortedCorps[i])
+			merge["defunct"] = append(merge["defunct"], corporations[i])
 		}
 	}
 
