@@ -1,10 +1,8 @@
 package player
 
 import (
-	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/tile"
-	"reflect"
 	"testing"
 )
 
@@ -14,36 +12,6 @@ func TestPickTile(t *testing.T) {
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
-	}
-}
-
-func TestSort(t *testing.T) {
-	players := []interfaces.Player{
-		NewStub(),
-		NewStub(),
-		NewStub(),
-		NewStub(),
-	}
-
-	corp, _ := corporation.New("Test", 0)
-
-	players[0].(*Stub).SetShares(corp, 3)
-	players[1].(*Stub).SetShares(corp, 1)
-	players[2].(*Stub).SetShares(corp, 0)
-	players[3].(*Stub).SetShares(corp, 2)
-
-	shares := func(p1, p2 interfaces.Player) bool {
-		return p1.Shares(corp) > p2.Shares(corp)
-	}
-	expectedSort := []interfaces.Player{
-		players[0],
-		players[3],
-		players[1],
-		players[2],
-	}
-	By(shares).Sort(players)
-	if !reflect.DeepEqual(players, expectedSort) {
-		t.Errorf("Players not sorted by corporation %s's shares amount", corp.Name())
 	}
 }
 

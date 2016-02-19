@@ -11,7 +11,7 @@ type BuyStock struct {
 
 // Name returns state's name
 func (s *BuyStock) Name() string {
-	return BuyStockStateName
+	return interfaces.BuyStockStateName
 }
 
 // ToPlayTile returns a PlayTile instance because it's an allowed state transition

@@ -11,7 +11,7 @@ type PlayTile struct {
 
 // Name returns state's name
 func (s *PlayTile) Name() string {
-	return PlayTileStateName
+	return interfaces.PlayTileStateName
 }
 
 // ToSellTrade returns a SellTrade instance because it's an allowed state transition

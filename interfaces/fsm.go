@@ -10,3 +10,14 @@ type State interface {
 	ToBuyStock() State
 	ToEndGame() State
 }
+
+// State names
+const (
+	ErrorStateName      = "Error"
+	EndGameStateName    = "EndGame"
+	BuyStockStateName   = "BuyStock"
+	FoundCorpStateName  = "FoundCorp"
+	PlayTileStateName   = "PlayTile"
+	SellTradeStateName  = "SellTrade"
+	UntieMergeStateName = "UntieMerge"
+)

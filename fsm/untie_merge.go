@@ -11,7 +11,7 @@ type UntieMerge struct {
 
 // Name returns state's name
 func (s *UntieMerge) Name() string {
-	return UntieMergeStateName
+	return interfaces.UntieMergeStateName
 }
 
 // ToSellTrade returns a SellTrade instance because it's an allowed state transition

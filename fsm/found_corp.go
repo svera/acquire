@@ -11,7 +11,7 @@ type FoundCorp struct {
 
 // Name returns state's name
 func (s *FoundCorp) Name() string {
-	return FoundCorpStateName
+	return interfaces.FoundCorpStateName
 }
 
 // ToBuyStock returns a BuyStock instance because it's an allowed state transition
