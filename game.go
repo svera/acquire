@@ -70,7 +70,7 @@ type Game struct {
 	sellTradePlayers    []int
 	lastPlayedTile      interfaces.Tile
 	turn                int
-	lastTurn            bool
+	isLastTurn          bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
 	frozenPlayer int
@@ -367,8 +367,8 @@ func (g *Game) ClaimEndGame() *Game {
 }
 
 // LastTurn returns if the current turn will be the last one or not
-func (g *Game) LastTurn() bool {
-	return g.lastTurn
+func (g *Game) IsLastTurn() bool {
+	return g.isLastTurn
 }
 
 // Classification returns the players list ordered by cash,
