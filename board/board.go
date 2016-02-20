@@ -61,7 +61,7 @@ func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile
 // TileMergeCorporations checks if the passed tile merges two or more corporations, returns a map of
 // corporations categorized between "acquirer" and "defunct"
 func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]interfaces.Corporation) {
-	var corporations []interfaces.Corporation
+	var corporations sortableCorporations
 
 	adjacent := b.adjacentCorporationTiles(t.Number(), t.Letter())
 	for _, adjacentCell := range adjacent {
@@ -75,7 +75,7 @@ func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]int
 }
 
 // Distributes the corporation in a merge between acquirers and defuncts
-func categorizeMerge(corporations []interfaces.Corporation) map[string][]interfaces.Corporation {
+func categorizeMerge(corporations sortableCorporations) map[string][]interfaces.Corporation {
 	sort.Sort(sort.Reverse(corporations))
 
 	merge := map[string][]interfaces.Corporation{

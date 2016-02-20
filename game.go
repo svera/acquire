@@ -101,7 +101,7 @@ func New(
 		currentPlayerNumber: 0,
 		turn:                1,
 		state:               state,
-		lastTurn:            false,
+		isLastTurn:          false,
 	}
 	for _, pl := range gm.players {
 		gm.giveInitialTileset(pl)
@@ -361,7 +361,7 @@ func (g *Game) Turn() int {
 // the player may finish the turn.
 func (g *Game) ClaimEndGame() *Game {
 	if g.AreEndConditionsReached() {
-		g.lastTurn = true
+		g.isLastTurn = true
 	}
 	return g
 }
