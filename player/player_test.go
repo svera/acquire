@@ -50,3 +50,19 @@ func TestShares(t *testing.T) {
 		t.Errorf("Shares() must return that the player has exactly %d stock shares in corporation %s, got %d", expected, corp.Name(), player.Shares(corp))
 	}
 }
+
+func TestAddShares(t *testing.T) {
+	corp, _ := corporation.New("Test corp", 0)
+	original := 5
+	add := 2
+	expected := 7
+	player := &Player{
+		shares: map[interfaces.Corporation]int{
+			corp: original,
+		},
+	}
+	player.AddShares(corp, add)
+	if player.Shares(corp) != expected {
+		t.Errorf("AddShares() must add %d stock shares as owned by the player in corporation %s, got %d", add, corp.Name(), player.Shares(corp))
+	}
+}

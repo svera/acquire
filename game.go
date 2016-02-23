@@ -371,24 +371,6 @@ func (g *Game) IsLastTurn() bool {
 	return g.isLastTurn
 }
 
-// Classification returns the players list ordered by cash,
-// which is the metric used to know game's final classification
-/*
-func (g *Game) Classification() []interfaces.Player {
-	var classification []interfaces.Player
-
-	cashDesc := func(pl1, pl2 interfaces.Player) bool {
-		return pl1.Cash() > pl2.Cash()
-	}
-
-	for _, pl := range g.players {
-		classification = append(classification, pl)
-	}
-	player.By(cashDesc).Sort(classification)
-	return classification
-}
-*/
-
 // Board returns game's board instance
 func (g *Game) Board() interfaces.Board {
 	return g.board
