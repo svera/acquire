@@ -1,7 +1,6 @@
 package acquire
 
 import (
-	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
@@ -438,22 +437,24 @@ func TestUntieMerge(t *testing.T) {
 }
 
 func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, interfaces.Tileset) {
-	var players []interfaces.Player
-	players = append(players, player.NewStub())
-	players = append(players, player.NewStub())
-	players = append(players, player.NewStub())
+	players := []interfaces.Player{
+		&interfaces.PlayerMock{},
+		&interfaces.PlayerMock{},
+		&interfaces.PlayerMock{},
+	}
 
-	var corporations [7]interfaces.Corporation
-	corporations[0] = corporation.NewStub("A", 0)
-	corporations[1] = corporation.NewStub("B", 0)
-	corporations[2] = corporation.NewStub("C", 1)
-	corporations[3] = corporation.NewStub("D", 1)
-	corporations[4] = corporation.NewStub("E", 1)
-	corporations[5] = corporation.NewStub("F", 2)
-	corporations[6] = corporation.NewStub("G", 2)
+	corporations := [7]interfaces.Corporation{
+		&interfaces.CorporationMock{FakeName: "A", FakeClass: 0},
+		&interfaces.CorporationMock{FakeName: "B", FakeClass: 0},
+		&interfaces.CorporationMock{FakeName: "C", FakeClass: 1},
+		&interfaces.CorporationMock{FakeName: "D", FakeClass: 1},
+		&interfaces.CorporationMock{FakeName: "E", FakeClass: 1},
+		&interfaces.CorporationMock{FakeName: "F", FakeClass: 2},
+		&interfaces.CorporationMock{FakeName: "G", FakeClass: 2},
+	}
 
-	board := board.New()
-	tileset := tileset.NewStub()
+	board := &interfaces.BoardMock{}
+	tileset := &interfaces.TilesetMock{}
 	return players, corporations, board, tileset
 }
 
