@@ -6,26 +6,10 @@ import (
 	"testing"
 )
 
-type tileMock struct {
-	number int
-	letter string
-}
-
-func (t *tileMock) Number() int {
-	return t.number
-}
-func (t *tileMock) Letter() string {
-	return t.letter
-}
-
-func (t *tileMock) Type() string {
-	return "unincorporated"
-}
-
 func TestPutTile(t *testing.T) {
 	board := New()
 
-	tile := &tileMock{number: 5, letter: "B"}
+	tile := &interfaces.TileMock{FakeNumber: 5, FakeLetter: "B"}
 	board.PutTile(tile)
 	if board.grid[5]["B"].Type() != "unincorporated" {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")
@@ -34,11 +18,11 @@ func TestPutTile(t *testing.T) {
 
 func TestTileFoundCorporation(t *testing.T) {
 	board := New()
-	board.PutTile(&tileMock{number: 5, letter: "D"})
-	board.PutTile(&tileMock{number: 6, letter: "C"})
-	board.PutTile(&tileMock{number: 6, letter: "E"})
-	board.PutTile(&tileMock{number: 7, letter: "D"})
-	foundingTile := &tileMock{number: 6, letter: "D"}
+	board.PutTile(&interfaces.TileMock{FakeNumber: 5, FakeLetter: "D"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "C"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 7, FakeLetter: "D"})
+	foundingTile := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "D"}
 	found, corporationTiles := board.TileFoundCorporation(
 		foundingTile,
 	)
@@ -61,17 +45,17 @@ func TestTileFoundCorporation(t *testing.T) {
 
 func TestTileDoesNotFoundCorporation(t *testing.T) {
 	board := New()
-	found, corporationTiles := board.TileFoundCorporation(&tileMock{number: 6, letter: "D"})
+	found, corporationTiles := board.TileFoundCorporation(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "D"})
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "D", corporationTiles)
 	}
 
-	board.PutTile(&tileMock{number: 5, letter: "E"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 5, FakeLetter: "E"})
 	board.grid[7]["E"] = &interfaces.CorporationMock{}
-	board.PutTile(&tileMock{number: 6, letter: "D"})
-	board.PutTile(&tileMock{number: 6, letter: "F"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "D"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "F"})
 
-	found, corporationTiles = board.TileFoundCorporation(&tileMock{number: 6, letter: "E"})
+	found, corporationTiles = board.TileFoundCorporation(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"})
 	if found {
 		t.Errorf("Position %d%s must not found a corporation, got %v instead", 6, "E", corporationTiles)
 	}
@@ -111,7 +95,7 @@ func TestTileQuadrupleMerge(t *testing.T) {
 		"acquirer": []interfaces.Corporation{corp2},
 		"defunct":  []interfaces.Corporation{corp1, corp3, corp4},
 	}
-	merge, corporations := board.TileMergeCorporations(&tileMock{number: 6, letter: "E"})
+	merge, corporations := board.TileMergeCorporations(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"})
 
 	if !slicesSameCorporations(corporations["acquirer"], expectedCorporations["acquirer"]) ||
 		!slicesSameCorporations(corporations["defunct"], expectedCorporations["defunct"]) {
@@ -149,7 +133,7 @@ func TestTileQuadrupleMergeTie(t *testing.T) {
 		"acquirer": []interfaces.Corporation{corp1, corp2, corp3, corp4},
 		"defunct":  []interfaces.Corporation{},
 	}
-	merge, corporations := board.TileMergeCorporations(&tileMock{number: 6, letter: "E"})
+	merge, corporations := board.TileMergeCorporations(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"})
 
 	if !slicesSameCorporations(corporations["acquirer"], expectedCorporations["acquirer"]) ||
 		!slicesSameCorporations(corporations["defunct"], expectedCorporations["defunct"]) {
@@ -166,12 +150,12 @@ func TestTileQuadrupleMergeTie(t *testing.T) {
 func TestTileDontMerge(t *testing.T) {
 	board := New()
 	corp2 := &interfaces.CorporationMock{}
-	board.PutTile(&tileMock{number: 3, letter: "E"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 3, FakeLetter: "E"})
 	board.grid[5]["E"] = corp2
 	board.grid[6]["E"] = corp2
 
 	expectedCorporationsMerged := map[string][]interfaces.Corporation{}
-	merge, corporations := board.TileMergeCorporations(&tileMock{number: 4, letter: "E"})
+	merge, corporations := board.TileMergeCorporations(&interfaces.TileMock{FakeNumber: 4, FakeLetter: "E"})
 	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
 		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
 	}
@@ -188,12 +172,12 @@ func TestTileDontMerge(t *testing.T) {
 func TestTileGrowCorporation(t *testing.T) {
 	board := New()
 	corp2 := &interfaces.CorporationMock{}
-	board.PutTile(&tileMock{number: 5, letter: "E"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 5, FakeLetter: "E"})
 	board.grid[7]["E"] = corp2
 	board.grid[8]["E"] = corp2
-	board.PutTile(&tileMock{number: 6, letter: "D"})
-	board.PutTile(&tileMock{number: 6, letter: "F"})
-	growerTile := &tileMock{number: 6, letter: "E"}
+	board.PutTile(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "D"})
+	board.PutTile(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "F"})
+	growerTile := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	expectedTilesToAppend := []interfaces.Tile{
 		board.grid[5]["E"].(interfaces.Tile),
@@ -226,7 +210,7 @@ func TestTileDontGrowCorporation(t *testing.T) {
 	board.grid[7]["E"] = corp2
 	board.grid[8]["E"] = corp2
 
-	grow, _, _ := board.TileGrowCorporation(&tileMock{number: 6, letter: "C"})
+	grow, _, _ := board.TileGrowCorporation(&interfaces.TileMock{FakeNumber: 6, FakeLetter: "C"})
 	if grow {
 		t.Errorf(
 			"Position %d%s must not grow any corporation, but got true",
@@ -238,7 +222,7 @@ func TestTileDontGrowCorporation(t *testing.T) {
 
 func TestAdjacentCells(t *testing.T) {
 	brd := New()
-	tl := &tileMock{number: 1, letter: "A"}
+	tl := &interfaces.TileMock{FakeNumber: 1, FakeLetter: "A"}
 
 	adjacentCells := brd.AdjacentCells(tl.Number(), tl.Letter())
 	if len(adjacentCells) != 2 {
@@ -252,8 +236,8 @@ func TestAdjacentCells(t *testing.T) {
 func TestSetOwner(t *testing.T) {
 	brd := New()
 	corp := &interfaces.CorporationMock{}
-	tl1 := &tileMock{number: 1, letter: "A"}
-	tl2 := &tileMock{number: 1, letter: "B"}
+	tl1 := &interfaces.TileMock{FakeNumber: 1, FakeLetter: "A"}
+	tl2 := &interfaces.TileMock{FakeNumber: 1, FakeLetter: "B"}
 	tls := []interfaces.Tile{tl1, tl2}
 	brd.SetOwner(corp, tls)
 	if brd.Cell(tl1.Number(), tl1.Letter()) != corp || brd.Cell(tl2.Number(), tl2.Letter()) != corp {
