@@ -31,7 +31,7 @@ type CorporationMock struct {
 }
 
 func (c *CorporationMock) Grow(number int) Corporation {
-	_ = number
+	c.FakeSize += number
 	return c
 }
 

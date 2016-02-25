@@ -1,6 +1,7 @@
 package acquire
 
 import (
+	//"fmt"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
@@ -22,8 +23,8 @@ func TestNewGameWrongNumberPlayers(t *testing.T) {
 func TestNewGameNotUniqueCorpNames(t *testing.T) {
 	players, corporations, board, tileset := setup()
 
-	corporations[0] = corporation.NewStub("A", 0)
-	corporations[1] = corporation.NewStub("A", 0)
+	corporations[0] = &interfaces.CorporationMock{FakeName: "A"}
+	corporations[1] = &interfaces.CorporationMock{FakeName: "A"}
 
 	if _, err := New(board, players, corporations, tileset, &fsm.PlayTile{}); err.Error() != CorpNamesNotUnique {
 		t.Errorf("Corporations must have unique names, expecting %s error, got %s", CorpNamesNotUnique, err.Error())
@@ -33,7 +34,7 @@ func TestNewGameNotUniqueCorpNames(t *testing.T) {
 func TestNewGameWrongNumberOfCorpsPerClass(t *testing.T) {
 	players, corporations, board, tileset := setup()
 
-	corporations[2] = corporation.NewStub("C", 0)
+	corporations[2] = &interfaces.CorporationMock{FakeClass: 0}
 
 	if _, err := New(board, players, corporations, tileset, &fsm.PlayTile{}); err.Error() != WrongNumberCorpsClass {
 		t.Errorf("Game must catch wrong number of corporations per class")
@@ -59,20 +60,25 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions not reached (no active corporations) but detected as it were")
 	}
 
-	corporations[0].(*corporation.Stub).SetSize(41)
+	corporations[0].(*interfaces.CorporationMock).FakeSize = 41
+	corporations[0].(*interfaces.CorporationMock).FakeIsActive = true
 
 	if !game.AreEndConditionsReached() {
 		t.Errorf("End game conditions reached (a corporation bigger than 40 tiles) but not detected")
 	}
 
-	corporations[0].(*corporation.Stub).SetSize(11)
+	corporations[0].(*interfaces.CorporationMock).FakeSize = 11
+	corporations[0].(*interfaces.CorporationMock).FakeIsActive = true
+	corporations[0].(*interfaces.CorporationMock).FakeIsSafe = true
 
 	if !game.AreEndConditionsReached() {
 		t.Errorf("End game conditions reached (all active corporations safe) but not detected")
 	}
 
-	corporations[0].(*corporation.Stub).SetSize(11)
-	corporations[1].(*corporation.Stub).SetSize(2)
+	corporations[0].(*interfaces.CorporationMock).FakeSize = 11
+	corporations[1].(*interfaces.CorporationMock).FakeSize = 2
+	corporations[0].(*interfaces.CorporationMock).FakeIsActive = true
+	corporations[1].(*interfaces.CorporationMock).FakeIsActive = true
 
 	if game.AreEndConditionsReached() {
 		t.Errorf("End game conditions not reached but detected as it were")
@@ -82,16 +88,12 @@ func TestAreEndConditionsReached(t *testing.T) {
 
 func TestPlayTileFoundCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tile.New(5, "A")
-	bd.PutTile(tile.New(5, "B"))
+	tileToPlay := &interfaces.TileMock{FakeNumber: 5, FakeLetter: "A"}
+	bd.(*interfaces.BoardMock).FakeFoundCorporation = true
+	players[0].(*interfaces.PlayerMock).FakeHasTile = true
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
 	game.PlayTile(tileToPlay)
-
 	if game.state.Name() != interfaces.FoundCorpStateName {
 		t.Errorf("Game must be in state FoundCorp, got %s", game.state.Name())
 	}
@@ -105,10 +107,13 @@ func TestFoundCorporation(t *testing.T) {
 	}
 	game.state = &fsm.FoundCorp{}
 	newCorpTiles := []interfaces.Tile{
-		tile.New(5, "E"),
-		tile.New(6, "E"),
+		&interfaces.TileMock{FakeNumber: 5, FakeLetter: "E"},
+		&interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"},
 	}
 	game.newCorpTiles = newCorpTiles
+	corporations[0].(*interfaces.CorporationMock).FakeStock = 25
+	bd.(*interfaces.BoardMock).FakeCellOwner = corporations[0]
+
 	game.FoundCorporation(corporations[0])
 	if game.state.Name() != interfaces.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
@@ -126,29 +131,14 @@ func TestFoundCorporation(t *testing.T) {
 
 func TestPlayTileGrowCorporation(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	tileToPlay := tile.New(6, "E")
-	corpTiles := []interfaces.Tile{
-		tile.New(7, "E"),
-		tile.New(8, "E"),
-	}
-	corporations[0].Grow(len(corpTiles))
-	bd.SetOwner(corporations[0], corpTiles)
-	bd.PutTile(tile.New(5, "E"))
+	tileToPlay := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
+	bd.(*interfaces.BoardMock).FakeGrowCorporation = true
 	game.PlayTile(tileToPlay)
-
-	expectedCorpSize := 4
 
 	if game.state.Name() != interfaces.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
-	}
-	if corporations[0].Size() != expectedCorpSize {
-		t.Errorf("Corporation size must be %d, got %d", expectedCorpSize, corporations[0].Size())
 	}
 }
 
@@ -161,16 +151,13 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E")
+	tileToPlay := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
-	players[0].(*player.Stub).SetShares(corporations[0], 6)
-	players[1].(*player.Stub).SetShares(corporations[0], 6)
-	players[2].(*player.Stub).SetShares(corporations[0], 4)
+
+	players[0].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[1].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[2].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 4
 
 	game.PlayTile(tileToPlay)
 	expectedPlayer0Cash := 7500
@@ -438,9 +425,9 @@ func TestUntieMerge(t *testing.T) {
 
 func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, interfaces.Tileset) {
 	players := []interfaces.Player{
-		&interfaces.PlayerMock{},
-		&interfaces.PlayerMock{},
-		&interfaces.PlayerMock{},
+		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}},
+		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}},
+		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}},
 	}
 
 	corporations := [7]interfaces.Corporation{

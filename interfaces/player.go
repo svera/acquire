@@ -26,17 +26,17 @@ func (p *PlayerMock) Shares(c Corporation) int {
 }
 
 func (p *PlayerMock) AddShares(c Corporation, amount int) Player {
-	_, _ = c, amount
+	p.FakeShares[c] += amount
 	return p
 }
 
 func (p *PlayerMock) RemoveShares(c Corporation, amount int) Player {
-	_, _ = c, amount
+	p.FakeShares[c] -= amount
 	return p
 }
 
 func (p *PlayerMock) PickTile(t Tile) Player {
-	_ = t
+	p.FakeTiles = append(p.FakeTiles, t)
 	return p
 }
 
@@ -58,11 +58,11 @@ func (p *PlayerMock) Cash() int {
 }
 
 func (p *PlayerMock) AddCash(amount int) Player {
-	_ = amount
+	p.FakeCash += amount
 	return p
 }
 
 func (p *PlayerMock) RemoveCash(amount int) Player {
-	_ = amount
+	p.FakeCash -= amount
 	return p
 }
