@@ -22,6 +22,7 @@ type BoardMock struct {
 	FakeGrowCorporationTiles   []Tile
 	FakeGrowCorporationCorp    Corporation
 	FakeAdjacentCells          []Owner
+	TimesCalled                map[string]int
 }
 
 func (b *BoardMock) Cell(number int, letter string) Owner {
@@ -52,6 +53,7 @@ func (b *BoardMock) AdjacentCells(number int, letter string) []Owner {
 
 func (b *BoardMock) SetOwner(cp Corporation, tiles []Tile) Board {
 	_, _ = cp, tiles
+	b.TimesCalled["SetOwner"]++
 	return b
 }
 

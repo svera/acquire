@@ -28,10 +28,12 @@ type CorporationMock struct {
 	FakeIsActive      bool
 	FakeName          string
 	FakeClass         int
+	TimesCalled       map[string]int
 }
 
 func (c *CorporationMock) Grow(number int) Corporation {
 	c.FakeSize += number
+	c.TimesCalled["Grow"]++
 	return c
 }
 
