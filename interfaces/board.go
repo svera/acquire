@@ -59,5 +59,6 @@ func (b *BoardMock) SetOwner(cp Corporation, tiles []Tile) Board {
 
 func (b *BoardMock) ChangeOwner(oldOwner Corporation, newOwner Corporation) Board {
 	_, _ = oldOwner, newOwner
+	b.TimesCalled["ChangeOwner"]++
 	return b
 }

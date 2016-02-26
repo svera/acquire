@@ -1,7 +1,7 @@
 package acquire
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/svera/acquire/corporation"
 	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
@@ -141,8 +141,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	bd.(*interfaces.BoardMock).FakeGrowCorporationCorp = corporations[0]
 	players[0].(*interfaces.PlayerMock).FakeHasTile = true
 
-	err := game.PlayTile(tileToPlay)
-	fmt.Println(err)
+	game.PlayTile(tileToPlay)
 	if game.state.Name() != interfaces.BuyStockStateName {
 		t.Errorf("Game must be in state BuyStock, got %s", game.state.Name())
 	}
@@ -165,12 +164,20 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
 
 	players[0].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[0].(*interfaces.PlayerMock).FakeHasTile = true
 	players[1].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
 	players[2].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 4
 
-	corporations[0].(*interfaces.CorporationMock).FakeMajorityBonus = 6000
-	corporations[0].(*interfaces.CorporationMock).FakeMinorityBonus = 3000
+	corporations[0].(*interfaces.CorporationMock).FakeMajorityBonus = 2000
+	corporations[0].(*interfaces.CorporationMock).FakeMinorityBonus = 1000
+
+	bd.(*interfaces.BoardMock).FakeMergeCorporations = true
+	bd.(*interfaces.BoardMock).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
+		"acquirer": []interfaces.Corporation{corporations[1]},
+		"defunct":  []interfaces.Corporation{corporations[0]},
+	}
 	game.PlayTile(tileToPlay)
+
 	expectedPlayer0Cash := 7500
 	if players[0].Cash() != expectedPlayer0Cash {
 		t.Errorf("Player haven't received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
@@ -191,19 +198,26 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 //
 // In this case, player 0 is the majority shareholder and players 1 and 2 are the minority ones
 // of corporation 0, with a size of 2
-func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
+func TestPlayTileMergeCorporationsMultipleMinorityShareholders(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E")
+	tileToPlay := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
-	players[0].(*player.Stub).SetShares(corporations[0], 6)
-	players[1].(*player.Stub).SetShares(corporations[0], 4)
-	players[2].(*player.Stub).SetShares(corporations[0], 4)
+
+	players[0].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[0].(*interfaces.PlayerMock).FakeHasTile = true
+	players[1].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 4
+	players[2].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 4
+
+	corporations[0].(*interfaces.CorporationMock).FakeMajorityBonus = 2000
+	corporations[0].(*interfaces.CorporationMock).FakeMinorityBonus = 1000
+
+	bd.(*interfaces.BoardMock).FakeMergeCorporations = true
+	bd.(*interfaces.BoardMock).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
+		"acquirer": []interfaces.Corporation{corporations[1]},
+		"defunct":  []interfaces.Corporation{corporations[0]},
+	}
 
 	game.PlayTile(tileToPlay)
 	expectedPlayer0Cash := 8000
@@ -229,14 +243,21 @@ func TestPlayTileMergeCorporationsMultipleMinorityhareholders(t *testing.T) {
 func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E")
+	tileToPlay := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
-	players[0].(*player.Stub).SetShares(corporations[0], 6)
+
+	players[0].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[0].(*interfaces.PlayerMock).FakeHasTile = true
+
+	corporations[0].(*interfaces.CorporationMock).FakeMajorityBonus = 2000
+	corporations[0].(*interfaces.CorporationMock).FakeMinorityBonus = 1000
+
+	bd.(*interfaces.BoardMock).FakeMergeCorporations = true
+	bd.(*interfaces.BoardMock).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
+		"acquirer": []interfaces.Corporation{corporations[1]},
+		"defunct":  []interfaces.Corporation{corporations[0]},
+	}
 
 	game.PlayTile(tileToPlay)
 	expectedPlayerCash := 9000
@@ -250,19 +271,28 @@ func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E")
+	tileToPlay := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
-	players[0].(*player.Stub).SetShares(corporations[0], 6)
+
+	players[0].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[0].(*interfaces.PlayerMock).FakeHasTile = true
+
+	corporations[0].(*interfaces.CorporationMock).FakeMajorityBonus = 2000
+	corporations[0].(*interfaces.CorporationMock).FakeMinorityBonus = 1000
+	corporations[0].(*interfaces.CorporationMock).FakeStockPrice = 200
+
+	bd.(*interfaces.BoardMock).FakeMergeCorporations = true
+	bd.(*interfaces.BoardMock).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
+		"acquirer": []interfaces.Corporation{corporations[1]},
+		"defunct":  []interfaces.Corporation{corporations[0]},
+	}
 
 	game.PlayTile(tileToPlay)
 	sell := map[interfaces.Corporation]int{corporations[0]: 6}
 	trade := map[interfaces.Corporation]int{}
 	game.SellTrade(sell, trade)
+
 	if game.state.Name() != interfaces.BuyStockStateName {
 		t.Errorf("Wrong game state after merge, expected %s, got %s", interfaces.BuyStockStateName, game.state.Name())
 	}
@@ -272,13 +302,13 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	if game.corporations[1].Size() != 6 {
 		t.Errorf("Wrong size for corporation 1, expected %d, got %d", 6, game.corporations[1].Size())
 	}
-	if game.board.Cell(6, "E") != corporations[1] {
-		t.Errorf("Wrong owner for cell %d%s, expected %s, got %s", 6, "E", "corporation", game.board.Cell(6, "E").Type())
+	if game.board.(*interfaces.BoardMock).TimesCalled["ChangeOwner"] != 1 {
+		t.Errorf("Corporation tiles does not change ownership")
 	}
 	// 6000$ (base cash) + 3000 (majority and minority bonus for class 0 corporation) + (200 * 6) (6 shares owned of the defunct corporation,
 	// 200$ per share) = 10200$
 	if players[0].Cash() != 10200 {
-		t.Errorf("Wrong cash amount for player, expected %d, got %d", 6000, players[0].Cash())
+		t.Errorf("Wrong cash amount for player, expected %d, got %d", 10200, players[0].Cash())
 	}
 	if players[0].Shares(game.corporations[0]) != 0 {
 		t.Errorf("Wrong stock shares amount for player, expected %d, got %d", 0, players[0].Shares(game.corporations[0]))
@@ -288,15 +318,15 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 func TestSellTradeTurnPassing(t *testing.T) {
 	players, corporations, bd, ts := setup()
 	setupPlayTileMerge(corporations, bd)
-	tileToPlay := tile.New(6, "E")
+	tileToPlay := &interfaces.TileMock{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(bd, players, corporations, ts, &fsm.PlayTile{})
-	playerTiles := players[0].Tiles()
-	players[0].
-		DiscardTile(playerTiles[0]).
-		PickTile(tileToPlay)
-	players[0].(*player.Stub).SetShares(corporations[0], 6)
-	players[2].(*player.Stub).SetShares(corporations[0], 4)
+
+	players[0].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 6
+	players[0].(*interfaces.PlayerMock).FakeHasTile = true
+	players[2].(*interfaces.PlayerMock).FakeShares[corporations[0]] = 4
+
+	bd.(*interfaces.BoardMock).FakeAdjacentCells = []interfaces.Owner{}
 
 	game.PlayTile(tileToPlay)
 	sell := map[interfaces.Corporation]int{corporations[0]: 6}
@@ -315,19 +345,8 @@ func TestSellTradeTurnPassing(t *testing.T) {
 //   4 5 6 7 8 9
 // E [][]><[][][]
 func setupPlayTileMerge(corporations [7]interfaces.Corporation, bd interfaces.Board) {
-	corp0Tiles := []interfaces.Tile{
-		tile.New(4, "E"),
-		tile.New(5, "E"),
-	}
-	corp1Tiles := []interfaces.Tile{
-		tile.New(7, "E"),
-		tile.New(8, "E"),
-		tile.New(9, "E"),
-	}
-	corporations[0].Grow(len(corp0Tiles))
-	corporations[1].Grow(len(corp1Tiles))
-	bd.SetOwner(corporations[0], corp0Tiles)
-	bd.SetOwner(corporations[1], corp1Tiles)
+	corporations[0].Grow(2)
+	corporations[1].Grow(3)
 }
 
 func TestBuyStock(t *testing.T) {
@@ -436,9 +455,9 @@ func TestUntieMerge(t *testing.T) {
 
 func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, interfaces.Tileset) {
 	players := []interfaces.Player{
-		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}},
-		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}},
-		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}},
+		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000},
+		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000},
+		&interfaces.PlayerMock{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000},
 	}
 
 	corporations := [7]interfaces.Corporation{
@@ -452,7 +471,7 @@ func setup() ([]interfaces.Player, [7]interfaces.Corporation, interfaces.Board, 
 	}
 
 	board := &interfaces.BoardMock{TimesCalled: map[string]int{}}
-	tileset := &interfaces.TilesetMock{}
+	tileset := &interfaces.TilesetMock{FakeTile: &interfaces.TileMock{FakeNumber: 1, FakeLetter: "A"}}
 	return players, corporations, board, tileset
 }
 

@@ -38,6 +38,8 @@ func (c *CorporationMock) Grow(number int) Corporation {
 }
 
 func (c *CorporationMock) Reset() Corporation {
+	c.FakeSize = 0
+	c.TimesCalled["Reset"]++
 	return c
 }
 
