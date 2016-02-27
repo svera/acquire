@@ -2,12 +2,13 @@ package player
 
 import (
 	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire/mocks"
 	"testing"
 )
 
 func TestPickTile(t *testing.T) {
 	player := New()
-	tl := &interfaces.TileMock{FakeNumber: 2, FakeLetter: "C"}
+	tl := &mocks.Tile{FakeNumber: 2, FakeLetter: "C"}
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
 		t.Errorf("Player must have exactly 1 tile, got %d", len(player.tiles))
@@ -18,15 +19,15 @@ func TestUseTile(t *testing.T) {
 	player := New()
 
 	player.tiles = []interfaces.Tile{
-		&interfaces.TileMock{FakeNumber: 7, FakeLetter: "c"},
-		&interfaces.TileMock{FakeNumber: 5, FakeLetter: "A"},
-		&interfaces.TileMock{FakeNumber: 8, FakeLetter: "E"},
-		&interfaces.TileMock{FakeNumber: 3, FakeLetter: "D"},
-		&interfaces.TileMock{FakeNumber: 1, FakeLetter: "B"},
-		&interfaces.TileMock{FakeNumber: 4, FakeLetter: "I"},
+		&mocks.Tile{FakeNumber: 7, FakeLetter: "c"},
+		&mocks.Tile{FakeNumber: 5, FakeLetter: "A"},
+		&mocks.Tile{FakeNumber: 8, FakeLetter: "E"},
+		&mocks.Tile{FakeNumber: 3, FakeLetter: "D"},
+		&mocks.Tile{FakeNumber: 1, FakeLetter: "B"},
+		&mocks.Tile{FakeNumber: 4, FakeLetter: "I"},
 	}
 
-	tl := &interfaces.TileMock{FakeNumber: 5, FakeLetter: "A"}
+	tl := &mocks.Tile{FakeNumber: 5, FakeLetter: "A"}
 	player.DiscardTile(tl)
 	if len(player.tiles) != 5 {
 		t.Errorf("Players must have 5 tiles after using one, got %d", len(player.tiles))
@@ -37,7 +38,7 @@ func TestUseTile(t *testing.T) {
 }
 
 func TestShares(t *testing.T) {
-	corp := &interfaces.CorporationMock{}
+	corp := &mocks.Corporation{}
 	expected := 5
 	player := &Player{
 		shares: map[interfaces.Corporation]int{
@@ -50,7 +51,7 @@ func TestShares(t *testing.T) {
 }
 
 func TestAddShares(t *testing.T) {
-	corp := &interfaces.CorporationMock{}
+	corp := &mocks.Corporation{}
 	original := 5
 	add := 2
 	expected := 7

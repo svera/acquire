@@ -5,7 +5,6 @@ package acquire
 
 import (
 	"errors"
-	//"fmt"
 	"github.com/svera/acquire/interfaces"
 )
 

@@ -87,7 +87,6 @@ func (g *Game) drawTile() error {
 func (g *Game) replaceUnplayableTiles() error {
 	for _, tile := range g.CurrentPlayer().Tiles() {
 		if g.isTilePermanentlyUnplayable(tile) {
-
 			g.CurrentPlayer().DiscardTile(tile)
 			if newTile, err := g.tileset.Draw(); err == nil {
 				g.CurrentPlayer().PickTile(newTile)
