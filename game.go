@@ -366,7 +366,7 @@ func (g *Game) ClaimEndGame() *Game {
 	return g
 }
 
-// LastTurn returns if the current turn will be the last one or not
+// IsLastTurn returns if the current turn will be the last one or not
 func (g *Game) IsLastTurn() bool {
 	return g.isLastTurn
 }
@@ -379,4 +379,41 @@ func (g *Game) Board() interfaces.Board {
 // GameStateName returns game's current state
 func (g *Game) GameStateName() string {
 	return g.state.Name()
+}
+
+// A player takes a tile from the facedown cluster to replace
+// the one he/she played. This is not done until the end of
+// the turn.
+func (g *Game) drawTile() error {
+	var tile interfaces.Tile
+	var err error
+	if tile, err = g.tileset.Draw(); err != nil {
+		return err
+	}
+	g.CurrentPlayer().PickTile(tile)
+
+	if err = g.replaceUnplayableTiles(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// If a player has any permanently
+// unplayable tiles that player discard the unplayable tiles
+// and draws an equal number of replacement tiles. This can
+// only be done once per turn.
+func (g *Game) replaceUnplayableTiles() error {
+	for _, tile := range g.CurrentPlayer().Tiles() {
+		if g.isTilePermanentlyUnplayable(tile) {
+			g.CurrentPlayer().DiscardTile(tile)
+			if newTile, err := g.tileset.Draw(); err == nil {
+				g.CurrentPlayer().PickTile(newTile)
+			} else {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

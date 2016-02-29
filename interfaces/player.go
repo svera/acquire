@@ -2,7 +2,7 @@ package interfaces
 
 // Player is an interface that declares all methods to be implemented by a player implementation
 type Player interface {
-	Shares(c Corporation) int
+	Shares(corp Corporation) int
 	AddShares(corp Corporation, amount int) Player
 	RemoveShares(corp Corporation, amount int) Player
 	PickTile(t Tile) Player

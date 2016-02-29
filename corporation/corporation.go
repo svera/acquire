@@ -3,7 +3,7 @@ package corporation
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"	
+	"github.com/svera/acquire/interfaces"
 )
 
 type prices struct {
