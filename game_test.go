@@ -175,15 +175,15 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 
 	expectedPlayer0Cash := 7500
 	if players[0].Cash() != expectedPlayer0Cash {
-		t.Errorf("Player haven't received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
 	}
 	expectedPlayer1Cash := 7500
 	if players[1].Cash() != expectedPlayer1Cash {
-		t.Errorf("Player haven't received the correct bonus, must have %d$, got %d$", expectedPlayer1Cash, players[1].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayer1Cash, players[1].Cash())
 	}
 	expectedPlayer2Cash := 6000
 	if players[2].Cash() != expectedPlayer2Cash {
-		t.Errorf("Player haven't received the correct bonus, must have %d$, got %d$", expectedPlayer2Cash, players[2].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayer2Cash, players[2].Cash())
 	}
 }
 
@@ -217,15 +217,15 @@ func TestPlayTileMergeCorporationsMultipleMinorityShareholders(t *testing.T) {
 	game.PlayTile(tileToPlay)
 	expectedPlayer0Cash := 8000
 	if players[0].Cash() != expectedPlayer0Cash {
-		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayer0Cash, players[0].Cash())
 	}
 	expectedPlayer1Cash := 6500
 	if players[1].Cash() != expectedPlayer1Cash {
-		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer1Cash, players[1].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayer1Cash, players[1].Cash())
 	}
 	expectedPlayer2Cash := 6500
 	if players[2].Cash() != expectedPlayer2Cash {
-		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayer2Cash, players[2].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayer2Cash, players[2].Cash())
 	}
 }
 
@@ -257,7 +257,7 @@ func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	game.PlayTile(tileToPlay)
 	expectedPlayerCash := 9000
 	if players[0].Cash() != expectedPlayerCash {
-		t.Errorf("Player havent received the correct bonus, must have %d$, got %d$", expectedPlayerCash, players[0].Cash())
+		t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayerCash, players[0].Cash())
 	}
 }
 
