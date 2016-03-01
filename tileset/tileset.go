@@ -45,3 +45,13 @@ func (t *Tileset) Draw() (interfaces.Tile, error) {
 	}
 	return &tile.Tile{}, errors.New(NoTilesAvailable)
 }
+
+// DiscardTile removes passed tile from the tileset
+func (t *Tileset) DiscardTile(tl interfaces.Tile) {
+	for i, currentTile := range t.tiles {
+		if currentTile.Number() == tl.Number() && currentTile.Letter() == tl.Letter() {
+			t.tiles = append(t.tiles[:i], t.tiles[i+1:]...)
+			break
+		}
+	}
+}
