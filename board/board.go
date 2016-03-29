@@ -67,14 +67,15 @@ func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]int
 	adjacent := b.adjacentCorporationTiles(t.Number(), t.Letter())
 	for _, adjacentCell := range adjacent {
 		exist = false
-		corp, _ := adjacentCell.(interfaces.Corporation)
+		corporationInTile, _ := adjacentCell.(interfaces.Corporation)
 		for i := range corporations {
-			if corp == corporations[i] {
+			if corporationInTile == corporations[i] {
 				exist = true
+				break
 			}
 		}
 		if !exist {
-			corporations = append(corporations, corp)
+			corporations = append(corporations, corporationInTile)
 		}
 	}
 	if len(corporations) > 1 {
