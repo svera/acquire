@@ -62,11 +62,20 @@ func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile
 // corporations categorized between "acquirer" and "defunct"
 func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]interfaces.Corporation) {
 	var corporations sortableCorporations
+	var exist bool
 
 	adjacent := b.adjacentCorporationTiles(t.Number(), t.Letter())
 	for _, adjacentCell := range adjacent {
+		exist = false
 		corp, _ := adjacentCell.(interfaces.Corporation)
-		corporations = append(corporations, corp)
+		for i := range corporations {
+			if corp == corporations[i] {
+				exist = true
+			}
+		}
+		if !exist {
+			corporations = append(corporations, corp)
+		}
 	}
 	if len(corporations) > 1 {
 		return true, categorizeMerge(corporations)

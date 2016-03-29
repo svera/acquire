@@ -165,6 +165,29 @@ func TestTileDontMerge(t *testing.T) {
 	}
 }
 
+// Testing not a merge as this:
+//   3 4
+// E []><
+// F [][]
+func TestTileDontMergeWhenPuttingATileNextToSeveralTilesOfTheSameCorporation(t *testing.T) {
+	board := New()
+	corp2 := &mocks.Corporation{}
+	board.PutTile(&mocks.Tile{FakeNumber: 3, FakeLetter: "E"})
+	board.grid[3]["E"] = corp2
+	board.grid[3]["F"] = corp2
+	board.grid[4]["F"] = corp2
+
+	expectedCorporationsMerged := map[string][]interfaces.Corporation{}
+	merge, corporations := board.TileMergeCorporations(&mocks.Tile{FakeNumber: 4, FakeLetter: "E"})
+	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
+		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
+	}
+	if merge {
+		t.Errorf("TileMergeCorporations() must return false")
+	}
+
+}
+
 // Testing growing corporation as this:
 //   5 6 7 8
 // D   []
