@@ -7,3 +7,9 @@ package interfaces
 type Owner interface {
 	Type() string
 }
+
+const (
+	EmptyOwner          = "empty"
+	UnincorporatedOwner = "unincorporated"
+	CorporationOwner    = "corporation"
+)

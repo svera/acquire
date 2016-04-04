@@ -18,5 +18,5 @@ func (t *Tile) Letter() string {
 
 // Type mocks the Type method defined in the Tile interface
 func (t *Tile) Type() string {
-	return "unincorporated"
+	return interfaces.UnincorporatedOwner
 }

@@ -81,7 +81,7 @@ func (c *Corporation) RemoveStock(amount int) interfaces.Corporation {
 
 // Type mocks the Type method defined in the Corporation interface
 func (c *Corporation) Type() string {
-	return "corporation"
+	return interfaces.CorporationOwner
 }
 
 // Size mocks the Size method defined in the Corporation interface
