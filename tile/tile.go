@@ -4,6 +4,10 @@
 // Corporation implementation)
 package tile
 
+import (
+	"github.com/svera/acquire/interfaces"
+)
+
 // Tile stores position and owner of a tile
 type Tile struct {
 	number int
@@ -27,5 +31,5 @@ func (t *Tile) Letter() string {
 
 // Type returns owner interface Type method value
 func (t *Tile) Type() string {
-	return "unincorporated"
+	return interfaces.UnincorporatedOwner
 }

@@ -5,6 +5,7 @@ package acquire
 
 import (
 	"errors"
+
 	"github.com/svera/acquire/interfaces"
 )
 
@@ -202,7 +203,7 @@ func (g *Game) isTilePermanentlyUnplayable(tl interfaces.Tile) bool {
 	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Type() == "corporation" && adjacent.(interfaces.Corporation).IsSafe() {
+		if adjacent.Type() == interfaces.CorporationOwner && adjacent.(interfaces.Corporation).IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -219,12 +220,19 @@ func (g *Game) isTileTemporaryUnplayable(tl interfaces.Tile) bool {
 		return false
 	}
 	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
+	emptyAdjacentCells := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Type() == "unincorporated" {
-			return true
+		if adjacent.Type() == interfaces.CorporationOwner {
+			return false
+		}
+		if adjacent.Type() == interfaces.EmptyOwner {
+			emptyAdjacentCells += 1
 		}
 	}
-	return false
+	if emptyAdjacentCells == len(adjacents) {
+		return false
+	}
+	return true
 }
 
 // Player returns player with passed number

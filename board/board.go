@@ -2,8 +2,9 @@
 package board
 
 import (
-	"github.com/svera/acquire/interfaces"
 	"sort"
+
+	"github.com/svera/acquire/interfaces"
 )
 
 var letters = [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
@@ -46,7 +47,7 @@ func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile
 	var newCorporationTiles []interfaces.Tile
 	adjacent := b.adjacentTiles(t.Number(), t.Letter())
 	for _, adjacentTile := range adjacent {
-		if adjacentTile.Type() == "corporation" {
+		if adjacentTile.Type() == interfaces.CorporationOwner {
 			return false, []interfaces.Tile{}
 		}
 		newCorporationTiles = append(newCorporationTiles, adjacentTile.(interfaces.Tile))
@@ -61,17 +62,34 @@ func (b *Board) TileFoundCorporation(t interfaces.Tile) (bool, []interfaces.Tile
 // TileMergeCorporations checks if the passed tile merges two or more corporations, returns a map of
 // corporations categorized between "acquirer" and "defunct"
 func (b *Board) TileMergeCorporations(t interfaces.Tile) (bool, map[string][]interfaces.Corporation) {
-	var corporations sortableCorporations
-
-	adjacent := b.adjacentCorporationTiles(t.Number(), t.Letter())
-	for _, adjacentCell := range adjacent {
-		corp, _ := adjacentCell.(interfaces.Corporation)
-		corporations = append(corporations, corp)
-	}
+	corporations := b.adjacentCorporations(t.Number(), t.Letter())
 	if len(corporations) > 1 {
 		return true, categorizeMerge(corporations)
 	}
 	return false, map[string][]interfaces.Corporation{}
+}
+
+// Returns all corporations that are adjacent to to a given tile, without
+// repetition
+func (b *Board) adjacentCorporations(number int, letter string) sortableCorporations {
+	var corporations sortableCorporations
+	var exist bool
+
+	adjacent := b.adjacentCorporationTiles(number, letter)
+	for _, adjacentCell := range adjacent {
+		exist = false
+		corporationInTile, _ := adjacentCell.(interfaces.Corporation)
+		for i := range corporations {
+			if corporationInTile == corporations[i] {
+				exist = true
+				break
+			}
+		}
+		if !exist {
+			corporations = append(corporations, corporationInTile)
+		}
+	}
+	return corporations
 }
 
 // Distributes the corporation in a merge between acquirers and defuncts
@@ -103,8 +121,8 @@ func (b *Board) TileGrowCorporation(tl interfaces.Tile) (bool, []interfaces.Tile
 	corporationToGrow := nullCorporation
 	adjacent := b.adjacentTiles(tl.Number(), tl.Letter())
 	for _, adjacentCell := range adjacent {
-		if adjacentCell.Type() != "unincorporated" {
-			if corporationToGrow != nullCorporation {
+		if adjacentCell.Type() != interfaces.UnincorporatedOwner {
+			if corporationToGrow != nullCorporation && adjacentCell.(interfaces.Corporation) != corporationToGrow {
 				return false, []interfaces.Tile{}, nullCorporation
 			}
 			corporationToGrow = adjacentCell.(interfaces.Corporation)
@@ -160,7 +178,7 @@ func (b *Board) adjacentTiles(number int, letter string) []interfaces.Owner {
 		number,
 		letter,
 		func(o interfaces.Owner) bool {
-			if o.Type() != "empty" {
+			if o.Type() != interfaces.EmptyOwner {
 				return true
 			}
 			return false
@@ -173,7 +191,7 @@ func (b *Board) adjacentCorporationTiles(number int, letter string) []interfaces
 		number,
 		letter,
 		func(o interfaces.Owner) bool {
-			if o.Type() == "corporation" {
+			if o.Type() == interfaces.CorporationOwner {
 				return true
 			}
 			return false

@@ -152,5 +152,5 @@ func (c *Corporation) Class() int {
 
 // Type returns type, to comply with owner interface
 func (c *Corporation) Type() string {
-	return "corporation"
+	return interfaces.CorporationOwner
 }

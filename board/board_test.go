@@ -1,10 +1,11 @@
 package board
 
 import (
-	"github.com/svera/acquire/interfaces"
-	"github.com/svera/acquire/mocks"
 	"reflect"
 	"testing"
+
+	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire/mocks"
 )
 
 func TestPutTile(t *testing.T) {
@@ -12,7 +13,7 @@ func TestPutTile(t *testing.T) {
 
 	tile := &mocks.Tile{FakeNumber: 5, FakeLetter: "B"}
 	board.PutTile(tile)
-	if board.grid[5]["B"].Type() != "unincorporated" {
+	if board.grid[5]["B"].Type() != interfaces.UnincorporatedOwner {
 		t.Errorf("Position %d%s was not put on the board", 5, "B")
 	}
 }
@@ -165,6 +166,29 @@ func TestTileDontMerge(t *testing.T) {
 	}
 }
 
+// Testing not a merge as this:
+//   3 4
+// E []><
+// F [][]
+func TestTileDontMergeWhenPuttingATileNextToSeveralTilesOfTheSameCorporation(t *testing.T) {
+	board := New()
+	corp2 := &mocks.Corporation{}
+	board.PutTile(&mocks.Tile{FakeNumber: 3, FakeLetter: "E"})
+	board.grid[3]["E"] = corp2
+	board.grid[3]["F"] = corp2
+	board.grid[4]["F"] = corp2
+
+	expectedCorporationsMerged := map[string][]interfaces.Corporation{}
+	merge, corporations := board.TileMergeCorporations(&mocks.Tile{FakeNumber: 4, FakeLetter: "E"})
+	if !reflect.DeepEqual(corporations, expectedCorporationsMerged) {
+		t.Errorf("Position %d%s must not merge corporations, got %v instead", 4, "E", corporations)
+	}
+	if merge {
+		t.Errorf("TileMergeCorporations() must return false")
+	}
+
+}
+
 // Testing growing corporation as this:
 //   5 6 7 8
 // D   []
@@ -201,6 +225,38 @@ func TestTileGrowCorporation(t *testing.T) {
 	}
 	if !grow {
 		t.Errorf("TileGrowCorporation() must return true")
+	}
+}
+
+// Testing this grows a corporation:
+//   3 4
+// E []><
+// F [][]
+func TestDiagonalTileGrowCorporation(t *testing.T) {
+	board := New()
+	corp2 := &mocks.Corporation{}
+	board.grid[3]["E"] = corp2
+	board.grid[3]["F"] = corp2
+	board.grid[4]["F"] = corp2
+	growerTile := &mocks.Tile{FakeNumber: 4, FakeLetter: "E"}
+
+	expectedTileToAppend := []interfaces.Tile{
+		growerTile,
+	}
+	expectedCorporationToGrow := corp2
+	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(growerTile)
+	if !grow {
+		t.Errorf("TileGrowCorporation() must return true")
+	} else if !slicesSameCells(tilesToAppend, expectedTileToAppend) {
+		t.Errorf(
+			"Position %d%s must grow corporation %s by %v, got %v in corporation %s instead",
+			4,
+			"E",
+			expectedCorporationToGrow.Name(),
+			expectedTileToAppend,
+			tilesToAppend,
+			corporationToGrow.Name(),
+		)
 	}
 }
 
