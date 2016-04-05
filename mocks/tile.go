@@ -1,5 +1,9 @@
 package mocks
 
+import (
+	"github.com/svera/acquire/interfaces"
+)
+
 // Tile is a structure that implements the Tile interface for testing
 type Tile struct {
 	FakeNumber int

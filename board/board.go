@@ -117,21 +117,19 @@ func categorizeMerge(corporations sortableCorporations) map[string][]interfaces.
 // the ID of the corporation which grows
 func (b *Board) TileGrowCorporation(tl interfaces.Tile) (bool, []interfaces.Tile, interfaces.Corporation) {
 	tilesToAppend := []interfaces.Tile{tl}
-	var nullCorporation interfaces.Corporation
-	corporationToGrow := nullCorporation
+	var corporationToGrow, nullCorporation interfaces.Corporation
+
+	corporations := b.adjacentCorporations(tl.Number(), tl.Letter())
+	if len(corporations) != 1 {
+		return false, []interfaces.Tile{}, nullCorporation
+	}
+	corporationToGrow = corporations[0]
+
 	adjacent := b.adjacentTiles(tl.Number(), tl.Letter())
 	for _, adjacentCell := range adjacent {
-		if adjacentCell.Type() != interfaces.UnincorporatedOwner {
-			if corporationToGrow != nullCorporation && adjacentCell.(interfaces.Corporation) != corporationToGrow {
-				return false, []interfaces.Tile{}, nullCorporation
-			}
-			corporationToGrow = adjacentCell.(interfaces.Corporation)
-		} else {
+		if adjacentCell.Type() == interfaces.UnincorporatedOwner {
 			tilesToAppend = append(tilesToAppend, adjacentCell.(interfaces.Tile))
 		}
-	}
-	if corporationToGrow == nullCorporation {
-		return false, []interfaces.Tile{}, nullCorporation
 	}
 	return true, tilesToAppend, corporationToGrow
 }
