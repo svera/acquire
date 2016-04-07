@@ -395,10 +395,9 @@ func (g *Game) GameStateName() string {
 func (g *Game) drawTile() error {
 	var tile interfaces.Tile
 	var err error
-	if tile, err = g.tileset.Draw(); err != nil {
-		return err
+	if tile, err = g.tileset.Draw(); err == nil {
+		g.CurrentPlayer().PickTile(tile)
 	}
-	g.CurrentPlayer().PickTile(tile)
 
 	if err = g.replaceUnplayableTiles(); err != nil {
 		return err
@@ -417,8 +416,6 @@ func (g *Game) replaceUnplayableTiles() error {
 			g.CurrentPlayer().DiscardTile(tile)
 			if newTile, err := g.tileset.Draw(); err == nil {
 				g.CurrentPlayer().PickTile(newTile)
-			} else {
-				return err
 			}
 		}
 	}

@@ -2,8 +2,9 @@ package acquire
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
 	"sort"
+
+	"github.com/svera/acquire/interfaces"
 )
 
 func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces.Corporation) {
@@ -69,11 +70,11 @@ func (g *Game) getMainStockHolders(corp interfaces.Corporation) map[string][]int
 
 // Returns players who are shareholders of at least one of the passed companies
 // starting from the current one in play (mergemaker)
-func (g *Game) setSellTradePlayers(corporations []interfaces.Corporation) []int {
+func (g *Game) setSellTradePlayers(sellableCorps []interfaces.Corporation) []int {
 	shareholders := []int{}
 	index := g.currentPlayerNumber
 	for _ = range g.players {
-		for _, corp := range g.corporations {
+		for _, corp := range sellableCorps {
 			if g.players[index].Shares(corp) > 0 {
 				shareholders = append(shareholders, index)
 				break

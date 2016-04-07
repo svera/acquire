@@ -1,9 +1,10 @@
 package acquire
 
 import (
+	"testing"
+
 	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/mocks"
-	"testing"
 )
 
 func TestNewGameWrongNumberPlayers(t *testing.T) {
@@ -344,6 +345,11 @@ func TestSellTradeTurnPassing(t *testing.T) {
 //   4 5 6 7 8 9
 // E [][]><[][][]
 func setupPlayTileMerge(corporations [7]interfaces.Corporation, bd interfaces.Board) {
+	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
+		"acquirer": []interfaces.Corporation{corporations[1]},
+		"defunct":  []interfaces.Corporation{corporations[0]},
+	}
+
 	corporations[0].Grow(2)
 	corporations[1].Grow(3)
 }

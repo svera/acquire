@@ -3,10 +3,11 @@ package tileset
 
 import (
 	"errors"
-	"github.com/svera/acquire/interfaces"
-	"github.com/svera/acquire/tile"
 	"math/rand"
 	"time"
+
+	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire/tile"
 )
 
 const (
@@ -37,13 +38,19 @@ func (t *Tileset) Draw() (interfaces.Tile, error) {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	remainingTiles := len(t.tiles)
-	if remainingTiles > 0 {
-		pos := rn.Intn(remainingTiles - 1)
-		tile := t.tiles[pos]
-		t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
-		return tile, nil
+	if remainingTiles == 0 {
+		return &tile.Tile{}, errors.New(NoTilesAvailable)
 	}
-	return &tile.Tile{}, errors.New(NoTilesAvailable)
+
+	var pos int
+	if remainingTiles > 1 {
+		pos = rn.Intn(remainingTiles - 1)
+	} else if remainingTiles == 1 {
+		pos = 0
+	}
+	tile := t.tiles[pos]
+	t.tiles = append(t.tiles[:pos], t.tiles[pos+1:]...)
+	return tile, nil
 }
 
 // DiscardTile removes passed tile from the tileset
