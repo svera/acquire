@@ -8,6 +8,7 @@ type Board interface {
 	TileGrowCorporation(t Tile) (bool, []Tile, Corporation)
 	PutTile(t Tile) Board
 	AdjacentCells(number int, letter string) []Owner
+	AdjacentCorporations(number int, letter string) []Corporation
 	SetOwner(cp Corporation, tiles []Tile) Board
 	ChangeOwner(oldOwner Corporation, newOwner Corporation) Board
 }

@@ -167,11 +167,6 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 	corporations[0].(*mocks.Corporation).FakeMajorityBonus = 2000
 	corporations[0].(*mocks.Corporation).FakeMinorityBonus = 1000
 
-	bd.(*mocks.Board).FakeMergeCorporations = true
-	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[1]},
-		"defunct":  []interfaces.Corporation{corporations[0]},
-	}
 	game.PlayTile(tileToPlay)
 
 	expectedPlayer0Cash := 7500
@@ -209,12 +204,6 @@ func TestPlayTileMergeCorporationsMultipleMinorityShareholders(t *testing.T) {
 	corporations[0].(*mocks.Corporation).FakeMajorityBonus = 2000
 	corporations[0].(*mocks.Corporation).FakeMinorityBonus = 1000
 
-	bd.(*mocks.Board).FakeMergeCorporations = true
-	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[1]},
-		"defunct":  []interfaces.Corporation{corporations[0]},
-	}
-
 	game.PlayTile(tileToPlay)
 	expectedPlayer0Cash := 8000
 	if players[0].Cash() != expectedPlayer0Cash {
@@ -249,12 +238,6 @@ func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	corporations[0].(*mocks.Corporation).FakeMajorityBonus = 2000
 	corporations[0].(*mocks.Corporation).FakeMinorityBonus = 1000
 
-	bd.(*mocks.Board).FakeMergeCorporations = true
-	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[1]},
-		"defunct":  []interfaces.Corporation{corporations[0]},
-	}
-
 	game.PlayTile(tileToPlay)
 	expectedPlayerCash := 9000
 	if players[0].Cash() != expectedPlayerCash {
@@ -277,12 +260,6 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	corporations[0].(*mocks.Corporation).FakeMajorityBonus = 2000
 	corporations[0].(*mocks.Corporation).FakeMinorityBonus = 1000
 	corporations[0].(*mocks.Corporation).FakeStockPrice = 200
-
-	bd.(*mocks.Board).FakeMergeCorporations = true
-	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[1]},
-		"defunct":  []interfaces.Corporation{corporations[0]},
-	}
 
 	game.PlayTile(tileToPlay)
 	sell := map[interfaces.Corporation]int{corporations[0]: 6}
@@ -309,6 +286,50 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	}
 	if players[0].Shares(game.corporations[0]) != 0 {
 		t.Errorf("Wrong stock shares amount for player, expected %d, got %d", 0, players[0].Shares(game.corporations[0]))
+	}
+}
+
+// Testing merge as this:
+//   4 5 6 7 8 9
+// E [][][]><[][]
+// F       []
+//
+// This is a special case in which, after the merger, tile 7F must be included
+// in the resulting corporation as it make it grow
+func TestPlayTileMergeCorporationsAndGrow(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	setupPlayTileMerge(corporations, bd)
+	tileToPlay := &mocks.Tile{FakeNumber: 7, FakeLetter: "E"}
+
+	game, _ := New(bd, players, corporations, ts, &mocks.State{FakeStateName: interfaces.PlayTileStateName, TimesCalled: map[string]int{}})
+
+	bd.PutTile(&mocks.Tile{FakeNumber: 7, FakeLetter: "F"})
+
+	game.PlayTile(tileToPlay)
+
+	bd.(*mocks.Board).FakeAdjacentCells = []interfaces.Owner{
+		corporations[0],
+		corporations[1],
+		&mocks.Empty{},
+		&mocks.Tile{FakeNumber: 7, FakeLetter: "F"},
+	}
+
+	players[0].(*mocks.Player).FakeShares[corporations[0]] = 6
+	players[0].(*mocks.Player).FakeHasTile = true
+	players[2].(*mocks.Player).FakeShares[corporations[0]] = 4
+
+	sell := map[interfaces.Corporation]int{corporations[0]: 6}
+	trade := map[interfaces.Corporation]int{}
+	game.state.(*mocks.State).FakeStateName = interfaces.SellTradeStateName
+	game.mergeCorps = map[string][]interfaces.Corporation{
+		"acquirer": []interfaces.Corporation{corporations[1]},
+		"defunct":  []interfaces.Corporation{corporations[0]},
+	}
+	game.lastPlayedTile = tileToPlay
+	game.SellTrade(sell, trade)
+
+	if game.corporations[1].Size() != 7 {
+		t.Errorf("Corporation 1 must have a size of %d, got %d", 7, corporations[1].Size())
 	}
 }
 
@@ -345,6 +366,7 @@ func TestSellTradeTurnPassing(t *testing.T) {
 //   4 5 6 7 8 9
 // E [][]><[][][]
 func setupPlayTileMerge(corporations [7]interfaces.Corporation, bd interfaces.Board) {
+	bd.(*mocks.Board).FakeMergeCorporations = true
 	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
 		"acquirer": []interfaces.Corporation{corporations[1]},
 		"defunct":  []interfaces.Corporation{corporations[0]},
@@ -413,26 +435,41 @@ func TestBuyStockAndEndGame(t *testing.T) {
 	}
 }
 
-// Testing that if player has an permanently unplayable tile, this is exchanged:
+// Testing that if player has an permanently unplayable tile, it is detected:
 // In the following example, tile 6D is unplayable because it would merge safe
 // corporations 0 and 1
 //
 //    5 6  7 8
 // D [0]><[1]
-func TestDrawTile(t *testing.T) {
+func TestIsTilePlayable(t *testing.T) {
 	players, corporations, bd, ts := setup()
-	corporations[0].(*mocks.Corporation).FakeSize = 11
-	corporations[1].(*mocks.Corporation).FakeSize = 15
 	corporations[0].(*mocks.Corporation).FakeIsSafe = true
 	corporations[1].(*mocks.Corporation).FakeIsSafe = true
 	unplayableTile := &mocks.Tile{FakeNumber: 6, FakeLetter: "D"}
-	bd.(*mocks.Board).FakeAdjacentCells = []interfaces.Owner{corporations[0], corporations[1]}
+	bd.(*mocks.Board).FakeAdjacentCorporations = []interfaces.Corporation{corporations[0], corporations[1]}
 
 	game, _ := New(bd, players, corporations, ts, &mocks.State{FakeStateName: interfaces.BuyStockStateName, TimesCalled: map[string]int{}})
-	players[0].(*mocks.Player).FakeTiles = []interfaces.Tile{unplayableTile}
-	game.drawTile()
-	if game.players[0].(*mocks.Player).TimesCalled["DiscardTile"] == 0 {
-		t.Errorf("Unplayable tile not discarded after drawing new tile, got %v", players[0].Tiles())
+	if game.IsTilePlayable(unplayableTile) {
+		t.Errorf("Unplayable tile not detected")
+	}
+}
+
+// Testing that if player has a neighbour tile of a safe corporation, that tile
+// is still playable:
+// In the following example, tile 6D is playable because it would make safe
+// corporations 0 grow
+//
+//    5 6  7 8
+// D [0]><[0]
+func TestIsGrowTilePlayable(t *testing.T) {
+	players, corporations, bd, ts := setup()
+	corporations[0].(*mocks.Corporation).FakeIsSafe = true
+	playableTile := &mocks.Tile{FakeNumber: 6, FakeLetter: "D"}
+	bd.(*mocks.Board).FakeAdjacentCorporations = []interfaces.Corporation{corporations[0], corporations[1]}
+
+	game, _ := New(bd, players, corporations, ts, &mocks.State{FakeStateName: interfaces.BuyStockStateName, TimesCalled: map[string]int{}})
+	if !game.IsTilePlayable(playableTile) {
+		t.Errorf("Playable tile detected as unplayable")
 	}
 }
 

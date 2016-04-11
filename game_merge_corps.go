@@ -169,5 +169,12 @@ func (g *Game) completeMerge() {
 	}
 	g.board.SetOwner(acquirer, []interfaces.Tile{g.lastPlayedTile})
 	acquirer.Grow(1)
+	adjacent := g.board.AdjacentCells(g.lastPlayedTile.Number(), g.lastPlayedTile.Letter())
+	for _, cell := range adjacent {
+		if cell.Type() == interfaces.UnincorporatedOwner {
+			acquirer.Grow(1)
+			g.board.SetOwner(acquirer, []interfaces.Tile{cell.(interfaces.Tile)})
+		}
+	}
 	g.mergeCorps = map[string][]interfaces.Corporation{}
 }

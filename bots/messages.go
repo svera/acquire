@@ -6,6 +6,7 @@ const (
 	BuyResponseType        = "buy"
 	SellTradeResponseType  = "sellTrade"
 	UntieMergeResponseType = "untieMerge"
+	EndGameResponseType    = "end"
 )
 
 type Message struct {

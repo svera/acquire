@@ -17,6 +17,7 @@ type Board struct {
 	FakeGrowCorporationTiles   []interfaces.Tile
 	FakeGrowCorporationCorp    interfaces.Corporation
 	FakeAdjacentCells          []interfaces.Owner
+	FakeAdjacentCorporations   []interfaces.Corporation
 	TimesCalled                map[string]int
 }
 
@@ -64,4 +65,9 @@ func (b *Board) ChangeOwner(oldOwner interfaces.Corporation, newOwner interfaces
 	_, _ = oldOwner, newOwner
 	b.TimesCalled["ChangeOwner"]++
 	return b
+}
+
+func (b *Board) AdjacentCorporations(number int, letter string) []interfaces.Corporation {
+	_, _ = number, letter
+	return b.FakeAdjacentCorporations
 }

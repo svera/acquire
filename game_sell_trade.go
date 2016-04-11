@@ -2,6 +2,7 @@ package acquire
 
 import (
 	"errors"
+
 	"github.com/svera/acquire/interfaces"
 )
 
@@ -17,7 +18,6 @@ func (g *Game) SellTrade(sell map[interfaces.Corporation]int, trade map[interfac
 	for corp, amount := range trade {
 		g.trade(corp, amount)
 	}
-
 	if len(g.sellTradePlayers) == 0 {
 		g.setCurrentPlayer(g.frozenPlayer)
 		g.completeMerge()

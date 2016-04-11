@@ -2,10 +2,16 @@
 package bots
 
 import (
-	"github.com/svera/acquire/interfaces"
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/svera/acquire/interfaces"
+)
+
+const (
+	endGameCorporationSize = 41
+	safeCorporationSize    = 11
 )
 
 // Random is a struct which implements a very stupid AI, which basically
@@ -14,41 +20,52 @@ type Random struct {
 	*base
 }
 
+// NewRandom returns a new instance of the random AI bot
 func NewRandom() *Random {
 	return &Random{
 		&base{},
 	}
 }
 
+// Play analyses the current game status and returns a message with the
+// next play movement by the bot AI
 func (r *Random) Play() interface{} {
 	var msg Message
-	switch r.status.State {
-	case interfaces.PlayTileStateName:
+
+	if !r.status.LastTurn && r.claimEndGame() {
 		msg = Message{
-			Type:   PlayTileResponseType,
-			Params: r.playTile(),
+			Type: EndGameResponseType,
 		}
-	case interfaces.FoundCorpStateName:
-		msg = Message{
-			Type:   NewCorpResponseType,
-			Params: r.foundCorporation(),
-		}
-	case interfaces.BuyStockStateName:
-		msg = Message{
-			Type:   BuyResponseType,
-			Params: r.buyStock(),
-		}
-	case interfaces.SellTradeStateName:
-		msg = Message{
-			Type:   SellTradeResponseType,
-			Params: r.sellTrade(),
-		}
-	case interfaces.UntieMergeStateName:
-		msg = Message{
-			Type:   UntieMergeResponseType,
-			Params: r.untieMerge(),
+	} else {
+		switch r.status.State {
+		case interfaces.PlayTileStateName:
+			msg = Message{
+				Type:   PlayTileResponseType,
+				Params: r.playTile(),
+			}
+		case interfaces.FoundCorpStateName:
+			msg = Message{
+				Type:   NewCorpResponseType,
+				Params: r.foundCorporation(),
+			}
+		case interfaces.BuyStockStateName:
+			msg = Message{
+				Type:   BuyResponseType,
+				Params: r.buyStock(),
+			}
+		case interfaces.SellTradeStateName:
+			msg = Message{
+				Type:   SellTradeResponseType,
+				Params: r.sellTrade(),
+			}
+		case interfaces.UntieMergeStateName:
+			msg = Message{
+				Type:   UntieMergeResponseType,
+				Params: r.untieMerge(),
+			}
 		}
 	}
+
 	return msg
 }
 
@@ -63,10 +80,15 @@ func (r *Random) playTile() PlayTileResponseParams {
 }
 
 func (r *Random) foundCorporation() NewCorpResponseParams {
+	source := rand.NewSource(time.Now().UnixNano())
+	rn := rand.New(source)
+	var corpNumber int
 	response := NewCorpResponseParams{}
-	for _, corp := range r.status.Corps {
-		if corp.Size == 0 {
-			response.Corporation = strings.ToLower(corp.Name)
+	for {
+		corpNumber = rn.Intn(len(r.status.Corps))
+		if r.status.Corps[corpNumber].Size == 0 {
+			response.Corporation = strings.ToLower(r.status.Corps[corpNumber].Name)
+			break
 		}
 	}
 	return response
@@ -122,4 +144,23 @@ func (r *Random) untieMerge() UntieMergeResponseParams {
 	return UntieMergeResponseParams{
 		Corporation: r.status.TiedCorps[0],
 	}
+}
+
+func (r *Random) claimEndGame() bool {
+	var active, safe int
+	for _, corp := range r.status.Corps {
+		if corp.Size >= endGameCorporationSize {
+			return true
+		}
+		if corp.Size > 0 {
+			active++
+		}
+		if corp.Size >= safeCorporationSize {
+			safe++
+		}
+	}
+	if active > 0 && active == safe {
+		return true
+	}
+	return false
 }

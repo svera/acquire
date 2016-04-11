@@ -200,10 +200,10 @@ func (g *Game) IsTilePlayable(tl interfaces.Tile) bool {
 // Returns true if a tile is permanently unplayable, that is,
 // that putting it on the board would merge two or more safe corporations
 func (g *Game) isTilePermanentlyUnplayable(tl interfaces.Tile) bool {
-	adjacents := g.board.AdjacentCells(tl.Number(), tl.Letter())
+	adjacents := g.board.AdjacentCorporations(tl.Number(), tl.Letter())
 	safeNeighbours := 0
 	for _, adjacent := range adjacents {
-		if adjacent.Type() == interfaces.CorporationOwner && adjacent.(interfaces.Corporation).IsSafe() {
+		if adjacent.IsSafe() {
 			safeNeighbours++
 		}
 		if safeNeighbours == 2 {
@@ -293,13 +293,9 @@ func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 	g.board.PutTile(tl)
 	if g.existActiveCorporations() {
 		g.state = g.state.ToBuyStock()
-	} else {
-		if err := g.drawTile(); err != nil {
-			return err
-		}
-		g.nextPlayer()
+		return nil
 	}
-	return nil
+	return g.nextTurn()
 }
 
 func (g *Game) existActiveCorporations() bool {
@@ -374,11 +370,6 @@ func (g *Game) ClaimEndGame() *Game {
 	return g
 }
 
-// IsLastTurn returns if the current turn will be the last one or not
-func (g *Game) IsLastTurn() bool {
-	return g.isLastTurn
-}
-
 // Board returns game's board instance
 func (g *Game) Board() interfaces.Board {
 	return g.board
@@ -387,6 +378,27 @@ func (g *Game) Board() interfaces.Board {
 // GameStateName returns game's current state
 func (g *Game) GameStateName() string {
 	return g.state.Name()
+}
+
+func (g *Game) nextTurn() error {
+	if g.isLastTurn {
+		g.state = g.state.ToEndGame()
+		return g.finish()
+	}
+	if err := g.drawTile(); err != nil {
+		return err
+	}
+	if g.state.Name() != interfaces.PlayTileStateName {
+		g.state = g.state.ToPlayTile()
+	}
+	g.nextPlayer()
+
+	return nil
+}
+
+// IsLastTurn returns if the current turn will be the last one or not
+func (g *Game) IsLastTurn() bool {
+	return g.isLastTurn
 }
 
 // A player takes a tile from the facedown cluster to replace

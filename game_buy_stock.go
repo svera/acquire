@@ -2,6 +2,7 @@ package acquire
 
 import (
 	"errors"
+
 	"github.com/svera/acquire/interfaces"
 )
 
@@ -19,17 +20,7 @@ func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
 		g.buy(corp, amount)
 	}
 
-	if g.isLastTurn {
-		g.state = g.state.ToEndGame()
-		return g.finish()
-	}
-	if err := g.drawTile(); err != nil {
-		return err
-	}
-	g.state = g.state.ToPlayTile()
-	g.nextPlayer()
-
-	return nil
+	return g.nextTurn()
 }
 
 func (g *Game) buy(corp interfaces.Corporation, amount int) {
