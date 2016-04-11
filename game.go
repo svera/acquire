@@ -148,6 +148,7 @@ func (g *Game) giveInitialTileset(plyr interfaces.Player) {
 // AreEndConditionsReached checks if game end conditions are reached
 func (g *Game) AreEndConditionsReached() bool {
 	active := g.activeCorporations()
+	safe := 0
 	if len(active) == 0 {
 		return false
 	}
@@ -155,11 +156,14 @@ func (g *Game) AreEndConditionsReached() bool {
 		if corp.Size() >= endGameCorporationSize {
 			return true
 		}
-		if !corp.IsSafe() {
-			return false
+		if corp.IsSafe() {
+			safe++
 		}
 	}
-	return true
+	if safe == len(active) {
+		return true
+	}
+	return false
 }
 
 // ActiveCorporations returns all corporations on the board

@@ -77,7 +77,16 @@ func TestAreEndConditionsReached(t *testing.T) {
 	corporations[1].(*mocks.Corporation).FakeIsActive = true
 
 	if game.AreEndConditionsReached() {
-		t.Errorf("End game conditions not reached but detected as it were")
+		t.Errorf("End game conditions not reached but detected as it were (only corporation 0 is safe)")
+	}
+
+	corporations[0].(*mocks.Corporation).FakeSize = 2
+	corporations[1].(*mocks.Corporation).FakeSize = 41
+	corporations[0].(*mocks.Corporation).FakeIsSafe = false
+	corporations[1].(*mocks.Corporation).FakeIsSafe = true
+
+	if !game.AreEndConditionsReached() {
+		t.Errorf("End game conditions reached but not detected (corporation 1 is bigger than 40 tiles)")
 	}
 
 }
