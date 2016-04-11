@@ -230,7 +230,7 @@ func (g *Game) isTileTemporaryUnplayable(tl interfaces.Tile) bool {
 			return false
 		}
 		if adjacent.Type() == interfaces.EmptyOwner {
-			emptyAdjacentCells += 1
+			emptyAdjacentCells++
 		}
 	}
 	if emptyAdjacentCells == len(adjacents) {
