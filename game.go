@@ -86,14 +86,36 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
 	}
-	if len(optional.Corporations) == 0 {
+	if optional, err := initOptionalParameters(optional); err == nil {
+		gm := Game{
+			board:               optional.Board,
+			players:             players,
+			corporations:        optional.Corporations,
+			tileset:             optional.Tileset,
+			currentPlayerNumber: 0,
+			turn:                1,
+			state:               optional.State,
+			isLastTurn:          false,
+		}
+		for _, pl := range gm.players {
+			gm.giveInitialHand(pl)
+		}
+
+		return &gm, nil
+	} else {
+		return nil, err
+	}
+}
+
+func initOptionalParameters(optional Optional) (Optional, error) {
+	if areCorporationsEmpty(optional.Corporations) {
 		optional.Corporations = defaultCorporations()
 	} else {
 		if !areNamesUnique(optional.Corporations) {
-			return nil, errors.New(CorpNamesNotUnique)
+			return Optional{}, errors.New(CorpNamesNotUnique)
 		}
 		if !isNumberOfCorpsPerClassRight(optional.Corporations) {
-			return nil, errors.New(WrongNumberCorpsClass)
+			return Optional{}, errors.New(WrongNumberCorpsClass)
 		}
 	}
 	if optional.Board == nil {
@@ -105,21 +127,16 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 	if optional.State == nil {
 		optional.State = &fsm.PlayTile{}
 	}
-	gm := Game{
-		board:               optional.Board,
-		players:             players,
-		corporations:        optional.Corporations,
-		tileset:             optional.Tileset,
-		currentPlayerNumber: 0,
-		turn:                1,
-		state:               optional.State,
-		isLastTurn:          false,
-	}
-	for _, pl := range gm.players {
-		gm.giveInitialTileset(pl)
-	}
+	return optional, nil
+}
 
-	return &gm, nil
+func areCorporationsEmpty(corporations [7]interfaces.Corporation) bool {
+	for i := range corporations {
+		if corporations[i] == nil {
+			return true
+		}
+	}
+	return false
 }
 
 // Check that the passed corporations have unique names
@@ -153,7 +170,7 @@ func (g *Game) Corporations() [7]interfaces.Corporation {
 }
 
 // Initialises player hand of tiles
-func (g *Game) giveInitialTileset(plyr interfaces.Player) {
+func (g *Game) giveInitialHand(plyr interfaces.Player) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
 		plyr.PickTile(tile)
