@@ -83,10 +83,11 @@ type Game struct {
 
 // New initialises a new Acquire game
 func New(players []interfaces.Player, optional Optional) (*Game, error) {
+	var err error
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
 	}
-	if optional, err := initOptionalParameters(optional); err == nil {
+	if optional, err = initOptionalParameters(optional); err == nil {
 		gm := Game{
 			board:               optional.Board,
 			players:             players,
@@ -102,9 +103,8 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 		}
 
 		return &gm, nil
-	} else {
-		return nil, err
 	}
+	return nil, err
 }
 
 func initOptionalParameters(optional Optional) (Optional, error) {
@@ -165,6 +165,7 @@ func isNumberOfCorpsPerClassRight(corporations [7]interfaces.Corporation) bool {
 	return true
 }
 
+// Corporations returns an array with all seven corporations
 func (g *Game) Corporations() [7]interfaces.Corporation {
 	return g.corporations
 }

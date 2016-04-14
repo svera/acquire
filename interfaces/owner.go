@@ -8,6 +8,7 @@ type Owner interface {
 	Type() string
 }
 
+// Constants which define identificators for all cell owner types.
 const (
 	EmptyOwner          = "empty"
 	UnincorporatedOwner = "unincorporated"
