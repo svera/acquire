@@ -6,7 +6,11 @@ package acquire
 import (
 	"errors"
 
+	"github.com/svera/acquire/board"
+	"github.com/svera/acquire/corporation"
+	"github.com/svera/acquire/fsm"
 	"github.com/svera/acquire/interfaces"
+	"github.com/svera/acquire/tileset"
 )
 
 const (
@@ -78,37 +82,61 @@ type Game struct {
 }
 
 // New initialises a new Acquire game
-func New(
-	board interfaces.Board,
-	players []interfaces.Player,
-	corporations [7]interfaces.Corporation,
-	tileset interfaces.Tileset,
-	state interfaces.State,
-) (*Game, error) {
+func New(players []interfaces.Player, optional Optional) (*Game, error) {
+	var err error
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
 	}
-	if !areNamesUnique(corporations) {
-		return nil, errors.New(CorpNamesNotUnique)
-	}
-	if !isNumberOfCorpsPerClassRight(corporations) {
-		return nil, errors.New(WrongNumberCorpsClass)
-	}
-	gm := Game{
-		board:               board,
-		players:             players,
-		corporations:        corporations,
-		tileset:             tileset,
-		currentPlayerNumber: 0,
-		turn:                1,
-		state:               state,
-		isLastTurn:          false,
-	}
-	for _, pl := range gm.players {
-		gm.giveInitialTileset(pl)
-	}
+	if optional, err = initOptionalParameters(optional); err == nil {
+		gm := Game{
+			board:               optional.Board,
+			players:             players,
+			corporations:        optional.Corporations,
+			tileset:             optional.Tileset,
+			currentPlayerNumber: 0,
+			turn:                1,
+			state:               optional.State,
+			isLastTurn:          false,
+		}
+		for _, pl := range gm.players {
+			gm.giveInitialHand(pl)
+		}
 
-	return &gm, nil
+		return &gm, nil
+	}
+	return nil, err
+}
+
+func initOptionalParameters(optional Optional) (Optional, error) {
+	if areCorporationsEmpty(optional.Corporations) {
+		optional.Corporations = defaultCorporations()
+	} else {
+		if !areNamesUnique(optional.Corporations) {
+			return Optional{}, errors.New(CorpNamesNotUnique)
+		}
+		if !isNumberOfCorpsPerClassRight(optional.Corporations) {
+			return Optional{}, errors.New(WrongNumberCorpsClass)
+		}
+	}
+	if optional.Board == nil {
+		optional.Board = board.New()
+	}
+	if optional.Tileset == nil {
+		optional.Tileset = tileset.New()
+	}
+	if optional.State == nil {
+		optional.State = &fsm.PlayTile{}
+	}
+	return optional, nil
+}
+
+func areCorporationsEmpty(corporations [7]interfaces.Corporation) bool {
+	for i := range corporations {
+		if corporations[i] == nil {
+			return true
+		}
+	}
+	return false
 }
 
 // Check that the passed corporations have unique names
@@ -137,8 +165,13 @@ func isNumberOfCorpsPerClassRight(corporations [7]interfaces.Corporation) bool {
 	return true
 }
 
+// Corporations returns an array with all seven corporations
+func (g *Game) Corporations() [7]interfaces.Corporation {
+	return g.corporations
+}
+
 // Initialises player hand of tiles
-func (g *Game) giveInitialTileset(plyr interfaces.Player) {
+func (g *Game) giveInitialHand(plyr interfaces.Player) {
 	for i := 0; i < 6; i++ {
 		tile, _ := g.tileset.Draw()
 		plyr.PickTile(tile)
@@ -437,4 +470,28 @@ func (g *Game) replaceUnplayableTiles() error {
 	}
 
 	return nil
+}
+
+func defaultCorporations() [7]interfaces.Corporation {
+	var corporations [7]interfaces.Corporation
+	corpsParams := [7]map[string]int{
+		map[string]int{"Sackson": 0},
+		map[string]int{"Zeta": 0},
+		map[string]int{"Hydra": 1},
+		map[string]int{"Fusion": 1},
+		map[string]int{"America": 1},
+		map[string]int{"Phoenix": 2},
+		map[string]int{"Quantum": 2},
+	}
+
+	for i, corpData := range corpsParams {
+		for corpName, corpClass := range corpData {
+			if corp, err := corporation.New(corpName, corpClass); err == nil {
+				corporations[i] = corp
+			} else {
+				panic(err)
+			}
+		}
+	}
+	return corporations
 }

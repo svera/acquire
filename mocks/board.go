@@ -67,6 +67,7 @@ func (b *Board) ChangeOwner(oldOwner interfaces.Corporation, newOwner interfaces
 	return b
 }
 
+// AdjacentCorporations mocks the AdjacentCorporations method defined in the Board interface
 func (b *Board) AdjacentCorporations(number int, letter string) []interfaces.Corporation {
 	_, _ = number, letter
 	return b.FakeAdjacentCorporations
