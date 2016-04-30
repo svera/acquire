@@ -73,10 +73,21 @@ func (r *Random) playTile() PlayTileResponseParams {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	tileNumber := rn.Intn(len(r.status.Hand))
+	tileCoords := r.tileCoords()
 
 	return PlayTileResponseParams{
-		Tile: r.status.Hand[tileNumber].Coords,
+		Tile: tileCoords[tileNumber],
 	}
+}
+
+// As the tiles in hand come as a map, we need to store its coordinates in an array
+// before selecting a random one
+func (r *Random) tileCoords() []string {
+	coords := make([]string, 0, len(r.status.Hand))
+	for k := range r.status.Hand {
+		coords = append(coords, k)
+	}
+	return coords
 }
 
 func (r *Random) foundCorporation() NewCorpResponseParams {

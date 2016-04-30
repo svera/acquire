@@ -3,9 +3,10 @@ package bots
 // Status is a struct used by bot implementations to know about the current
 // status of a game.
 type Status struct {
-	Board      map[string]string
-	State      string
-	Hand       []HandData
+	Board map[string]string
+	State string
+	// Hand is a map that stores all player's tiles and whether each is playable or not
+	Hand       map[string]bool
 	Corps      [7]CorpData
 	TiedCorps  []string
 	PlayerInfo PlayerData
@@ -29,10 +30,4 @@ type PlayerData struct {
 	Name        string
 	Cash        int
 	OwnedShares [7]int
-}
-
-// HandData is a struct which holds data about a player hand in a game.
-type HandData struct {
-	Coords   string
-	Playable bool
 }
