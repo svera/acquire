@@ -1,9 +1,7 @@
 // Package player containst the struct Player and attached methods which manages player status in game.
 package player
 
-import (
-	"github.com/svera/acquire/interfaces"
-)
+import "github.com/svera/acquire/interfaces"
 
 // Player stores the status of a player
 type Player struct {

@@ -288,6 +288,27 @@ func TestAdjacentCells(t *testing.T) {
 			tl.Number(), tl.Letter(), len(adjacentCells),
 		)
 	}
+
+	tl = &mocks.Tile{FakeNumber: 2, FakeLetter: "A"}
+
+	adjacentCells = brd.AdjacentCells(tl.Number(), tl.Letter())
+	if len(adjacentCells) != 3 {
+		t.Errorf(
+			"Position %d%s expected to have adjacent 3 adjacent tiles, got %d",
+			tl.Number(), tl.Letter(), len(adjacentCells),
+		)
+	}
+
+	tl = &mocks.Tile{FakeNumber: 2, FakeLetter: "B"}
+
+	adjacentCells = brd.AdjacentCells(tl.Number(), tl.Letter())
+	if len(adjacentCells) != 4 {
+		t.Errorf(
+			"Position %d%s expected to have adjacent 4 adjacent tiles, got %d",
+			tl.Number(), tl.Letter(), len(adjacentCells),
+		)
+	}
+
 }
 
 func TestSetOwner(t *testing.T) {

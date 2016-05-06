@@ -5,6 +5,7 @@ package acquire
 
 import (
 	"errors"
+	"log"
 
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
@@ -318,6 +319,7 @@ func (g *Game) checkTile(tl interfaces.Tile) error {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
+		log.Printf("Unplayable tile: %d%s", tl.Number(), tl.Letter())
 		return errors.New(TileTemporaryUnplayable)
 	}
 	if !g.CurrentPlayer().HasTile(tl) {

@@ -81,11 +81,13 @@ func (r *Random) playTile() PlayTileResponseParams {
 }
 
 // As the tiles in hand come as a map, we need to store its coordinates in an array
-// before selecting a random one
+// before selecting a random one (only the playable ones)
 func (r *Random) tileCoords() []string {
 	coords := make([]string, 0, len(r.status.Hand))
-	for k := range r.status.Hand {
-		coords = append(coords, k)
+	for k, playable := range r.status.Hand {
+		if playable {
+			coords = append(coords, k)
+		}
 	}
 	return coords
 }
