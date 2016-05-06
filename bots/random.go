@@ -72,8 +72,8 @@ func (r *Random) Play() interface{} {
 func (r *Random) playTile() PlayTileResponseParams {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
-	tileNumber := rn.Intn(len(r.status.Hand))
 	tileCoords := r.tileCoords()
+	tileNumber := rn.Intn(len(tileCoords))
 
 	return PlayTileResponseParams{
 		Tile: tileCoords[tileNumber],
