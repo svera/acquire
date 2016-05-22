@@ -5,7 +5,6 @@ package acquire
 
 import (
 	"errors"
-	"log"
 
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
@@ -319,7 +318,6 @@ func (g *Game) checkTile(tl interfaces.Tile) error {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
-		log.Printf("Unplayable tile: %d%s", tl.Number(), tl.Letter())
 		return errors.New(TileTemporaryUnplayable)
 	}
 	if !g.CurrentPlayer().HasTile(tl) {
@@ -385,12 +383,33 @@ func (g *Game) growCorporation(corp interfaces.Corporation, tiles []interfaces.T
 	corp.Grow(len(tiles))
 }
 
-// Increases the number which specifies the current player
+// Increases the number which specifies the current player.
+// Turn passes only to an active player.
 func (g *Game) nextPlayer() {
-	g.currentPlayerNumber++
-	if g.currentPlayerNumber == len(g.players) {
-		g.currentPlayerNumber = 0
-		g.turn++
+	for {
+		g.currentPlayerNumber++
+		if g.currentPlayerNumber == len(g.players) {
+			g.currentPlayerNumber = 0
+			g.turn++
+		}
+		if g.players[g.currentPlayerNumber].Active() {
+			return
+		}
+	}
+}
+
+// DeactivatePlayer gets the received player and marks it as inactive
+// (probably because the player has left the game). All player's
+// assets are returned to its respective origin sets (tile heap)
+func (g *Game) DeactivatePlayer(pl interfaces.Player) {
+	pl.Deactivate()
+	pl.RemoveCash(pl.Cash())
+	g.tileset.Add(pl.Tiles())
+	for _, corp := range g.Corporations() {
+		if pl.Shares(corp) > 0 {
+			corp.AddStock(pl.Shares(corp))
+			pl.RemoveShares(corp, pl.Shares(corp))
+		}
 	}
 }
 

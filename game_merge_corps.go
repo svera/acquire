@@ -75,7 +75,7 @@ func (g *Game) setSellTradePlayers(sellableCorps []interfaces.Corporation) []int
 	index := g.currentPlayerNumber
 	for _ = range g.players {
 		for _, corp := range sellableCorps {
-			if g.players[index].Shares(corp) > 0 {
+			if g.players[index].Shares(corp) > 0 && g.players[index].Active() {
 				shareholders = append(shareholders, index)
 				break
 			}
@@ -94,7 +94,7 @@ func (g *Game) getStockHolders(corp interfaces.Corporation) []interfaces.Player 
 	var stockHolders sortablePlayers
 
 	for _, pl := range g.players {
-		if pl.Shares(corp) > 0 {
+		if pl.Shares(corp) > 0 && pl.Active() {
 			stockHolders.players = append(stockHolders.players, pl)
 		}
 	}

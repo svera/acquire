@@ -8,6 +8,7 @@ type Player struct {
 	cash   int
 	tiles  []interfaces.Tile
 	shares map[interfaces.Corporation]int
+	active bool
 }
 
 // New initialises and returns a Player instance
@@ -15,6 +16,7 @@ func New() *Player {
 	return &Player{
 		cash:   6000,
 		shares: map[interfaces.Corporation]int{},
+		active: true,
 	}
 }
 
@@ -81,5 +83,16 @@ func (p *Player) AddCash(amount int) interfaces.Player {
 // RemoveCash removes cash from player
 func (p *Player) RemoveCash(amount int) interfaces.Player {
 	p.cash -= amount
+	return p
+}
+
+// Active returns if the player is currently active in the game
+func (p *Player) Active() bool {
+	return p.active
+}
+
+// Deactivate marks the player as no active (namely when the player leaves the game)
+func (p *Player) Deactivate() interfaces.Player {
+	p.active = false
 	return p
 }

@@ -2,6 +2,7 @@ package acquire
 
 import (
 	"errors"
+
 	"github.com/svera/acquire/interfaces"
 )
 
@@ -15,7 +16,7 @@ func (g *Game) finish() error {
 	for _, corp := range g.activeCorporations() {
 		g.payBonuses(corp)
 		for _, pl := range g.players {
-			if pl.Shares(corp) > 0 {
+			if pl.Shares(corp) > 0 && pl.Active() {
 				g.sell(pl, corp, pl.Shares(corp))
 			}
 		}

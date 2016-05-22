@@ -516,11 +516,25 @@ func TestUntieMerge(t *testing.T) {
 	}
 }
 
+func TestDeactivatePlayer(t *testing.T) {
+	players, optional := setup()
+	optional.State = &mocks.State{FakeStateName: interfaces.UntieMergeStateName, TimesCalled: map[string]int{}}
+
+	game, _ := New(players, optional)
+	game.DeactivatePlayer(players[1])
+	if players[1].Active() == true {
+		t.Errorf("Deactivated player must be not active")
+	}
+	if players[1].Cash() != 0 {
+		t.Errorf("Deactivated player expected to have no money, got %d", players[1].Cash())
+	}
+}
+
 func setup() ([]interfaces.Player, Optional) {
 	players := []interfaces.Player{
-		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}},
-		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}},
-		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}},
+		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}, FakeActive: true},
+		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}, FakeActive: true},
+		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}, FakeActive: true},
 	}
 
 	corporations := [7]interfaces.Corporation{
@@ -534,7 +548,7 @@ func setup() ([]interfaces.Player, Optional) {
 	}
 
 	board := &mocks.Board{TimesCalled: map[string]int{}}
-	tileset := &mocks.Tileset{FakeTile: &mocks.Tile{FakeNumber: 1, FakeLetter: "A"}}
+	tileset := &mocks.Tileset{FakeTile: &mocks.Tile{FakeNumber: 1, FakeLetter: "A"}, TimesCalled: map[string]int{}}
 
 	optional := Optional{
 		Board:        board,

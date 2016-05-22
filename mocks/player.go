@@ -11,6 +11,7 @@ type Player struct {
 	FakeHasTile bool
 	FakeCash    int
 	TimesCalled map[string]int
+	FakeActive  bool
 }
 
 // Shares mocks the Shares method defined in the Player interface
@@ -66,5 +67,17 @@ func (p *Player) AddCash(amount int) interfaces.Player {
 // RemoveCash mocks the RemoveCash method defined in the Player interface
 func (p *Player) RemoveCash(amount int) interfaces.Player {
 	p.FakeCash -= amount
+	return p
+}
+
+// Active mocks the Active method defined in the Player interface
+func (p *Player) Active() bool {
+	return p.FakeActive
+}
+
+// Deactivate mocks the Deactivate method defined in the Player interface
+func (p *Player) Deactivate() interfaces.Player {
+	p.FakeActive = false
+	p.TimesCalled["Deactivate"]++
 	return p
 }
