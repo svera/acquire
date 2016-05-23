@@ -32,7 +32,7 @@ func NewRandom() *Random {
 func (r *Random) Play() interface{} {
 	var msg Message
 
-	if !r.status.LastTurn && r.claimEndGame() {
+	if !r.status.IsLastRound && r.claimEndGame() {
 		msg = Message{
 			Type: EndGameResponseType,
 		}

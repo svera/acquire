@@ -6,12 +6,12 @@ type Status struct {
 	Board map[string]string
 	State string
 	// Hand is a map that stores all player's tiles and whether each is playable or not
-	Hand       map[string]bool
-	Corps      [7]CorpData
-	TiedCorps  []string
-	PlayerInfo PlayerData
-	RivalsInfo []PlayerData
-	LastTurn   bool
+	Hand        map[string]bool
+	Corps       [7]CorpData
+	TiedCorps   []string
+	PlayerInfo  PlayerData
+	RivalsInfo  []PlayerData
+	IsLastRound bool
 }
 
 // CorpData is a struct which holds data about a corporation in a game.

@@ -26,7 +26,7 @@ const (
 	TilePermanentlyUnplayable = "tile_permanently_unplayable"
 	// NotEnoughCash is an error returned when player has not enough cash to buy stock shares
 	NotEnoughCash = "not_enough_cash"
-	// TooManyStockSharesToBuy is an error returned when player can not buy more than 3 stock shares per turn
+	// TooManyStockSharesToBuy is an error returned when player can not buy more than 3 stock shares per round
 	TooManyStockSharesToBuy = "too_many_stock_shares_to_buy"
 	// CorpNamesNotUnique is an error returned when some corporation names are repeated
 	CorpNamesNotUnique = "corp_names_not_unique"
@@ -74,8 +74,8 @@ type Game struct {
 	mergeCorps          map[string][]interfaces.Corporation
 	sellTradePlayers    []int
 	lastPlayedTile      interfaces.Tile
-	turn                int
-	isLastTurn          bool
+	round               int
+	isLastRound         bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
 	frozenPlayer int
@@ -94,9 +94,9 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 			corporations:        optional.Corporations,
 			tileset:             optional.Tileset,
 			currentPlayerNumber: 0,
-			turn:                1,
+			round:               1,
 			state:               optional.State,
-			isLastTurn:          false,
+			isLastRound:         false,
 		}
 		for _, pl := range gm.players {
 			gm.giveInitialHand(pl)
@@ -332,7 +332,7 @@ func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 		g.state = g.state.ToBuyStock()
 		return nil
 	}
-	return g.nextTurn()
+	return g.nextRound()
 }
 
 func (g *Game) existActiveCorporations() bool {
@@ -390,7 +390,7 @@ func (g *Game) nextPlayer() {
 		g.currentPlayerNumber++
 		if g.currentPlayerNumber == len(g.players) {
 			g.currentPlayerNumber = 0
-			g.turn++
+			g.round++
 		}
 		if g.players[g.currentPlayerNumber].Active() {
 			return
@@ -399,8 +399,9 @@ func (g *Game) nextPlayer() {
 }
 
 // DeactivatePlayer gets the received player and marks it as inactive
-// (probably because the player has left the game). All player's
-// assets are returned to its respective origin sets (tile heap)
+// because the player has left the game. All player's
+// assets are returned to its respective origin sets. If the deactivated player was in
+// his/her turn, turn passes to the next player.
 func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 	pl.Deactivate()
 	pl.RemoveCash(pl.Cash())
@@ -411,19 +412,25 @@ func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 			pl.RemoveShares(corp, pl.Shares(corp))
 		}
 	}
+	for i := range g.players {
+		if g.players[i] == pl && g.currentPlayerNumber == i {
+			g.nextPlayer()
+			return
+		}
+	}
 }
 
-// Turn returns the current turn number
-func (g *Game) Turn() int {
-	return g.turn
+// Round returns the current round number
+func (g *Game) Round() int {
+	return g.round
 }
 
 // ClaimEndGame allows the current player to claim end game
 // This can be done at any time. After announcing that the game is over,
-// the player may finish the turn.
+// the player may finish his/her turn.
 func (g *Game) ClaimEndGame() *Game {
 	if g.AreEndConditionsReached() {
-		g.isLastTurn = true
+		g.isLastRound = true
 	}
 	return g
 }
@@ -438,8 +445,8 @@ func (g *Game) GameStateName() string {
 	return g.state.Name()
 }
 
-func (g *Game) nextTurn() error {
-	if g.isLastTurn {
+func (g *Game) nextRound() error {
+	if g.isLastRound {
 		g.state = g.state.ToEndGame()
 		return g.finish()
 	}
@@ -454,9 +461,9 @@ func (g *Game) nextTurn() error {
 	return nil
 }
 
-// IsLastTurn returns if the current turn will be the last one or not
-func (g *Game) IsLastTurn() bool {
-	return g.isLastTurn
+// IsLastRound returns if the current round will be the last one or not
+func (g *Game) IsLastRound() bool {
+	return g.isLastRound
 }
 
 // A player takes a tile from the facedown cluster to replace
