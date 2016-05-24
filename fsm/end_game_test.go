@@ -1,8 +1,9 @@
 package fsm
 
 import (
-	"github.com/svera/acquire/interfaces"
 	"testing"
+
+	"github.com/svera/acquire/interfaces"
 )
 
 func TestEndGameToPlayTile(t *testing.T) {
@@ -37,5 +38,13 @@ func TestEndGameToBuyStock(t *testing.T) {
 	state := &EndGame{}
 	if state.ToBuyStock().Name() != interfaces.ErrorStateName {
 		t.Errorf("Transition from EndGame to BuyStock must not be possible")
+	}
+}
+
+func TestEndGameToInsufficientPlayers(t *testing.T) {
+	state := &EndGame{}
+
+	if state.ToInsufficientPlayers().Name() != interfaces.ErrorStateName {
+		t.Errorf("Transition from EndGame to InsufficientPlayers must not be possible")
 	}
 }

@@ -1,8 +1,9 @@
 package fsm
 
 import (
-	"github.com/svera/acquire/interfaces"
 	"testing"
+
+	"github.com/svera/acquire/interfaces"
 )
 
 func TestUntieMergeToPlayTile(t *testing.T) {
@@ -30,5 +31,13 @@ func TestUntieMergeToBuyStock(t *testing.T) {
 	state := &UntieMerge{}
 	if state.ToBuyStock().Name() != interfaces.ErrorStateName {
 		t.Errorf("Transition from UntieMerge to BuyStock must return not be valid")
+	}
+}
+
+func TestUntieMergeToInsufficientPlayers(t *testing.T) {
+	state := &UntieMerge{}
+
+	if state.ToInsufficientPlayers().Name() != interfaces.InsufficientPlayersStateName {
+		t.Errorf("Transition from UntieMerge to InsufficientPlayers must be valid")
 	}
 }

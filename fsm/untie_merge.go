@@ -18,3 +18,8 @@ func (s *UntieMerge) Name() string {
 func (s *UntieMerge) ToSellTrade() interfaces.State {
 	return &SellTrade{}
 }
+
+// ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
+func (s *UntieMerge) ToInsufficientPlayers() interfaces.State {
+	return &InsufficientPlayers{}
+}

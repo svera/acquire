@@ -41,3 +41,8 @@ func (s *ErrorState) ToBuyStock() interfaces.State {
 func (s *ErrorState) ToEndGame() interfaces.State {
 	return s
 }
+
+// ToInsufficientPlayers is not a valid state transition
+func (s *ErrorState) ToInsufficientPlayers() interfaces.State {
+	return s
+}

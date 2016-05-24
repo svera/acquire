@@ -18,3 +18,8 @@ func (s *SellTrade) Name() string {
 func (s *SellTrade) ToBuyStock() interfaces.State {
 	return &BuyStock{}
 }
+
+// ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
+func (s *SellTrade) ToInsufficientPlayers() interfaces.State {
+	return &InsufficientPlayers{}
+}

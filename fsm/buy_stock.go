@@ -23,3 +23,8 @@ func (s *BuyStock) ToPlayTile() interfaces.State {
 func (s *BuyStock) ToEndGame() interfaces.State {
 	return &EndGame{}
 }
+
+// ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
+func (s *BuyStock) ToInsufficientPlayers() interfaces.State {
+	return &InsufficientPlayers{}
+}

@@ -1,8 +1,9 @@
 package fsm
 
 import (
-	"github.com/svera/acquire/interfaces"
 	"testing"
+
+	"github.com/svera/acquire/interfaces"
 )
 
 func TestPlayTileToSellTrade(t *testing.T) {
@@ -30,5 +31,13 @@ func TestPlayTileToBuyStock(t *testing.T) {
 	state := &PlayTile{}
 	if state.ToBuyStock().Name() != interfaces.BuyStockStateName {
 		t.Errorf("Transition from PlayTile to BuyStock must be valid")
+	}
+}
+
+func TestPlayTileToInsufficientPlayers(t *testing.T) {
+	state := &PlayTile{}
+
+	if state.ToInsufficientPlayers().Name() != interfaces.InsufficientPlayersStateName {
+		t.Errorf("Transition from PlayTile to InsufficientPlayers must be valid")
 	}
 }

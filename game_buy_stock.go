@@ -20,7 +20,7 @@ func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
 		g.buy(corp, amount)
 	}
 
-	return g.nextRound()
+	return g.nextPlayer()
 }
 
 func (g *Game) buy(corp interfaces.Corporation, amount int) {

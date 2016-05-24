@@ -33,3 +33,8 @@ func (s *PlayTile) ToUntieMerge() interfaces.State {
 func (s *PlayTile) ToBuyStock() interfaces.State {
 	return &BuyStock{}
 }
+
+// ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
+func (s *PlayTile) ToInsufficientPlayers() interfaces.State {
+	return &InsufficientPlayers{}
+}

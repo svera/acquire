@@ -528,6 +528,9 @@ func TestDeactivatePlayer(t *testing.T) {
 	if players[1].Cash() != 0 {
 		t.Errorf("Deactivated player expected to have no money, got %d", players[1].Cash())
 	}
+	if game.state.(*mocks.State).TimesCalled["ToInsufficientPlayers"] != 1 {
+		t.Errorf("Game must change its state to InsufficientPlayers as it has less than 3 active players")
+	}
 }
 
 func setup() ([]interfaces.Player, Optional) {

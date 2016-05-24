@@ -332,7 +332,7 @@ func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 		g.state = g.state.ToBuyStock()
 		return nil
 	}
-	return g.nextRound()
+	return g.nextPlayer()
 }
 
 func (g *Game) existActiveCorporations() bool {
@@ -366,7 +366,7 @@ func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
 	return nil
 }
 
-// Receive a free stock share from a rencently found corporation, if it has
+// Receive a free stock share from a recently founded corporation, if it has
 // remaining shares available
 // TODO this should trigger an event warning that no founder stock share will be given
 // of the founded corporation has no stock shares left
@@ -383,21 +383,6 @@ func (g *Game) growCorporation(corp interfaces.Corporation, tiles []interfaces.T
 	corp.Grow(len(tiles))
 }
 
-// Increases the number which specifies the current player.
-// Turn passes only to an active player.
-func (g *Game) nextPlayer() {
-	for {
-		g.currentPlayerNumber++
-		if g.currentPlayerNumber == len(g.players) {
-			g.currentPlayerNumber = 0
-			g.round++
-		}
-		if g.players[g.currentPlayerNumber].Active() {
-			return
-		}
-	}
-}
-
 // DeactivatePlayer gets the received player and marks it as inactive
 // because the player has left the game. All player's
 // assets are returned to its respective origin sets. If the deactivated player was in
@@ -412,12 +397,25 @@ func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 			pl.RemoveShares(corp, pl.Shares(corp))
 		}
 	}
+	if len(g.activePlayers()) < 3 {
+		g.state = g.state.ToInsufficientPlayers()
+	}
 	for i := range g.players {
 		if g.players[i] == pl && g.currentPlayerNumber == i {
 			g.nextPlayer()
 			return
 		}
 	}
+}
+
+func (g *Game) activePlayers() []interfaces.Player {
+	var activePlayers []interfaces.Player
+	for i := range g.players {
+		if g.players[i].Active() {
+			activePlayers = append(activePlayers, g.players[i])
+		}
+	}
+	return activePlayers
 }
 
 // Round returns the current round number
@@ -445,7 +443,7 @@ func (g *Game) GameStateName() string {
 	return g.state.Name()
 }
 
-func (g *Game) nextRound() error {
+func (g *Game) nextPlayer() error {
 	if g.isLastRound {
 		g.state = g.state.ToEndGame()
 		return g.finish()
@@ -456,9 +454,23 @@ func (g *Game) nextRound() error {
 	if g.state.Name() != interfaces.PlayTileStateName {
 		g.state = g.state.ToPlayTile()
 	}
-	g.nextPlayer()
-
+	g.updateCurrentPlayerNumber()
 	return nil
+}
+
+// Increases the number which specifies the current player.
+// Turn passes only to an active player.
+func (g *Game) updateCurrentPlayerNumber() {
+	for {
+		g.currentPlayerNumber++
+		if g.currentPlayerNumber == len(g.players) {
+			g.currentPlayerNumber = 0
+			g.round++
+		}
+		if g.players[g.currentPlayerNumber].Active() {
+			return
+		}
+	}
 }
 
 // IsLastRound returns if the current round will be the last one or not

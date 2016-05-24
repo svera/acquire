@@ -50,3 +50,9 @@ func (s *State) ToEndGame() interfaces.State {
 	s.TimesCalled["ToEndGame"]++
 	return s
 }
+
+// ToInsufficientPlayers mocks the ToInsufficientPlayers method defined in the State interface
+func (s *State) ToInsufficientPlayers() interfaces.State {
+	s.TimesCalled["ToInsufficientPlayers"]++
+	return s
+}
