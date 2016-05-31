@@ -16,27 +16,6 @@ func TestNewGameWrongNumberPlayers(t *testing.T) {
 	}
 }
 
-func TestNewGameNotUniqueCorpNames(t *testing.T) {
-	players, optional := setup()
-
-	optional.Corporations[0] = &mocks.Corporation{FakeName: "A"}
-	optional.Corporations[1] = &mocks.Corporation{FakeName: "A"}
-
-	if _, err := New(players, optional); err.Error() != CorpNamesNotUnique {
-		t.Errorf("Corporations must have unique names, expecting %s error, got %s", CorpNamesNotUnique, err.Error())
-	}
-}
-
-func TestNewGameWrongNumberOfCorpsPerClass(t *testing.T) {
-	players, optional := setup()
-
-	optional.Corporations[2] = &mocks.Corporation{FakeClass: 0}
-
-	if _, err := New(players, optional); err.Error() != WrongNumberCorpsClass {
-		t.Errorf("Game must catch wrong number of corporations per class")
-	}
-}
-
 func TestNewGameInitsPlayersTilesets(t *testing.T) {
 	players, optional := setup()
 	New(players, optional)
@@ -506,7 +485,7 @@ func TestUntieMerge(t *testing.T) {
 
 	game.UntieMerge(optional.Corporations[1])
 	if game.mergeCorps["acquirer"][0] != optional.Corporations[1] {
-		t.Errorf("Tied merge not untied, expected acquirer to be %s, got %s", optional.Corporations[1].Name(), game.mergeCorps["acquirer"][0].Name())
+		t.Errorf("Tied merge not untied")
 	}
 	if len(game.mergeCorps["defunct"]) != 3 {
 		t.Errorf("Wrong number of defunct corporations after merge untie, expected %d, got %d", 3, len(game.mergeCorps["defunct"]))
@@ -541,13 +520,13 @@ func setup() ([]interfaces.Player, Optional) {
 	}
 
 	corporations := [7]interfaces.Corporation{
-		&mocks.Corporation{FakeName: "A", FakeClass: 0, TimesCalled: map[string]int{}, FakeStock: 25},
-		&mocks.Corporation{FakeName: "B", FakeClass: 0, TimesCalled: map[string]int{}, FakeStock: 25},
-		&mocks.Corporation{FakeName: "C", FakeClass: 1, TimesCalled: map[string]int{}, FakeStock: 25},
-		&mocks.Corporation{FakeName: "D", FakeClass: 1, TimesCalled: map[string]int{}, FakeStock: 25},
-		&mocks.Corporation{FakeName: "E", FakeClass: 1, TimesCalled: map[string]int{}, FakeStock: 25},
-		&mocks.Corporation{FakeName: "F", FakeClass: 2, TimesCalled: map[string]int{}, FakeStock: 25},
-		&mocks.Corporation{FakeName: "G", FakeClass: 2, TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
+		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
 	}
 
 	board := &mocks.Board{TimesCalled: map[string]int{}}

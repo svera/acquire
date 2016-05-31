@@ -1,9 +1,10 @@
 package player
 
 import (
+	"testing"
+
 	"github.com/svera/acquire/interfaces"
 	"github.com/svera/acquire/mocks"
-	"testing"
 )
 
 func TestPickTile(t *testing.T) {
@@ -46,7 +47,7 @@ func TestShares(t *testing.T) {
 		},
 	}
 	if player.Shares(corp) != expected {
-		t.Errorf("Shares() must return that the player has exactly %d stock shares in corporation %s, got %d", expected, corp.Name(), player.Shares(corp))
+		t.Errorf("Shares() must return that the player has exactly %d stock shares in corporation %p, got %d", expected, corp, player.Shares(corp))
 	}
 }
 
@@ -62,6 +63,6 @@ func TestAddShares(t *testing.T) {
 	}
 	player.AddShares(corp, add)
 	if player.Shares(corp) != expected {
-		t.Errorf("AddShares() must add %d stock shares as owned by the player in corporation %s, got %d", add, corp.Name(), player.Shares(corp))
+		t.Errorf("AddShares() must add %d stock shares as owned by the player in corporation %p, got %d", add, corp, player.Shares(corp))
 	}
 }

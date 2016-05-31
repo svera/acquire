@@ -24,17 +24,17 @@ type PlayTileResponseParams struct {
 
 // NewCorpResponseParams is a struct with all data needed to inform about founding a new corporation by a bot.
 type NewCorpResponseParams struct {
-	Corporation string
+	CorporationIndex int
 }
 
 // BuyResponseParams is a struct with all data needed to inform about buying stocks from corporations by a bot.
 type BuyResponseParams struct {
-	Corporations map[string]int
+	CorporationsIndexes map[string]int
 }
 
 // SellTradeResponseParams is a struct with all data needed to inform about selling or trading stocks from corporations by a bot.
 type SellTradeResponseParams struct {
-	Corporations map[string]SellTrade
+	CorporationsIndexes map[string]SellTrade
 }
 
 // SellTrade is a struct used by the SellTradeResponseParams one
@@ -46,5 +46,5 @@ type SellTrade struct {
 // UntieMergeResponseParams is a struct with all data needed to inform about
 // which corporation must be the acquirer in a tied merge by a bot.
 type UntieMergeResponseParams struct {
-	Corporation string
+	CorporationIndex int
 }
