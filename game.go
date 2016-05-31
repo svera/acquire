@@ -98,6 +98,10 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 			state:               optional.State,
 			isLastRound:         false,
 		}
+		for i := range gm.corporations {
+			gm.corporations[i].SetPricesChart(gm.setPricesChart(i))
+		}
+
 		for _, pl := range gm.players {
 			gm.giveInitialHand(pl)
 		}
@@ -110,13 +114,6 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 func initOptionalParameters(optional Optional) (Optional, error) {
 	if areCorporationsEmpty(optional.Corporations) {
 		optional.Corporations = defaultCorporations()
-	} else {
-		if !areNamesUnique(optional.Corporations) {
-			return Optional{}, errors.New(CorpNamesNotUnique)
-		}
-		if !isNumberOfCorpsPerClassRight(optional.Corporations) {
-			return Optional{}, errors.New(WrongNumberCorpsClass)
-		}
 	}
 	if optional.Board == nil {
 		optional.Board = board.New()
@@ -137,32 +134,6 @@ func areCorporationsEmpty(corporations [7]interfaces.Corporation) bool {
 		}
 	}
 	return false
-}
-
-// Check that the passed corporations have unique names
-func areNamesUnique(corporations [7]interfaces.Corporation) bool {
-	for i, corp1 := range corporations {
-		if i < len(corporations)-1 {
-			for _, corp2 := range corporations[i+1:] {
-				if corp1.Name() == corp2.Name() {
-					return false
-				}
-			}
-		}
-	}
-	return true
-}
-
-// Check that the number of corporations per class is right
-func isNumberOfCorpsPerClassRight(corporations [7]interfaces.Corporation) bool {
-	corpsPerClass := [3]int{0, 0, 0}
-	for _, corp := range corporations {
-		corpsPerClass[corp.Class()]++
-	}
-	if corpsPerClass[0] != 2 || corpsPerClass[1] != 3 || corpsPerClass[2] != 2 {
-		return false
-	}
-	return true
 }
 
 // Corporations returns an array with all seven corporations
@@ -514,24 +485,9 @@ func (g *Game) replaceUnplayableTiles() error {
 
 func defaultCorporations() [7]interfaces.Corporation {
 	var corporations [7]interfaces.Corporation
-	corpsParams := [7]map[string]int{
-		map[string]int{"Sackson": 0},
-		map[string]int{"Zeta": 0},
-		map[string]int{"Hydra": 1},
-		map[string]int{"Fusion": 1},
-		map[string]int{"America": 1},
-		map[string]int{"Phoenix": 2},
-		map[string]int{"Quantum": 2},
-	}
 
-	for i, corpData := range corpsParams {
-		for corpName, corpClass := range corpData {
-			if corp, err := corporation.New(corpName, corpClass); err == nil {
-				corporations[i] = corp
-			} else {
-				panic(err)
-			}
-		}
+	for i := 0; i < 7; i++ {
+		corporations[i] = corporation.New()
 	}
 	return corporations
 }

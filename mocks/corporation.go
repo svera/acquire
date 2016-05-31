@@ -13,23 +13,20 @@ type Corporation struct {
 	FakeMinorityBonus int
 	FakeIsSafe        bool
 	FakeIsActive      bool
-	FakeName          string
-	FakeClass         int
+	FakePricesChart   map[int]interfaces.Prices
 	TimesCalled       map[string]int
 }
 
 // Grow mocks the Grow method defined in the Corporation interface
-func (c *Corporation) Grow(number int) interfaces.Corporation {
+func (c *Corporation) Grow(number int) {
 	c.FakeSize += number
 	c.TimesCalled["Grow"]++
-	return c
 }
 
 // Reset mocks the Reset method defined in the Corporation interface
-func (c *Corporation) Reset() interfaces.Corporation {
+func (c *Corporation) Reset() {
 	c.FakeSize = 0
 	c.TimesCalled["Reset"]++
-	return c
 }
 
 // Stock mocks the Stock method defined in the Corporation interface
@@ -62,21 +59,14 @@ func (c *Corporation) IsActive() bool {
 	return c.FakeIsActive
 }
 
-// Name mocks the Name method defined in the Corporation interface
-func (c *Corporation) Name() string {
-	return c.FakeName
-}
-
 // AddStock mocks the AddStock method defined in the Corporation interface
-func (c *Corporation) AddStock(amount int) interfaces.Corporation {
+func (c *Corporation) AddStock(amount int) {
 	_ = amount
-	return c
 }
 
 // RemoveStock mocks the RemoveStock method defined in the Corporation interface
-func (c *Corporation) RemoveStock(amount int) interfaces.Corporation {
+func (c *Corporation) RemoveStock(amount int) {
 	c.FakeStock -= amount
-	return c
 }
 
 // Type mocks the Type method defined in the Corporation interface
@@ -89,7 +79,7 @@ func (c *Corporation) Size() int {
 	return c.FakeSize
 }
 
-// Class mocks the Class method defined in the Corporation interface
-func (c *Corporation) Class() int {
-	return c.FakeClass
+// SetPricesChart mocks the SetPricesChart method defined in the Corporation interface
+func (c *Corporation) SetPricesChart(prices map[int]interfaces.Prices) {
+	c.FakePricesChart = prices
 }

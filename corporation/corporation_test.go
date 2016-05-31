@@ -2,40 +2,12 @@ package corporation
 
 import (
 	"testing"
+
+	"github.com/svera/acquire/interfaces"
 )
 
-func TestStockPrice(t *testing.T) {
-	var corporations = new([4]*Corporation)
-	corporations[0], _ = New("class0", 0)
-	corporations[1], _ = New("class1", 1)
-	corporations[2], _ = New("class2", 2)
-	corporations[3], _ = New("class0 big", 0)
-
-	corporations[0].size = 2
-	corporations[1].size = 2
-	corporations[2].size = 2
-	corporations[3].size = 42
-
-	var expectedStockPrices = new([4]int)
-	expectedStockPrices[0] = 200
-	expectedStockPrices[1] = 300
-	expectedStockPrices[2] = 400
-	expectedStockPrices[3] = 1000
-
-	for class, corporation := range corporations {
-		if corporation.StockPrice() != expectedStockPrices[class] {
-			t.Errorf(
-				"Class %d corporation with a size of 2 must have a stock price of %d, got %d",
-				class,
-				expectedStockPrices[class],
-				corporation.StockPrice(),
-			)
-		}
-	}
-}
-
 func TestSize(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	expectedSize := 8
 	corp.size = expectedSize
 	if size := corp.Size(); size != expectedSize {
@@ -44,7 +16,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestGrow(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	expectedSize := 2
 	corp.Grow(2)
 	if corp.size != expectedSize {
@@ -53,7 +25,7 @@ func TestGrow(t *testing.T) {
 }
 
 func TestStock(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	expectedStock := 20
 	corp.stock = expectedStock
 	if corp.Stock() != expectedStock {
@@ -62,7 +34,7 @@ func TestStock(t *testing.T) {
 }
 
 func TestAddStock(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	expectedStock := 45
 	corp.AddStock(20)
 	if corp.stock != expectedStock {
@@ -71,7 +43,7 @@ func TestAddStock(t *testing.T) {
 }
 
 func TestRemoveStock(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	expectedStock := 5
 	corp.RemoveStock(20)
 	if corp.stock != expectedStock {
@@ -80,7 +52,11 @@ func TestRemoveStock(t *testing.T) {
 }
 
 func TestMajorityBonus(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
+	prices := make(map[int]interfaces.Prices)
+	prices[2] = interfaces.Prices{Price: 200, MajorityBonus: 2000, MinorityBonus: 1000}
+	prices[41] = interfaces.Prices{Price: 1000, MajorityBonus: 10000, MinorityBonus: 5000}
+	corp.SetPricesChart(prices)
 	corp.size = 2
 	expectedMajorityBonus := 2000
 	if bonus := corp.MajorityBonus(); bonus != expectedMajorityBonus {
@@ -94,8 +70,31 @@ func TestMajorityBonus(t *testing.T) {
 	}
 }
 
+func TestStockPrice(t *testing.T) {
+	corp := New()
+	prices := make(map[int]interfaces.Prices)
+	prices[2] = interfaces.Prices{Price: 200, MajorityBonus: 2000, MinorityBonus: 1000}
+	prices[41] = interfaces.Prices{Price: 1000, MajorityBonus: 10000, MinorityBonus: 5000}
+	corp.SetPricesChart(prices)
+	corp.size = 2
+	expectedStockPrice := 200
+	if stockPrice := corp.StockPrice(); stockPrice != expectedStockPrice {
+		t.Errorf("Expected stock price of %d, got %d", expectedStockPrice, stockPrice)
+	}
+
+	corp.size = 42
+	expectedStockPrice = 1000
+	if stockPrice := corp.StockPrice(); stockPrice != expectedStockPrice {
+		t.Errorf("Expected stock price of %d, got %d", expectedStockPrice, stockPrice)
+	}
+}
+
 func TestMinorityBonus(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
+	prices := make(map[int]interfaces.Prices)
+	prices[2] = interfaces.Prices{Price: 200, MajorityBonus: 2000, MinorityBonus: 1000}
+	prices[41] = interfaces.Prices{Price: 1000, MajorityBonus: 10000, MinorityBonus: 5000}
+	corp.SetPricesChart(prices)
 	corp.size = 2
 	expectedMinorityBonus := 1000
 	if bonus := corp.MinorityBonus(); bonus != expectedMinorityBonus {
@@ -110,7 +109,7 @@ func TestMinorityBonus(t *testing.T) {
 }
 
 func TestIsSafe(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	corp.size = 2
 	if corp.IsSafe() {
 		t.Errorf("Unsafe corporation regarded as safe")
@@ -122,19 +121,12 @@ func TestIsSafe(t *testing.T) {
 }
 
 func TestIsActive(t *testing.T) {
-	corp, _ := New("Test", 0)
+	corp := New()
 	if corp.IsActive() {
 		t.Errorf("Inactive corporation regarded as active")
 	}
 	corp.size = 2
 	if !corp.IsActive() {
 		t.Errorf("Active corporation regarded as inactive")
-	}
-}
-
-func TestName(t *testing.T) {
-	corp, _ := New("Test", 0)
-	if corp.Name() != "Test" {
-		t.Errorf("Expected corporation name 'Test'")
 	}
 }

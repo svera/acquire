@@ -214,13 +214,13 @@ func TestTileGrowCorporation(t *testing.T) {
 	grow, tilesToAppend, corporationToGrow := board.TileGrowCorporation(growerTile)
 	if !slicesSameCells(tilesToAppend, expectedTilesToAppend) {
 		t.Errorf(
-			"Position %d%s must grow corporation %s by %v, got %v in corporation %s instead",
+			"Position %d%s must grow corporation %p by %v, got %v in corporation %p instead",
 			6,
 			"E",
-			expectedCorporationToGrow.Name(),
+			expectedCorporationToGrow,
 			expectedTilesToAppend,
 			tilesToAppend,
-			corporationToGrow.Name(),
+			&corporationToGrow,
 		)
 	}
 	if !grow {
@@ -249,13 +249,13 @@ func TestDiagonalTileGrowCorporation(t *testing.T) {
 		t.Errorf("TileGrowCorporation() must return true")
 	} else if !slicesSameCells(tilesToAppend, expectedTileToAppend) {
 		t.Errorf(
-			"Position %d%s must grow corporation %s by %v, got %v in corporation %s instead",
+			"Position %d%s must grow corporation %p by %v, got %v in corporation %p instead",
 			4,
 			"E",
-			expectedCorporationToGrow.Name(),
+			&expectedCorporationToGrow,
 			expectedTileToAppend,
 			tilesToAppend,
-			corporationToGrow.Name(),
+			&corporationToGrow,
 		)
 	}
 }

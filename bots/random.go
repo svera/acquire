@@ -3,7 +3,7 @@ package bots
 
 import (
 	"math/rand"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/svera/acquire/interfaces"
@@ -100,7 +100,7 @@ func (r *Random) foundCorporation() NewCorpResponseParams {
 	for {
 		corpNumber = rn.Intn(len(r.status.Corps))
 		if r.status.Corps[corpNumber].Size == 0 {
-			response.Corporation = strings.ToLower(r.status.Corps[corpNumber].Name)
+			response.CorporationIndex = corpNumber
 			break
 		}
 	}
@@ -112,12 +112,12 @@ func (r *Random) buyStock() BuyResponseParams {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	buy := 0
-	var corpNumber int
+	var corpIndex int
 	var corp CorpData
 
 	for {
-		corpNumber = rn.Intn(len(r.status.Corps))
-		corp = r.status.Corps[corpNumber]
+		corpIndex = rn.Intn(len(r.status.Corps))
+		corp = r.status.Corps[corpIndex]
 		if corp.Size > 0 {
 			break
 		}
@@ -127,9 +127,10 @@ func (r *Random) buyStock() BuyResponseParams {
 	} else if corp.Size > 0 && r.hasEnoughCash(corp.RemainingShares, corp.Price) {
 		buy = corp.RemainingShares
 	}
+	index := strconv.Itoa(corpIndex)
 	return BuyResponseParams{
-		Corporations: map[string]int{
-			strings.ToLower(corp.Name): buy,
+		CorporationsIndexes: map[string]int{
+			index: buy,
 		},
 	}
 }
@@ -144,18 +145,19 @@ func (r *Random) sellTrade() SellTradeResponseParams {
 
 	for i, corp := range r.status.Corps {
 		if corp.Defunct && r.status.PlayerInfo.OwnedShares[i] > 0 {
-			sellTradeCorporations[strings.ToLower(corp.Name)] = SellTrade{
+			index := strconv.Itoa(i)
+			sellTradeCorporations[index] = SellTrade{
 				Sell: r.status.PlayerInfo.OwnedShares[i],
 			}
 		}
 	}
-	sellTrade.Corporations = sellTradeCorporations
+	sellTrade.CorporationsIndexes = sellTradeCorporations
 	return sellTrade
 }
 
 func (r *Random) untieMerge() UntieMergeResponseParams {
 	return UntieMergeResponseParams{
-		Corporation: r.status.TiedCorps[0],
+		CorporationIndex: r.status.TiedCorps[0],
 	}
 }
 
