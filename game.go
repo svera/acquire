@@ -5,6 +5,9 @@ package acquire
 
 import (
 	"errors"
+	"time"
+
+	"math/rand"
 
 	"github.com/svera/acquire/board"
 	"github.com/svera/acquire/corporation"
@@ -70,6 +73,7 @@ type Game struct {
 	corporations        [7]interfaces.Corporation
 	tileset             interfaces.Tileset
 	currentPlayerNumber int
+	initialPlayerNumber int
 	newCorpTiles        []interfaces.Tile
 	mergeCorps          map[string][]interfaces.Corporation
 	sellTradePlayers    []int
@@ -105,7 +109,7 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 		for _, pl := range gm.players {
 			gm.giveInitialHand(pl)
 		}
-
+		gm.pickRandomPlayer()
 		return &gm, nil
 	}
 	return nil, err
@@ -370,6 +374,7 @@ func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 	}
 	if len(g.activePlayers()) < 3 {
 		g.state = g.state.ToInsufficientPlayers()
+		return
 	}
 	for i := range g.players {
 		if g.players[i] == pl && g.currentPlayerNumber == i {
@@ -436,6 +441,8 @@ func (g *Game) updateCurrentPlayerNumber() {
 		g.currentPlayerNumber++
 		if g.currentPlayerNumber == len(g.players) {
 			g.currentPlayerNumber = 0
+		}
+		if g.currentPlayerNumber == g.initialPlayerNumber {
 			g.round++
 		}
 		if g.players[g.currentPlayerNumber].Active() {
@@ -490,4 +497,13 @@ func defaultCorporations() [7]interfaces.Corporation {
 		corporations[i] = corporation.New()
 	}
 	return corporations
+}
+
+// Choose a random player who'll be the one to start playing
+func (g *Game) pickRandomPlayer() {
+	source := rand.NewSource(time.Now().UnixNano())
+	rn := rand.New(source)
+	numberPlayers := len(g.players)
+	g.currentPlayerNumber = rn.Intn(numberPlayers - 1)
+	g.initialPlayerNumber = g.currentPlayerNumber
 }
