@@ -8,7 +8,7 @@ import (
 
 // BuyStock buys stock from corporations
 func (g *Game) BuyStock(buys map[interfaces.Corporation]int) error {
-	if g.state.Name() != interfaces.BuyStockStateName {
+	if g.stateMachine.CurrentStateName() != interfaces.BuyStockStateName {
 		return errors.New(ActionNotAllowed)
 	}
 

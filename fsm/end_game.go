@@ -5,11 +5,11 @@ import (
 )
 
 // EndGame is a struct representing a finite state machine's state
-type EndGame struct {
-	ErrorState
+type endGame struct {
+	errorState
 }
 
 // Name returns state's name
-func (s *EndGame) Name() string {
+func (s *endGame) Name() string {
 	return interfaces.EndGameStateName
 }

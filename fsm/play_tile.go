@@ -4,37 +4,37 @@ import (
 	"github.com/svera/acquire/interfaces"
 )
 
-// PlayTile is a struct representing a finite state machine's state
-type PlayTile struct {
-	ErrorState
+// playTile is a struct representing a finite state machine's state
+type playTile struct {
+	errorState
 }
 
 // Name returns state's name
-func (s *PlayTile) Name() string {
+func (s *playTile) Name() string {
 	return interfaces.PlayTileStateName
 }
 
 // ToSellTrade returns a SellTrade instance because it's an allowed state transition
-func (s *PlayTile) ToSellTrade() interfaces.State {
-	return &SellTrade{}
+func (s *playTile) ToSellTrade() interfaces.State {
+	return &sellTrade{}
 }
 
 // ToFoundCorp returns a FoundCorp instance because it's an allowed state transition
-func (s *PlayTile) ToFoundCorp() interfaces.State {
-	return &FoundCorp{}
+func (s *playTile) ToFoundCorp() interfaces.State {
+	return &foundCorp{}
 }
 
 // ToUntieMerge returns a UntieMerge instance because it's an allowed state transition
-func (s *PlayTile) ToUntieMerge() interfaces.State {
-	return &UntieMerge{}
+func (s *playTile) ToUntieMerge() interfaces.State {
+	return &untieMerge{}
 }
 
 // ToBuyStock returns a BuyStock instance because it's an allowed state transition
-func (s *PlayTile) ToBuyStock() interfaces.State {
-	return &BuyStock{}
+func (s *playTile) ToBuyStock() interfaces.State {
+	return &buyStock{}
 }
 
 // ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
-func (s *PlayTile) ToInsufficientPlayers() interfaces.State {
-	return &InsufficientPlayers{}
+func (s *playTile) ToInsufficientPlayers() interfaces.State {
+	return &insufficientPlayers{}
 }

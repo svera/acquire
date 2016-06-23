@@ -10,7 +10,7 @@ import (
 // For all active corporations, and all stocks are sold back to the
 // stock market bank at current prices. Stock in a corporation that is not on the board is worthless."
 func (g *Game) finish() error {
-	if g.state.Name() != interfaces.EndGameStateName {
+	if g.stateMachine.CurrentStateName() != interfaces.EndGameStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for _, corp := range g.activeCorporations() {
