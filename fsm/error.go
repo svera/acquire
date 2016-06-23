@@ -5,44 +5,46 @@ import (
 )
 
 // ErrorState is a struct representing a finite state machine's state
-type ErrorState struct{}
+// This state must only be reached when a unsupported transition is tried
+// It is reached automatically, there is not a specific transition to this state
+type errorState struct{}
 
 // Name returns state's name
-func (s *ErrorState) Name() string {
+func (s *errorState) Name() string {
 	return interfaces.ErrorStateName
 }
 
 // ToPlayTile is not a valid state transition
-func (s *ErrorState) ToPlayTile() interfaces.State {
+func (s *errorState) ToPlayTile() interfaces.State {
 	return s
 }
 
 // ToFoundCorp is not a valid state transition
-func (s *ErrorState) ToFoundCorp() interfaces.State {
+func (s *errorState) ToFoundCorp() interfaces.State {
 	return s
 }
 
 // ToUntieMerge is not a valid state transition
-func (s *ErrorState) ToUntieMerge() interfaces.State {
+func (s *errorState) ToUntieMerge() interfaces.State {
 	return s
 }
 
 // ToSellTrade is not a valid state transition
-func (s *ErrorState) ToSellTrade() interfaces.State {
+func (s *errorState) ToSellTrade() interfaces.State {
 	return s
 }
 
 // ToBuyStock is not a valid state transition
-func (s *ErrorState) ToBuyStock() interfaces.State {
+func (s *errorState) ToBuyStock() interfaces.State {
 	return s
 }
 
 // ToEndGame is not a valid state transition
-func (s *ErrorState) ToEndGame() interfaces.State {
+func (s *errorState) ToEndGame() interfaces.State {
 	return s
 }
 
 // ToInsufficientPlayers is not a valid state transition
-func (s *ErrorState) ToInsufficientPlayers() interfaces.State {
+func (s *errorState) ToInsufficientPlayers() interfaces.State {
 	return s
 }

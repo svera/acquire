@@ -21,7 +21,7 @@ func (g *Game) SellTrade(sell map[interfaces.Corporation]int, trade map[interfac
 	if len(g.sellTradePlayers) == 0 {
 		g.setCurrentPlayer(g.frozenPlayer)
 		g.completeMerge()
-		g.state = g.state.ToBuyStock()
+		g.stateMachine.ToBuyStock()
 	} else {
 		g.setCurrentPlayer(g.nextSellTradePlayer())
 	}
@@ -58,7 +58,7 @@ func (g *Game) trade(corp interfaces.Corporation, amount int) {
 
 // Check that the requisites for both selling and trading stock shares are met
 func (g *Game) checkSellTrade(sell map[interfaces.Corporation]int, trade map[interfaces.Corporation]int) error {
-	if g.state.Name() != interfaces.SellTradeStateName {
+	if g.stateMachine.CurrentStateName() != interfaces.SellTradeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for corp, amount := range sell {

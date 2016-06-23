@@ -5,21 +5,21 @@ import (
 )
 
 // SellTrade is a struct representing a finite state machine's state
-type SellTrade struct {
-	ErrorState
+type sellTrade struct {
+	errorState
 }
 
 // Name returns state's name
-func (s *SellTrade) Name() string {
+func (s *sellTrade) Name() string {
 	return interfaces.SellTradeStateName
 }
 
 // ToBuyStock returns a BuyStock instance because it's an allowed state transition
-func (s *SellTrade) ToBuyStock() interfaces.State {
-	return &BuyStock{}
+func (s *sellTrade) ToBuyStock() interfaces.State {
+	return &buyStock{}
 }
 
 // ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
-func (s *SellTrade) ToInsufficientPlayers() interfaces.State {
-	return &InsufficientPlayers{}
+func (s *sellTrade) ToInsufficientPlayers() interfaces.State {
+	return &insufficientPlayers{}
 }

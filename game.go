@@ -68,7 +68,7 @@ func (s sortablePlayers) Swap(i, j int) { s.players[i], s.players[j] = s.players
 // Game stores state of game elements and provides methods to control game flow
 type Game struct {
 	board               interfaces.Board
-	state               interfaces.State
+	stateMachine        interfaces.StateMachine
 	players             []interfaces.Player
 	corporations        [7]interfaces.Corporation
 	tileset             interfaces.Tileset
@@ -99,7 +99,7 @@ func New(players []interfaces.Player, optional Optional) (*Game, error) {
 			tileset:             optional.Tileset,
 			currentPlayerNumber: 0,
 			round:               1,
-			state:               optional.State,
+			stateMachine:        optional.StateMachine,
 			isLastRound:         false,
 		}
 		for i := range gm.corporations {
@@ -125,8 +125,8 @@ func initOptionalParameters(optional Optional) (Optional, error) {
 	if optional.Tileset == nil {
 		optional.Tileset = tileset.New()
 	}
-	if optional.State == nil {
-		optional.State = &fsm.PlayTile{}
+	if optional.StateMachine == nil {
+		optional.StateMachine = fsm.New()
 	}
 	return optional, nil
 }
@@ -275,11 +275,11 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 		g.startMerge(tl, mergeCorps)
 	} else if corpFounded, tiles := g.board.TileFoundCorporation(tl); corpFounded {
 		g.board.PutTile(tl)
-		g.state = g.state.ToFoundCorp()
+		g.stateMachine.ToFoundCorp()
 		g.newCorpTiles = tiles
 	} else if grow, tiles, corp := g.board.TileGrowCorporation(tl); grow {
 		g.growCorporation(corp, tiles)
-		g.state = g.state.ToBuyStock()
+		g.stateMachine.ToBuyStock()
 	} else {
 		if err := g.putUnincorporatedTile(tl); err != nil {
 			return err
@@ -289,7 +289,7 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 }
 
 func (g *Game) checkTile(tl interfaces.Tile) error {
-	if g.state.Name() != interfaces.PlayTileStateName {
+	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if g.isTileTemporaryUnplayable(tl) {
@@ -304,7 +304,7 @@ func (g *Game) checkTile(tl interfaces.Tile) error {
 func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 	g.board.PutTile(tl)
 	if g.existActiveCorporations() {
-		g.state = g.state.ToBuyStock()
+		g.stateMachine.ToBuyStock()
 		return nil
 	}
 	return g.nextPlayer()
@@ -327,7 +327,7 @@ func (g *Game) setCurrentPlayer(number int) *Game {
 
 // FoundCorporation founds a new corporation
 func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
-	if g.state.Name() != interfaces.FoundCorpStateName {
+	if g.stateMachine.CurrentStateName() != interfaces.FoundCorpStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	if corp.IsActive() {
@@ -337,7 +337,7 @@ func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
 	corp.Grow(len(g.newCorpTiles))
 	g.newCorpTiles = []interfaces.Tile{}
 	g.getFounderStockShare(g.CurrentPlayer(), corp)
-	g.state = g.state.ToBuyStock()
+	g.stateMachine.ToBuyStock()
 	return nil
 }
 
@@ -373,7 +373,7 @@ func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 		}
 	}
 	if len(g.activePlayers()) < 3 {
-		g.state = g.state.ToInsufficientPlayers()
+		g.stateMachine.ToInsufficientPlayers()
 		return
 	}
 	for i := range g.players {
@@ -416,19 +416,19 @@ func (g *Game) Board() interfaces.Board {
 
 // GameStateName returns game's current state
 func (g *Game) GameStateName() string {
-	return g.state.Name()
+	return g.stateMachine.CurrentStateName()
 }
 
 func (g *Game) nextPlayer() error {
 	if g.isLastRound {
-		g.state = g.state.ToEndGame()
+		g.stateMachine.ToEndGame()
 		return g.finish()
 	}
 	if err := g.drawTile(); err != nil {
 		return err
 	}
-	if g.state.Name() != interfaces.PlayTileStateName {
-		g.state = g.state.ToPlayTile()
+	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
+		g.stateMachine.ToPlayTile()
 	}
 	g.updateCurrentPlayerNumber()
 	return nil

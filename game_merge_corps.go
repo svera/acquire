@@ -11,7 +11,7 @@ func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces
 	g.board.PutTile(tl)
 	g.mergeCorps = mergeCorps
 	if g.isMergeTied() {
-		g.state = g.state.ToUntieMerge()
+		g.stateMachine.ToUntieMerge()
 	} else {
 		for _, corp := range mergeCorps["defunct"] {
 			g.payBonuses(corp)
@@ -19,7 +19,7 @@ func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces
 		g.sellTradePlayers = g.setSellTradePlayers(mergeCorps["defunct"])
 		g.frozenPlayer = g.currentPlayerNumber
 		g.setCurrentPlayer(g.nextSellTradePlayer())
-		g.state = g.state.ToSellTrade()
+		g.stateMachine.ToSellTrade()
 	}
 }
 
@@ -139,7 +139,7 @@ func (g *Game) TiedCorps() []interfaces.Corporation {
 // UntieMerge resolves a tied merge selecting which corporation will be the acquirer,
 // marking the rest as defunct
 func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
-	if g.state.Name() != interfaces.UntieMergeStateName {
+	if g.stateMachine.CurrentStateName() != interfaces.UntieMergeStateName {
 		return errors.New(ActionNotAllowed)
 	}
 	for i, corp := range g.mergeCorps["acquirer"] {

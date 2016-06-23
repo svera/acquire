@@ -63,6 +63,7 @@ func (t *Tileset) DiscardTile(tl interfaces.Tile) {
 	}
 }
 
+// Add appends the passed tiles to the tileset
 func (t *Tileset) Add(tiles []interfaces.Tile) interfaces.Tileset {
 	t.tiles = append(t.tiles, tiles...)
 	return t

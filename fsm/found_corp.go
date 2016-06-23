@@ -4,22 +4,22 @@ import (
 	"github.com/svera/acquire/interfaces"
 )
 
-// FoundCorp is a struct representing a finite state machine's state
-type FoundCorp struct {
-	ErrorState
+// foundCorp is a struct representing a finite state machine's state
+type foundCorp struct {
+	errorState
 }
 
 // Name returns state's name
-func (s *FoundCorp) Name() string {
+func (s *foundCorp) Name() string {
 	return interfaces.FoundCorpStateName
 }
 
 // ToBuyStock returns a BuyStock instance because it's an allowed state transition
-func (s *FoundCorp) ToBuyStock() interfaces.State {
-	return &BuyStock{}
+func (s *foundCorp) ToBuyStock() interfaces.State {
+	return &buyStock{}
 }
 
 // ToInsufficientPlayers returns an InsufficientPlayers instance because it's an allowed state transition
-func (s *FoundCorp) ToInsufficientPlayers() interfaces.State {
-	return &InsufficientPlayers{}
+func (s *foundCorp) ToInsufficientPlayers() interfaces.State {
+	return &insufficientPlayers{}
 }
