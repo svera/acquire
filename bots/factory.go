@@ -12,10 +12,10 @@ const (
 )
 
 // Create returns a new instance of a bot.
-func Create(name string) (interfaces.Bot, error) {
-	switch name {
-	case "random":
-		return NewRandom(), nil
+func Create(level string) (interfaces.Bot, error) {
+	switch level {
+	case "chaotic":
+		return NewChaotic(), nil
 	default:
 		return nil, errors.New(BotNotFound)
 	}

@@ -419,6 +419,7 @@ func (g *Game) GameStateName() string {
 	return g.stateMachine.CurrentStateName()
 }
 
+// Passes the turn to the next player
 func (g *Game) nextPlayer() error {
 	if g.isLastRound {
 		g.stateMachine.ToEndGame()
@@ -431,6 +432,9 @@ func (g *Game) nextPlayer() error {
 		g.stateMachine.ToPlayTile()
 	}
 	g.updateCurrentPlayerNumber()
+	if g.isHandUnplayable() {
+		g.replaceWholeHand()
+	}
 	return nil
 }
 
@@ -483,10 +487,37 @@ func (g *Game) replaceUnplayableTiles() error {
 			g.CurrentPlayer().DiscardTile(tile)
 			if newTile, err := g.tileset.Draw(); err == nil {
 				g.CurrentPlayer().PickTile(newTile)
+			} else {
+				return err
 			}
 		}
 	}
 
+	return nil
+}
+
+// This checks the (highly improbable, but possible) case in which all tiles in a
+// hand are not playable and thus, the player cannot place a tile as it is forced
+// to
+func (g *Game) isHandUnplayable() bool {
+	for _, tile := range g.CurrentPlayer().Tiles() {
+		if !g.isTilePermanentlyUnplayable(tile) || !g.isTileTemporaryUnplayable(tile) {
+			return false
+		}
+	}
+	return true
+}
+
+// This must be only used if a player hand is COMPLETELY unplayable
+func (g *Game) replaceWholeHand() error {
+	for _, tile := range g.CurrentPlayer().Tiles() {
+		g.CurrentPlayer().DiscardTile(tile)
+		if newTile, err := g.tileset.Draw(); err == nil {
+			g.CurrentPlayer().PickTile(newTile)
+		} else {
+			return err
+		}
+	}
 	return nil
 }
 

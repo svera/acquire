@@ -14,22 +14,22 @@ const (
 	safeCorporationSize    = 11
 )
 
-// Random is a struct which implements a very stupid AI, which basically
+// Chaotic is a struct which implements a very stupid AI, which basically
 // chooses all its decisions randomly (So not that much an AI but an AS)
-type Random struct {
+type Chaotic struct {
 	*base
 }
 
-// NewRandom returns a new instance of the random AI bot
-func NewRandom() *Random {
-	return &Random{
+// NewChaotic returns a new instance of the chaotic AI bot
+func NewChaotic() *Chaotic {
+	return &Chaotic{
 		&base{},
 	}
 }
 
 // Play analyses the current game status and returns a message with the
 // next play movement by the bot AI
-func (r *Random) Play() interface{} {
+func (r *Chaotic) Play() interface{} {
 	var msg Message
 
 	if !r.status.IsLastRound && r.claimEndGame() {
@@ -69,7 +69,7 @@ func (r *Random) Play() interface{} {
 	return msg
 }
 
-func (r *Random) playTile() PlayTileResponseParams {
+func (r *Chaotic) playTile() PlayTileResponseParams {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	tileCoords := r.tileCoords()
@@ -82,7 +82,7 @@ func (r *Random) playTile() PlayTileResponseParams {
 
 // As the tiles in hand come as a map, we need to store its coordinates in an array
 // before selecting a random one (only the playable ones)
-func (r *Random) tileCoords() []string {
+func (r *Chaotic) tileCoords() []string {
 	coords := make([]string, 0, len(r.status.Hand))
 	for k, playable := range r.status.Hand {
 		if playable {
@@ -92,7 +92,7 @@ func (r *Random) tileCoords() []string {
 	return coords
 }
 
-func (r *Random) foundCorporation() NewCorpResponseParams {
+func (r *Chaotic) foundCorporation() NewCorpResponseParams {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	var corpNumber int
@@ -108,7 +108,7 @@ func (r *Random) foundCorporation() NewCorpResponseParams {
 }
 
 // buyStock buys stock from a random active corporation
-func (r *Random) buyStock() BuyResponseParams {
+func (r *Chaotic) buyStock() BuyResponseParams {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
 	buy := 0
@@ -135,11 +135,11 @@ func (r *Random) buyStock() BuyResponseParams {
 	}
 }
 
-func (r *Random) hasEnoughCash(amount int, price int) bool {
+func (r *Chaotic) hasEnoughCash(amount int, price int) bool {
 	return amount*price < r.status.PlayerInfo.Cash
 }
 
-func (r *Random) sellTrade() SellTradeResponseParams {
+func (r *Chaotic) sellTrade() SellTradeResponseParams {
 	var sellTrade SellTradeResponseParams
 	sellTradeCorporations := map[string]SellTrade{}
 
@@ -155,13 +155,20 @@ func (r *Random) sellTrade() SellTradeResponseParams {
 	return sellTrade
 }
 
-func (r *Random) untieMerge() UntieMergeResponseParams {
-	return UntieMergeResponseParams{
-		CorporationIndex: r.status.TiedCorps[0],
+func (r *Chaotic) untieMerge() UntieMergeResponseParams {
+	var untieMerge UntieMergeResponseParams
+	for i, corp := range r.status.Corps {
+		if corp.Tied {
+			untieMerge = UntieMergeResponseParams{
+				CorporationIndex: i,
+			}
+			break
+		}
 	}
+	return untieMerge
 }
 
-func (r *Random) claimEndGame() bool {
+func (r *Chaotic) claimEndGame() bool {
 	var active, safe int
 	for _, corp := range r.status.Corps {
 		if corp.Size >= endGameCorporationSize {

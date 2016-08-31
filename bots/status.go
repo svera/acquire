@@ -8,7 +8,6 @@ type Status struct {
 	// Hand is a map that stores all player's tiles and whether each is playable or not
 	Hand        map[string]bool
 	Corps       [7]CorpData
-	TiedCorps   []int
 	PlayerInfo  PlayerData
 	RivalsInfo  []PlayerData
 	IsLastRound bool
@@ -23,6 +22,7 @@ type CorpData struct {
 	RemainingShares int
 	Size            int
 	Defunct         bool
+	Tied            bool
 }
 
 // PlayerData is a struct which holds data about a player in a game.
