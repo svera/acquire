@@ -14,6 +14,13 @@ const (
 	safeCorporationSize    = 11
 )
 
+var rn *rand.Rand
+
+func init() {
+	source := rand.NewSource(time.Now().UnixNano())
+	rn = rand.New(source)
+}
+
 // Chaotic is a struct which implements a very stupid AI, which basically
 // chooses all its decisions randomly (So not that much an AI but an AS)
 type Chaotic struct {
@@ -70,8 +77,6 @@ func (r *Chaotic) Play() interface{} {
 }
 
 func (r *Chaotic) playTile() PlayTileResponseParams {
-	source := rand.NewSource(time.Now().UnixNano())
-	rn := rand.New(source)
 	tileCoords := r.tileCoords()
 	tileNumber := rn.Intn(len(tileCoords))
 
@@ -93,8 +98,6 @@ func (r *Chaotic) tileCoords() []string {
 }
 
 func (r *Chaotic) foundCorporation() NewCorpResponseParams {
-	source := rand.NewSource(time.Now().UnixNano())
-	rn := rand.New(source)
 	var corpNumber int
 	response := NewCorpResponseParams{}
 	for {
@@ -109,8 +112,6 @@ func (r *Chaotic) foundCorporation() NewCorpResponseParams {
 
 // buyStock buys stock from a random active corporation
 func (r *Chaotic) buyStock() BuyResponseParams {
-	source := rand.NewSource(time.Now().UnixNano())
-	rn := rand.New(source)
 	buy := 0
 	var corpIndex int
 	var corp CorpData

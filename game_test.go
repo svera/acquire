@@ -527,44 +527,21 @@ func TestDeactivatePlayer(t *testing.T) {
 	}
 }
 
-// Testing this hand:
-//    1  2  3
-// A [0]><[1]
-// B [0]><[1]
-// C [0]><[1]
-// D [0]><[1]
-// E [0]><[1]
-// F [0]><[1]
-//
-// In this case, the whole hand must be replaced at the beginning of the turn
-// as it is unplayable (both corporations 0 and 1 are safe)
+// Testing that a completely unplayable hand (both corporations 0 and 1 are safe)
+// is detected and replaced
 func TestUnplayableHandIsReplaced(t *testing.T) {
-	/*
-		players, optional := setup()
-		setupPlayTileMerge(optional.Corporations, optional.Board)
-		tiles := []interfaces.Tile{
-			&mocks.Tile{FakeNumber: 2, FakeLetter: "A"},
-			&mocks.Tile{FakeNumber: 2, FakeLetter: "B"},
-			&mocks.Tile{FakeNumber: 2, FakeLetter: "C"},
-			&mocks.Tile{FakeNumber: 2, FakeLetter: "D"},
-			&mocks.Tile{FakeNumber: 2, FakeLetter: "E"},
-			&mocks.Tile{FakeNumber: 2, FakeLetter: "F"},
-		}
-		game, _ := New(players, optional)
-		game.currentPlayerNumber = 0
+	players, optional := setup()
+	optional.Corporations[0].(*mocks.Corporation).FakeIsSafe = true
+	optional.Corporations[1].(*mocks.Corporation).FakeIsSafe = true
+	optional.Board.(*mocks.Board).FakeAdjacentCorporations = []interfaces.Corporation{optional.Corporations[0], optional.Corporations[1]}
 
-		players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
-		players[0].(*mocks.Player).FakeHasTile = true
-
-		optional.Corporations[0].(*mocks.Corporation).FakeMajorityBonus = 2000
-		optional.Corporations[0].(*mocks.Corporation).FakeMinorityBonus = 1000
-
-		game.PlayTile(tileToPlay)
-		expectedPlayerCash := 9000
-		if players[0].Cash() != expectedPlayerCash {
-			t.Errorf("Player hasn't received the correct bonus, must have %d$, got %d$", expectedPlayerCash, players[0].Cash())
-		}
-	*/
+	game, _ := New(players, optional)
+	game.currentPlayerNumber = 0
+	tileToPlay := &mocks.Tile{FakeNumber: 5, FakeLetter: "A"}
+	game.PlayTile(tileToPlay)
+	if players[1].(*mocks.Player).TimesCalled["PickTile"] != 6 {
+		t.Errorf("Player's hand should have been completely replaced")
+	}
 }
 
 func setup() ([]interfaces.Player, Optional) {

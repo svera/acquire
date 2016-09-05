@@ -34,6 +34,7 @@ func (p *Player) RemoveShares(c interfaces.Corporation, amount int) interfaces.P
 // PickTile mocks the PickTile method defined in the Player interface
 func (p *Player) PickTile(t interfaces.Tile) interfaces.Player {
 	p.FakeTiles = append(p.FakeTiles, t)
+	p.TimesCalled["PickTile"]++
 	return p
 }
 

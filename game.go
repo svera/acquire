@@ -23,8 +23,8 @@ const (
 	StockSharesNotBuyable = "stock_shares_not_buyable"
 	// NotEnoughStockShares is an error returned when not enough stock shares of a corporation to buy
 	NotEnoughStockShares = "not_enough_stock_shares"
-	// TileTemporaryUnplayable is an error returned when tile temporarily unplayable
-	TileTemporaryUnplayable = "tile_temporary_unplayable"
+	// TileTemporarilyUnplayable is an error returned when tile temporarily unplayable
+	TileTemporarilyUnplayable = "tile_temporarily_unplayable"
 	// TilePermanentlyUnplayable is an error returned when tile permanently unplayable
 	TilePermanentlyUnplayable = "tile_permanently_unplayable"
 	// NotEnoughCash is an error returned when player has not enough cash to buy stock shares
@@ -203,7 +203,7 @@ func (g *Game) IsCorporationDefunct(corp interfaces.Corporation) bool {
 // IsTilePlayable returns false if the passed tile is either
 // temporary or permanently unplayable, true otherwise
 func (g *Game) IsTilePlayable(tl interfaces.Tile) bool {
-	if g.isTileTemporaryUnplayable(tl) || g.isTilePermanentlyUnplayable(tl) {
+	if g.isTileTemporarilyUnplayable(tl) || g.isTilePermanentlyUnplayable(tl) {
 		return false
 	}
 	return true
@@ -227,7 +227,7 @@ func (g *Game) isTilePermanentlyUnplayable(tl interfaces.Tile) bool {
 
 // Returns true if a tile is temporarily unplayable, that is,
 // that putting it on the board would create an 8th corporation
-func (g *Game) isTileTemporaryUnplayable(tl interfaces.Tile) bool {
+func (g *Game) isTileTemporarilyUnplayable(tl interfaces.Tile) bool {
 	if len(g.activeCorporations()) < totalCorporations {
 		return false
 	}
@@ -292,8 +292,8 @@ func (g *Game) checkTile(tl interfaces.Tile) error {
 	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
 		return errors.New(ActionNotAllowed)
 	}
-	if g.isTileTemporaryUnplayable(tl) {
-		return errors.New(TileTemporaryUnplayable)
+	if g.isTileTemporarilyUnplayable(tl) {
+		return errors.New(TileTemporarilyUnplayable)
 	}
 	if !g.CurrentPlayer().HasTile(tl) {
 		return errors.New(TileNotOnHand)
@@ -307,7 +307,7 @@ func (g *Game) putUnincorporatedTile(tl interfaces.Tile) error {
 		g.stateMachine.ToBuyStock()
 		return nil
 	}
-	return g.nextPlayer()
+	return g.endTurn()
 }
 
 func (g *Game) existActiveCorporations() bool {
@@ -378,7 +378,7 @@ func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 	}
 	for i := range g.players {
 		if g.players[i] == pl && g.currentPlayerNumber == i {
-			g.nextPlayer()
+			g.endTurn()
 			return
 		}
 	}
@@ -419,8 +419,7 @@ func (g *Game) GameStateName() string {
 	return g.stateMachine.CurrentStateName()
 }
 
-// Passes the turn to the next player
-func (g *Game) nextPlayer() error {
+func (g *Game) endTurn() error {
 	if g.isLastRound {
 		g.stateMachine.ToEndGame()
 		return g.finish()
@@ -428,6 +427,12 @@ func (g *Game) nextPlayer() error {
 	if err := g.drawTile(); err != nil {
 		return err
 	}
+	g.nextPlayer()
+	return nil
+}
+
+// Passes the turn to the next player
+func (g *Game) nextPlayer() {
 	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
 		g.stateMachine.ToPlayTile()
 	}
@@ -435,7 +440,6 @@ func (g *Game) nextPlayer() error {
 	if g.isHandUnplayable() {
 		g.replaceWholeHand()
 	}
-	return nil
 }
 
 // Increases the number which specifies the current player.
@@ -501,7 +505,7 @@ func (g *Game) replaceUnplayableTiles() error {
 // to
 func (g *Game) isHandUnplayable() bool {
 	for _, tile := range g.CurrentPlayer().Tiles() {
-		if !g.isTilePermanentlyUnplayable(tile) || !g.isTileTemporaryUnplayable(tile) {
+		if g.IsTilePlayable(tile) {
 			return false
 		}
 	}
