@@ -68,6 +68,11 @@ func (g *Game) checkSellTrade(sell map[interfaces.Corporation]int, trade map[int
 		if g.CurrentPlayer().Shares(corp) < amount {
 			return errors.New(NotEnoughCorporationSharesOwned)
 		}
+		if _, ok := trade[corp]; ok {
+			if trade[corp]+amount > g.CurrentPlayer().Shares(corp) {
+				return errors.New(NotEnoughCorporationSharesOwned)
+			}
+		}
 	}
 	for corp, amount := range trade {
 		if amount > 0 && g.CurrentPlayer().Shares(corp) == 0 {
