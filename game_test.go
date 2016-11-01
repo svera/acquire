@@ -364,6 +364,23 @@ func TestSellTradeTurnPassing(t *testing.T) {
 	}
 }
 
+func TestSellTradeCheckAmount(t *testing.T) {
+	players, optional := setup()
+
+	game, _ := New(players, optional)
+	game.currentPlayerNumber = 0
+
+	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
+
+	sell := map[interfaces.Corporation]int{optional.Corporations[0]: 6}
+	trade := map[interfaces.Corporation]int{optional.Corporations[0]: 6}
+	game.stateMachine.(*mocks.StateMachine).FakeStateName = interfaces.SellTradeStateName
+
+	if game.SellTrade(sell, trade) == nil {
+		t.Errorf("Trying to sell and trade more shares than owned must return an error")
+	}
+}
+
 // Set ups the board this way for merge tests
 //   4 5 6 7 8 9
 // E [][]><[][][]
