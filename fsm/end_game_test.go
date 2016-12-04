@@ -48,3 +48,11 @@ func TestEndGameToInsufficientPlayers(t *testing.T) {
 		t.Errorf("Transition from EndGame to InsufficientPlayers must not be possible")
 	}
 }
+
+func TestEndGameToEndGame(t *testing.T) {
+	state := &endGame{}
+
+	if state.ToEndGame().Name() != interfaces.EndGameStateName {
+		t.Errorf("Transition from EndGame to EndGame must be valid")
+	}
+}

@@ -46,7 +46,7 @@ func TestBuyStockToEndGame(t *testing.T) {
 func TestBuyStockToInsufficientPlayers(t *testing.T) {
 	state := &buyStock{}
 
-	if state.ToInsufficientPlayers().Name() != interfaces.InsufficientPlayersStateName {
-		t.Errorf("Transition from BuyStock to InsufficientPlayers must be valid")
+	if state.ToBuyStock().Name() != interfaces.BuyStockStateName {
+		t.Errorf("Transition from BuyStock to BuyStock must be valid")
 	}
 }

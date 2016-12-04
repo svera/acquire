@@ -41,3 +41,11 @@ func TestUntieMergeToInsufficientPlayers(t *testing.T) {
 		t.Errorf("Transition from UntieMerge to InsufficientPlayers must be valid")
 	}
 }
+
+func TestUntieMergeToUntieMerge(t *testing.T) {
+	state := &untieMerge{}
+
+	if state.ToUntieMerge().Name() != interfaces.UntieMergeStateName {
+		t.Errorf("Transition from UntieMerge to UntieMerge must be valid")
+	}
+}

@@ -41,3 +41,11 @@ func TestFoundCorpToInsufficientPlayers(t *testing.T) {
 		t.Errorf("Transition from FoundCorp to InsufficientPlayers must be valid")
 	}
 }
+
+func TestFoundCorpToFoundCorp(t *testing.T) {
+	state := &foundCorp{}
+
+	if state.ToFoundCorp().Name() != interfaces.FoundCorpStateName {
+		t.Errorf("Transition from FoundCorp to FoundCorp must be valid")
+	}
+}

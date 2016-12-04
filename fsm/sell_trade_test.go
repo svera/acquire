@@ -41,3 +41,11 @@ func TestSellTradeToInsufficientPlayers(t *testing.T) {
 		t.Errorf("Transition from SellTrade to InsufficientPlayers must be valid")
 	}
 }
+
+func TestSellTradeToSellTrade(t *testing.T) {
+	state := &sellTrade{}
+
+	if state.ToSellTrade().Name() != interfaces.SellTradeStateName {
+		t.Errorf("Transition from SellTrade to SellTrade must be valid")
+	}
+}

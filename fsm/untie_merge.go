@@ -23,3 +23,9 @@ func (s *untieMerge) ToSellTrade() interfaces.State {
 func (s *untieMerge) ToInsufficientPlayers() interfaces.State {
 	return &insufficientPlayers{}
 }
+
+// ToUntieMerge returns self because machine is already in that state
+// Although it may make no sense, this is to avoid the machine to go to errorState
+func (s *untieMerge) ToUntieMerge() interfaces.State {
+	return s
+}

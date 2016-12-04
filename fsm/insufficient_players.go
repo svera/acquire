@@ -13,3 +13,9 @@ type insufficientPlayers struct {
 func (s *insufficientPlayers) Name() string {
 	return interfaces.InsufficientPlayersStateName
 }
+
+// ToInsufficientPlayers returns self because machine is already in that state
+// Although it may make no sense, this is to avoid the machine to go to errorState
+func (s *insufficientPlayers) ToInsufficientPlayers() interfaces.State {
+	return s
+}

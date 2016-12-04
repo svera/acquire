@@ -23,3 +23,9 @@ func (s *sellTrade) ToBuyStock() interfaces.State {
 func (s *sellTrade) ToInsufficientPlayers() interfaces.State {
 	return &insufficientPlayers{}
 }
+
+// ToSellTrade returns self because machine is already in that state
+// Although it may make no sense, this is to avoid the machine to go to errorState
+func (s *sellTrade) ToSellTrade() interfaces.State {
+	return s
+}

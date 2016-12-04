@@ -28,3 +28,9 @@ func (s *buyStock) ToEndGame() interfaces.State {
 func (s *buyStock) ToInsufficientPlayers() interfaces.State {
 	return &insufficientPlayers{}
 }
+
+// ToBuyStock returns self because machine is already in that state
+// Although it may make no sense, this is to avoid the machine to go to errorState
+func (s *buyStock) ToBuyStock() interfaces.State {
+	return s
+}

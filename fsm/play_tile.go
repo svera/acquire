@@ -38,3 +38,9 @@ func (s *playTile) ToBuyStock() interfaces.State {
 func (s *playTile) ToInsufficientPlayers() interfaces.State {
 	return &insufficientPlayers{}
 }
+
+// ToPlayTile returns self because machine is already in that state
+// Although it may make no sense, this is to avoid the machine to go to errorState
+func (s *playTile) ToPlayTile() interfaces.State {
+	return s
+}

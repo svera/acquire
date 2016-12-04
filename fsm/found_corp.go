@@ -23,3 +23,9 @@ func (s *foundCorp) ToBuyStock() interfaces.State {
 func (s *foundCorp) ToInsufficientPlayers() interfaces.State {
 	return &insufficientPlayers{}
 }
+
+// ToFoundCorp returns self because machine is already in that state
+// Although it may make no sense, this is to avoid the machine to go to errorState
+func (s *foundCorp) ToFoundCorp() interfaces.State {
+	return s
+}

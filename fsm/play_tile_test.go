@@ -41,3 +41,11 @@ func TestPlayTileToInsufficientPlayers(t *testing.T) {
 		t.Errorf("Transition from PlayTile to InsufficientPlayers must be valid")
 	}
 }
+
+func TestPlayTileToPlayTile(t *testing.T) {
+	state := &playTile{}
+
+	if state.ToPlayTile().Name() != interfaces.PlayTileStateName {
+		t.Errorf("Transition from PlayTile to PlayTile must be valid")
+	}
+}
