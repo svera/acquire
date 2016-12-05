@@ -66,3 +66,47 @@ func TestAddShares(t *testing.T) {
 		t.Errorf("AddShares() must add %d stock shares as owned by the player in corporation %p, got %d", add, corp, player.Shares(corp))
 	}
 }
+
+func TestRemoveShares(t *testing.T) {
+	corp := &mocks.Corporation{}
+	original := 5
+	remove := 2
+	expected := 3
+	player := &Player{
+		shares: map[interfaces.Corporation]int{
+			corp: original,
+		},
+	}
+	player.RemoveShares(corp, remove)
+	if player.Shares(corp) != expected {
+		t.Errorf("RemoveShares() must remove %d stock shares as owned by the player in corporation %p, got %d", remove, corp, player.Shares(corp))
+	}
+}
+
+func TestTiles(t *testing.T) {
+	player := &Player{
+		tiles: []interfaces.Tile{
+			&mocks.Tile{},
+			&mocks.Tile{},
+		},
+	}
+	if len(player.Tiles()) != 2 {
+		t.Errorf("Tiles() must return 2 tiles in player's hand, got %d", len(player.Tiles()))
+	}
+}
+
+func TestHasTile(t *testing.T) {
+	player := &Player{
+		tiles: []interfaces.Tile{
+			&mocks.Tile{FakeNumber: 5, FakeLetter: "C"},
+			&mocks.Tile{FakeNumber: 4, FakeLetter: "A"},
+		},
+	}
+	if player.HasTile(&mocks.Tile{FakeNumber: 5, FakeLetter: "C"}) != true {
+		t.Errorf("HasTile() must return true for tile 5C")
+	}
+	if player.HasTile(&mocks.Tile{FakeNumber: 2, FakeLetter: "F"}) != false {
+		t.Errorf("HasTile() must return false for tile 2F")
+	}
+
+}
