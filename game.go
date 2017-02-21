@@ -4,7 +4,9 @@
 package acquire
 
 import (
+	"container/ring"
 	"errors"
+	"sort"
 	"time"
 
 	"math/rand"
@@ -69,50 +71,65 @@ func (s sortablePlayers) Swap(i, j int) { s.players[i], s.players[j] = s.players
 type Game struct {
 	board               interfaces.Board
 	stateMachine        interfaces.StateMachine
-	players             []interfaces.Player
+	players             *ring.Ring
 	corporations        [7]interfaces.Corporation
 	tileset             interfaces.Tileset
-	currentPlayerNumber int
 	initialPlayerNumber int
 	newCorpTiles        []interfaces.Tile
 	mergeCorps          map[string][]interfaces.Corporation
-	sellTradePlayers    []int
+	sellTradePlayers    []interfaces.Player
 	lastPlayedTile      interfaces.Tile
 	round               int
 	isLastRound         bool
 	// When in sell_trade state, the current player is stored here temporary as the turn
 	// is passed to all defunct corporations stockholders
-	frozenPlayer int
+	frozenPlayer interfaces.Player
 }
 
 // New initialises a new Acquire game
-func New(players []interfaces.Player, optional Optional) (*Game, error) {
+func New(players map[int]interfaces.Player, optional Optional) (*Game, error) {
 	var err error
 	if len(players) < 3 || len(players) > 6 {
 		return nil, errors.New(WrongNumberPlayers)
 	}
 	if optional, err = initOptionalParameters(optional); err == nil {
 		gm := Game{
-			board:               optional.Board,
-			players:             players,
-			corporations:        optional.Corporations,
-			tileset:             optional.Tileset,
-			currentPlayerNumber: 0,
-			round:               1,
-			stateMachine:        optional.StateMachine,
-			isLastRound:         false,
+			board:        optional.Board,
+			corporations: optional.Corporations,
+			tileset:      optional.Tileset,
+			round:        1,
+			stateMachine: optional.StateMachine,
+			isLastRound:  false,
 		}
+
+		gm.initPlayersRing(players)
+
 		for i := range gm.corporations {
 			gm.corporations[i].SetPricesChart(gm.setPricesChart(i))
 		}
 
-		for _, pl := range gm.players {
-			gm.giveInitialHand(pl)
-		}
 		gm.pickRandomPlayer()
 		return &gm, nil
 	}
 	return nil, err
+}
+
+// initRing puts all players into a ring struct, so they can be looped in an
+// order, circular fashion.
+func (g *Game) initPlayersRing(players map[int]interfaces.Player) {
+	var playerNumbers []int
+
+	g.players = ring.New(len(players))
+
+	for k := range players {
+		playerNumbers = append(playerNumbers, k)
+	}
+	sort.Ints(playerNumbers)
+	for _, n := range playerNumbers {
+		g.giveInitialHand(players[n])
+		g.players = g.players.Next()
+		g.players.Value = players[n]
+	}
 }
 
 func initOptionalParameters(optional Optional) (Optional, error) {
@@ -249,17 +266,19 @@ func (g *Game) isTileTemporarilyUnplayable(tl interfaces.Tile) bool {
 
 // Player returns player with passed number
 func (g *Game) Player(playerNumber int) interfaces.Player {
-	return g.players[playerNumber]
+	cp := g.players.Next()
+	for i := 0; i < cp.Len(); i++ {
+		if cp.Value.(interfaces.Player).Number() == playerNumber {
+			return cp.Value.(interfaces.Player)
+		}
+		cp = cp.Next()
+	}
+	return nil
 }
 
 // CurrentPlayer returns player currently in play
 func (g *Game) CurrentPlayer() interfaces.Player {
-	return g.players[g.currentPlayerNumber]
-}
-
-// CurrentPlayerNumber returns the number of the player currently in play
-func (g *Game) CurrentPlayerNumber() int {
-	return g.currentPlayerNumber
+	return g.players.Value.(interfaces.Player)
 }
 
 // PlayTile puts the given tile on board and triggers related actions
@@ -320,8 +339,12 @@ func (g *Game) existActiveCorporations() bool {
 }
 
 // Sets player currently in play
-func (g *Game) setCurrentPlayer(number int) *Game {
-	g.currentPlayerNumber = number
+func (g *Game) setCurrentPlayer(pl interfaces.Player) *Game {
+	for i := 0; i < g.players.Len(); i++ {
+		if g.players.Value.(interfaces.Player) != pl {
+			g.players = g.players.Next()
+		}
+	}
 	return g
 }
 
@@ -358,12 +381,11 @@ func (g *Game) growCorporation(corp interfaces.Corporation, tiles []interfaces.T
 	corp.Grow(len(tiles))
 }
 
-// DeactivatePlayer gets the received player and marks it as inactive
+// RemovePlayer gets the received player and removes him/her from the game
 // because the player has left the game. All player's
-// assets are returned to its respective origin sets. If the deactivated player was in
+// assets are returned to its respective origin sets. If the removed player was in
 // his/her turn, turn passes to the next player.
-func (g *Game) DeactivatePlayer(pl interfaces.Player) {
-	pl.Deactivate()
+func (g *Game) RemovePlayer(pl interfaces.Player) {
 	pl.RemoveCash(pl.Cash())
 	g.tileset.Add(pl.Tiles())
 	for _, corp := range g.Corporations() {
@@ -372,26 +394,27 @@ func (g *Game) DeactivatePlayer(pl interfaces.Player) {
 			pl.RemoveShares(corp, pl.Shares(corp))
 		}
 	}
-	if len(g.activePlayers()) < 3 {
+
+	// Is current player the one to remove? Then end his/her turn before removing
+	if g.players.Value.(interfaces.Player) == pl {
+		g.endTurn()
+		g.players.Unlink(1)
+	} else {
+		search := g.players
+
+		for i := 0; i < g.players.Len(); i++ {
+			if search.Next().Value.(interfaces.Player) == pl {
+				search.Unlink(1)
+				break
+			}
+			search = search.Next()
+		}
+	}
+
+	if g.players.Len() < 3 {
 		g.stateMachine.ToInsufficientPlayers()
 		return
 	}
-	for i := range g.players {
-		if g.players[i] == pl && g.currentPlayerNumber == i {
-			g.endTurn()
-			return
-		}
-	}
-}
-
-func (g *Game) activePlayers() []interfaces.Player {
-	var activePlayers []interfaces.Player
-	for i := range g.players {
-		if g.players[i].Active() {
-			activePlayers = append(activePlayers, g.players[i])
-		}
-	}
-	return activePlayers
 }
 
 // Round returns the current round number
@@ -436,26 +459,9 @@ func (g *Game) nextPlayer() {
 	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
 		g.stateMachine.ToPlayTile()
 	}
-	g.updateCurrentPlayerNumber()
+	g.players = g.players.Next()
 	if g.isHandUnplayable() {
 		g.replaceWholeHand()
-	}
-}
-
-// Increases the number which specifies the current player.
-// Turn passes only to an active player.
-func (g *Game) updateCurrentPlayerNumber() {
-	for {
-		g.currentPlayerNumber++
-		if g.currentPlayerNumber == len(g.players) {
-			g.currentPlayerNumber = 0
-		}
-		if g.currentPlayerNumber == g.initialPlayerNumber {
-			g.round++
-		}
-		if g.players[g.currentPlayerNumber].Active() {
-			return
-		}
 	}
 }
 
@@ -538,7 +544,8 @@ func defaultCorporations() [7]interfaces.Corporation {
 func (g *Game) pickRandomPlayer() {
 	source := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(source)
-	numberPlayers := len(g.players)
-	g.currentPlayerNumber = rn.Intn(numberPlayers - 1)
-	g.initialPlayerNumber = g.currentPlayerNumber
+	numberPlayers := g.players.Len()
+	move := rn.Intn(numberPlayers - 1)
+	g.players = g.players.Move(move)
+	g.initialPlayerNumber = g.players.Value.(interfaces.Player).Number()
 }
