@@ -544,6 +544,18 @@ func TestRemovePlayer(t *testing.T) {
 	}
 }
 
+func TestRemoveCurrentPlayer(t *testing.T) {
+	players, optional := setup()
+	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.UntieMergeStateName, TimesCalled: map[string]int{}}
+
+	game, _ := New(players, optional)
+	game.setCurrentPlayer(players[1])
+	game.RemovePlayer(game.CurrentPlayer())
+	if game.CurrentPlayer().Number() != 2 {
+		t.Errorf("Player 2 must be in turn after removing player 2, player %d in turn instead", game.CurrentPlayer().Number())
+	}
+}
+
 // Testing that a completely unplayable hand (both corporations 0 and 1 are safe)
 // is detected and replaced
 func TestUnplayableHandIsReplaced(t *testing.T) {
@@ -564,9 +576,9 @@ func TestUnplayableHandIsReplaced(t *testing.T) {
 func setup() (map[int]interfaces.Player, Optional) {
 	players := make(map[int]interfaces.Player, 3)
 
-	players[0] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}}
-	players[1] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}}
-	players[2] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}}
+	players[0] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 0, TimesCalled: map[string]int{}}
+	players[1] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 1, TimesCalled: map[string]int{}}
+	players[2] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 2, TimesCalled: map[string]int{}}
 
 	corporations := [7]interfaces.Corporation{
 		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},

@@ -397,8 +397,9 @@ func (g *Game) RemovePlayer(pl interfaces.Player) {
 
 	// Is current player the one to remove? Then end his/her turn before removing
 	if g.players.Value.(interfaces.Player) == pl {
-		g.endTurn()
+		g.players = g.players.Prev()
 		g.players.Unlink(1)
+		g.nextPlayer()
 	} else {
 		search := g.players
 
