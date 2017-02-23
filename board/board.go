@@ -14,12 +14,6 @@ type Board struct {
 	grid *[13]map[string]interfaces.Owner
 }
 
-type sortableCorporations []interfaces.Corporation
-
-func (s sortableCorporations) Len() int           { return len(s) }
-func (s sortableCorporations) Less(i, j int) bool { return s[i].Size() < s[j].Size() }
-func (s sortableCorporations) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-
 // New initialises and returns a Board instance
 func New() *Board {
 	brd := Board{

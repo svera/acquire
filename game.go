@@ -19,53 +19,9 @@ import (
 )
 
 const (
-	// ActionNotAllowed is an error returned when action not allowed at current state
-	ActionNotAllowed = "action_not_allowed"
-	// StockSharesNotBuyable is an error returned when stock shares from a corporation not on board are not buyable
-	StockSharesNotBuyable = "stock_shares_not_buyable"
-	// NotEnoughStockShares is an error returned when not enough stock shares of a corporation to buy
-	NotEnoughStockShares = "not_enough_stock_shares"
-	// TileTemporarilyUnplayable is an error returned when tile temporarily unplayable
-	TileTemporarilyUnplayable = "tile_temporarily_unplayable"
-	// TilePermanentlyUnplayable is an error returned when tile permanently unplayable
-	TilePermanentlyUnplayable = "tile_permanently_unplayable"
-	// NotEnoughCash is an error returned when player has not enough cash to buy stock shares
-	NotEnoughCash = "not_enough_cash"
-	// TooManyStockSharesToBuy is an error returned when player can not buy more than 3 stock shares per round
-	TooManyStockSharesToBuy = "too_many_stock_shares_to_buy"
-	// CorpNamesNotUnique is an error returned when some corporation names are repeated
-	CorpNamesNotUnique = "corp_names_not_unique"
-	// WrongNumberCorpsClass is an error returned when corporations classes do not fit rules
-	WrongNumberCorpsClass = "wrong_number_corps_class"
-	// CorporationAlreadyOnBoard is an error returned when corporation is already on board and cannot be founded
-	CorporationAlreadyOnBoard = "corporation_already_on_board"
-	// WrongNumberPlayers is an error returned when there must be between 3 and 6 players
-	WrongNumberPlayers = "wrong_number_players"
-	// NoCorporationSharesOwned is an error returned when player does not own stock shares of a certain corporation
-	NoCorporationSharesOwned = "no_corporation_shares_owned"
-	// NotEnoughCorporationSharesOwned is an error returned when player does not own enough stock shares of a certain corporation
-	NotEnoughCorporationSharesOwned = "not_enough_corporation_shares_owned"
-	// TileNotOnHand is an error returned when player does not have tile on hand
-	TileNotOnHand = "tile_not_on_hand"
-	// NotAnAcquirerCorporation is an error returned when corporation is not the acquirer in a merge
-	NotAnAcquirerCorporation = "not_an_acquirer_corporation"
-	// TradeAmountNotEven is an error returned when number of stock shares is not even in a trade
-	TradeAmountNotEven = "trade_amount_not_even"
-
 	totalCorporations      = 7
 	endGameCorporationSize = 41
 )
-
-type sortablePlayers struct {
-	players []interfaces.Player
-	corp    interfaces.Corporation
-}
-
-func (s sortablePlayers) Len() int { return len(s.players) }
-func (s sortablePlayers) Less(i, j int) bool {
-	return s.players[i].Shares(s.corp) < s.players[j].Shares(s.corp)
-}
-func (s sortablePlayers) Swap(i, j int) { s.players[i], s.players[j] = s.players[j], s.players[i] }
 
 // Game stores state of game elements and provides methods to control game flow
 type Game struct {
