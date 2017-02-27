@@ -6,17 +6,17 @@ import "github.com/svera/acquire/interfaces"
 // Player stores the status of a player
 type Player struct {
 	cash   int
+	number int
 	tiles  []interfaces.Tile
 	shares map[interfaces.Corporation]int
-	active bool
 }
 
 // New initialises and returns a Player instance
-func New() *Player {
+func New(n int) *Player {
 	return &Player{
 		cash:   6000,
+		number: n,
 		shares: map[interfaces.Corporation]int{},
-		active: true,
 	}
 }
 
@@ -86,13 +86,13 @@ func (p *Player) RemoveCash(amount int) interfaces.Player {
 	return p
 }
 
-// Active returns if the player is currently active in the game
-func (p *Player) Active() bool {
-	return p.active
+// SetNumber sets player's number
+func (p *Player) SetNumber(n int) interfaces.Player {
+	p.number = n
+	return p
 }
 
-// Deactivate marks the player as no active (namely when the player leaves the game)
-func (p *Player) Deactivate() interfaces.Player {
-	p.active = false
-	return p
+// Number returns player's number
+func (p *Player) Number() int {
+	return p.number
 }

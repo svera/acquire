@@ -17,7 +17,7 @@ func (g *Game) startMerge(tl interfaces.Tile, mergeCorps map[string][]interfaces
 			g.payBonuses(corp)
 		}
 		g.sellTradePlayers = g.setSellTradePlayers(mergeCorps["defunct"])
-		g.frozenPlayer = g.currentPlayerNumber
+		g.frozenPlayer = g.players.Value.(interfaces.Player)
 		g.setCurrentPlayer(g.nextSellTradePlayer())
 		g.stateMachine.ToSellTrade()
 	}
@@ -70,22 +70,22 @@ func (g *Game) getMainStockHolders(corp interfaces.Corporation) map[string][]int
 
 // Returns players who are shareholders of at least one of the passed companies
 // starting from the current one in play (mergemaker)
-func (g *Game) setSellTradePlayers(sellableCorps []interfaces.Corporation) []int {
-	shareholders := []int{}
-	index := g.currentPlayerNumber
-	for _ = range g.players {
+func (g *Game) setSellTradePlayers(sellableCorps []interfaces.Corporation) []interfaces.Player {
+	shareHolders := []interfaces.Player{}
+
+	search := g.players
+
+	// Only add to shareHolders if player has shares in one of the sellable corps
+	for i := 0; i < search.Len(); i++ {
 		for _, corp := range sellableCorps {
-			if g.players[index].Shares(corp) > 0 && g.players[index].Active() {
-				shareholders = append(shareholders, index)
-				break
+			if search.Value.(interfaces.Player).Shares(corp) > 0 {
+				shareHolders = append(shareHolders, search.Value.(interfaces.Player))
 			}
-		}
-		index++
-		if index == len(g.players) {
-			index = 0
+			search = search.Next()
 		}
 	}
-	return shareholders
+
+	return shareHolders
 }
 
 // Get players who have stock of the passed corporation, ordered descendently by number of stock shares
@@ -93,10 +93,13 @@ func (g *Game) setSellTradePlayers(sellableCorps []interfaces.Corporation) []int
 func (g *Game) getStockHolders(corp interfaces.Corporation) []interfaces.Player {
 	var stockHolders sortablePlayers
 
-	for _, pl := range g.players {
-		if pl.Shares(corp) > 0 && pl.Active() {
-			stockHolders.players = append(stockHolders.players, pl)
+	search := g.players
+
+	for i := 0; i < search.Len(); i++ {
+		if search.Value.(interfaces.Player).Shares(corp) > 0 {
+			stockHolders.players = append(stockHolders.players, search.Value.(interfaces.Player))
 		}
+		search = search.Next()
 	}
 	stockHolders.corp = corp
 	if len(stockHolders.players) > 0 {

@@ -15,10 +15,12 @@ func (g *Game) finish() error {
 	}
 	for _, corp := range g.activeCorporations() {
 		g.payBonuses(corp)
-		for _, pl := range g.players {
-			if pl.Shares(corp) > 0 && pl.Active() {
+		for i := 0; i < g.players.Len(); i++ {
+			pl := g.players.Value.(interfaces.Player)
+			if pl.Shares(corp) > 0 {
 				g.sell(pl, corp, pl.Shares(corp))
 			}
+			g.players = g.players.Next()
 		}
 	}
 	return nil

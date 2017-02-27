@@ -8,7 +8,7 @@ import (
 )
 
 func TestPickTile(t *testing.T) {
-	player := New()
+	player := New(0)
 	tl := &mocks.Tile{FakeNumber: 2, FakeLetter: "C"}
 	player.PickTile(tl)
 	if len(player.tiles) != 1 {
@@ -17,7 +17,7 @@ func TestPickTile(t *testing.T) {
 }
 
 func TestUseTile(t *testing.T) {
-	player := New()
+	player := New(0)
 
 	player.tiles = []interfaces.Tile{
 		&mocks.Tile{FakeNumber: 7, FakeLetter: "c"},

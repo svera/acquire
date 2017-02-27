@@ -12,6 +12,6 @@ type Player interface {
 	Cash() int
 	AddCash(amount int) Player
 	RemoveCash(amount int) Player
-	Active() bool
-	Deactivate() Player
+	SetNumber(n int) Player
+	Number() int
 }

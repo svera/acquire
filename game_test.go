@@ -9,7 +9,7 @@ import (
 
 func TestNewGameWrongNumberPlayers(t *testing.T) {
 	players, optional := setup()
-	players = players[:1]
+	delete(players, 0)
 
 	if _, err := New(players, optional); err.Error() != WrongNumberPlayers {
 		t.Errorf("Game must not be created with less than 3 players, got %d", len(players))
@@ -77,7 +77,7 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 	players[0].(*mocks.Player).FakeHasTile = true
 	//optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.PlayTileStateName, TimesCalled: map[string]int{}}
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 	game.PlayTile(tileToPlay)
 	if game.stateMachine.(*mocks.StateMachine).TimesCalled["ToFoundCorp"] != 1 {
 		t.Errorf("Game must change its state to FoundCorp")
@@ -87,7 +87,7 @@ func TestPlayTileFoundCorporation(t *testing.T) {
 func TestFoundCorporation(t *testing.T) {
 	players, optional := setup()
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeHasTile = true
 	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.PlayTileStateName, TimesCalled: map[string]int{}}
@@ -123,7 +123,7 @@ func TestPlayTileGrowCorporation(t *testing.T) {
 	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.PlayTileStateName, TimesCalled: map[string]int{}}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 	optional.Board.(*mocks.Board).FakeGrowCorporation = true
 	optional.Board.(*mocks.Board).FakeGrowCorporationTiles = []interfaces.Tile{
 		&mocks.Tile{FakeNumber: 7, FakeLetter: "E"},
@@ -154,7 +154,7 @@ func TestPlayTileMergeCorporationsMultipleMajorityShareholders(t *testing.T) {
 	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.PlayTileStateName, TimesCalled: map[string]int{}}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
 	players[0].(*mocks.Player).FakeHasTile = true
@@ -192,7 +192,7 @@ func TestPlayTileMergeCorporationsMultipleMinorityShareholders(t *testing.T) {
 	tileToPlay := &mocks.Tile{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
 	players[0].(*mocks.Player).FakeHasTile = true
@@ -229,7 +229,7 @@ func TestPlayTileMergeCorporationsOneShareholder(t *testing.T) {
 	tileToPlay := &mocks.Tile{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
 	players[0].(*mocks.Player).FakeHasTile = true
@@ -252,7 +252,7 @@ func TestPlayTileMergeCorporationsComplete(t *testing.T) {
 	tileToPlay := &mocks.Tile{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
 	players[0].(*mocks.Player).FakeHasTile = true
@@ -302,7 +302,7 @@ func TestPlayTileMergeCorporationsAndGrow(t *testing.T) {
 	tileToPlay := &mocks.Tile{FakeNumber: 7, FakeLetter: "E"}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	optional.Board.PutTile(&mocks.Tile{FakeNumber: 7, FakeLetter: "F"})
 
@@ -340,7 +340,7 @@ func TestSellTradeTurnPassing(t *testing.T) {
 	tileToPlay := &mocks.Tile{FakeNumber: 6, FakeLetter: "E"}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
 	players[0].(*mocks.Player).FakeHasTile = true
@@ -360,7 +360,7 @@ func TestSellTradeTurnPassing(t *testing.T) {
 		t.Errorf("Wrong game state after merge, expected %s, got %s", interfaces.SellTradeStateName, game.stateMachine.CurrentStateName())
 	}
 	if game.CurrentPlayer() != players[2] {
-		t.Errorf("Wrong active player, expected %d, got %d", 2, game.currentPlayerNumber)
+		t.Errorf("Wrong active player, expected %d, got %d", 2, game.CurrentPlayer().Number())
 	}
 }
 
@@ -368,7 +368,7 @@ func TestSellTradeCheckAmount(t *testing.T) {
 	players, optional := setup()
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6
 
@@ -403,7 +403,7 @@ func TestBuyStock(t *testing.T) {
 	expectedPlayerStock := 2
 	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.BuyStockStateName, TimesCalled: map[string]int{}}
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	game.BuyStock(buys)
 
@@ -425,7 +425,7 @@ func TestBuyStockWithNotEnoughCash(t *testing.T) {
 	buys := map[interfaces.Corporation]int{optional.Corporations[0]: 2}
 	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.BuyStockStateName, TimesCalled: map[string]int{}}
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 
 	err := game.BuyStock(buys)
 	if err == nil {
@@ -527,20 +527,32 @@ func TestUntieMerge(t *testing.T) {
 	}
 }
 
-func TestDeactivatePlayer(t *testing.T) {
+func TestRemovePlayer(t *testing.T) {
 	players, optional := setup()
 	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.UntieMergeStateName, TimesCalled: map[string]int{}}
 
 	game, _ := New(players, optional)
-	game.DeactivatePlayer(players[1])
-	if players[1].Active() == true {
-		t.Errorf("Deactivated player must be not active")
+	game.RemovePlayer(players[1])
+	if game.players.Len() != 2 {
+		t.Errorf("Removed player must be not in the game")
 	}
 	if players[1].Cash() != 0 {
 		t.Errorf("Deactivated player expected to have no money, got %d", players[1].Cash())
 	}
 	if game.stateMachine.(*mocks.StateMachine).TimesCalled["ToInsufficientPlayers"] != 1 {
 		t.Errorf("Game must change its state to InsufficientPlayers as it has less than 3 active players")
+	}
+}
+
+func TestRemoveCurrentPlayer(t *testing.T) {
+	players, optional := setup()
+	optional.StateMachine = &mocks.StateMachine{FakeStateName: interfaces.UntieMergeStateName, TimesCalled: map[string]int{}}
+
+	game, _ := New(players, optional)
+	game.setCurrentPlayer(players[1])
+	game.RemovePlayer(game.CurrentPlayer())
+	if game.CurrentPlayer().Number() != 2 {
+		t.Errorf("Player 2 must be in turn after removing player 2, player %d in turn instead", game.CurrentPlayer().Number())
 	}
 }
 
@@ -553,7 +565,7 @@ func TestUnplayableHandIsReplaced(t *testing.T) {
 	optional.Board.(*mocks.Board).FakeAdjacentCorporations = []interfaces.Corporation{optional.Corporations[0], optional.Corporations[1]}
 
 	game, _ := New(players, optional)
-	game.currentPlayerNumber = 0
+	game.setCurrentPlayer(players[0])
 	tileToPlay := &mocks.Tile{FakeNumber: 5, FakeLetter: "A"}
 	game.PlayTile(tileToPlay)
 	if players[1].(*mocks.Player).TimesCalled["PickTile"] != 6 {
@@ -561,12 +573,12 @@ func TestUnplayableHandIsReplaced(t *testing.T) {
 	}
 }
 
-func setup() ([]interfaces.Player, Optional) {
-	players := []interfaces.Player{
-		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}, FakeActive: true},
-		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}, FakeActive: true},
-		&mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, TimesCalled: map[string]int{}, FakeActive: true},
-	}
+func setup() (map[int]interfaces.Player, Optional) {
+	players := make(map[int]interfaces.Player, 3)
+
+	players[0] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 0, TimesCalled: map[string]int{}}
+	players[1] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 1, TimesCalled: map[string]int{}}
+	players[2] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 2, TimesCalled: map[string]int{}}
 
 	corporations := [7]interfaces.Corporation{
 		&mocks.Corporation{TimesCalled: map[string]int{}, FakeStock: 25},
