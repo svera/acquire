@@ -416,6 +416,9 @@ func (g *Game) nextPlayer() {
 	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
 		g.stateMachine.ToPlayTile()
 	}
+	if g.players.Value.(interfaces.Player).Number() > g.players.Next().Value.(interfaces.Player).Number() {
+		g.round++
+	}
 	g.players = g.players.Next()
 	if g.isHandUnplayable() {
 		g.replaceWholeHand()
