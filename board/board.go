@@ -92,8 +92,8 @@ func categorizeMerge(corporations sortableCorporations) map[string][]interfaces.
 	sort.Sort(sort.Reverse(corporations))
 
 	merge := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[0]},
-		"defunct":  []interfaces.Corporation{},
+		"acquirer": {corporations[0]},
+		"defunct":  {},
 	}
 
 	for i := 1; i < len(corporations); i++ {
