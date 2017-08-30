@@ -323,8 +323,8 @@ func TestPlayTileMergeCorporationsAndGrow(t *testing.T) {
 	trade := map[interfaces.Corporation]int{}
 	game.stateMachine.(*mocks.StateMachine).FakeStateName = interfaces.SellTradeStateName
 	game.mergeCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{optional.Corporations[1]},
-		"defunct":  []interfaces.Corporation{optional.Corporations[0]},
+		"acquirer": {optional.Corporations[1]},
+		"defunct":  {optional.Corporations[0]},
 	}
 	game.lastPlayedTile = tileToPlay
 	game.SellTrade(sell, trade)
@@ -387,8 +387,8 @@ func TestSellTradeCheckAmount(t *testing.T) {
 func setupPlayTileMerge(corporations [7]interfaces.Corporation, bd interfaces.Board) {
 	bd.(*mocks.Board).FakeMergeCorporations = true
 	bd.(*mocks.Board).FakeMergeCorporationsCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corporations[1]},
-		"defunct":  []interfaces.Corporation{corporations[0]},
+		"acquirer": {corporations[1]},
+		"defunct":  {corporations[0]},
 	}
 
 	corporations[0].Grow(2)
@@ -507,8 +507,8 @@ func TestUntieMerge(t *testing.T) {
 
 	game, _ := New(players, optional)
 	game.mergeCorps = map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{optional.Corporations[0], optional.Corporations[1], optional.Corporations[2]},
-		"defunct":  []interfaces.Corporation{optional.Corporations[3]},
+		"acquirer": {optional.Corporations[0], optional.Corporations[1], optional.Corporations[2]},
+		"defunct":  {optional.Corporations[3]},
 	}
 	game.lastPlayedTile = &mocks.Tile{FakeNumber: 5, FakeLetter: "E"}
 	players[0].(*mocks.Player).FakeShares[optional.Corporations[0]] = 6

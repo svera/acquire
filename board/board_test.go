@@ -94,8 +94,8 @@ func TestTileQuadrupleMerge(t *testing.T) {
 	board.grid[6]["G"] = corp4
 
 	expectedCorporations := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corp2},
-		"defunct":  []interfaces.Corporation{corp1, corp3, corp4},
+		"acquirer": {corp2},
+		"defunct":  {corp1, corp3, corp4},
 	}
 	merge, corporations := board.TileMergeCorporations(&mocks.Tile{FakeNumber: 6, FakeLetter: "E"})
 
@@ -132,8 +132,8 @@ func TestTileQuadrupleMergeTie(t *testing.T) {
 	board.grid[6]["G"] = corp4
 
 	expectedCorporations := map[string][]interfaces.Corporation{
-		"acquirer": []interfaces.Corporation{corp1, corp2, corp3, corp4},
-		"defunct":  []interfaces.Corporation{},
+		"acquirer": {corp1, corp2, corp3, corp4},
+		"defunct":  {},
 	}
 	merge, corporations := board.TileMergeCorporations(&mocks.Tile{FakeNumber: 6, FakeLetter: "E"})
 
