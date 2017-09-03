@@ -6,6 +6,7 @@ package acquire
 import (
 	"container/ring"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -265,7 +266,7 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 
 func (g *Game) checkTile(tl interfaces.Tile) error {
 	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
-		return errors.New(ActionNotAllowed)
+		return fmt.Errorf(ActionNotAllowed, "play_tile")
 	}
 	if g.isTileTemporarilyUnplayable(tl) {
 		return errors.New(TileTemporarilyUnplayable)
@@ -307,7 +308,7 @@ func (g *Game) setCurrentPlayer(pl interfaces.Player) *Game {
 // FoundCorporation founds a new corporation
 func (g *Game) FoundCorporation(corp interfaces.Corporation) error {
 	if g.stateMachine.CurrentStateName() != interfaces.FoundCorpStateName {
-		return errors.New(ActionNotAllowed)
+		return fmt.Errorf(ActionNotAllowed, "found_corp", g.stateMachine.CurrentStateName())
 	}
 	if corp.IsActive() {
 		return errors.New(CorporationAlreadyOnBoard)

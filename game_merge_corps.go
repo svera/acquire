@@ -2,6 +2,7 @@ package acquire
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/svera/acquire/interfaces"
@@ -143,7 +144,7 @@ func (g *Game) TiedCorps() []interfaces.Corporation {
 // marking the rest as defunct
 func (g *Game) UntieMerge(acquirer interfaces.Corporation) error {
 	if g.stateMachine.CurrentStateName() != interfaces.UntieMergeStateName {
-		return errors.New(ActionNotAllowed)
+		return fmt.Errorf(ActionNotAllowed, "untie_merge", g.stateMachine.CurrentStateName())
 	}
 	for i, corp := range g.mergeCorps["acquirer"] {
 		if corp == acquirer {

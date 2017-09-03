@@ -3,7 +3,7 @@ package acquire
 // Error messages returned by the game
 const (
 	// Returned when action not allowed at current state
-	ActionNotAllowed = "action_not_allowed"
+	ActionNotAllowed = "action_%s_not_allowed_expecting_%s"
 	// Returned when stock shares from a corporation not on board are not buyable
 	StockSharesNotBuyable = "stock_shares_not_buyable"
 	// Returned when not enough stock shares of a corporation to buy

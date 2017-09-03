@@ -2,6 +2,7 @@ package acquire
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/svera/acquire/interfaces"
 )
@@ -59,7 +60,7 @@ func (g *Game) trade(corp interfaces.Corporation, amount int) {
 // Check that the requisites for both selling and trading stock shares are met
 func (g *Game) checkSellTrade(sell map[interfaces.Corporation]int, trade map[interfaces.Corporation]int) error {
 	if g.stateMachine.CurrentStateName() != interfaces.SellTradeStateName {
-		return errors.New(ActionNotAllowed)
+		return fmt.Errorf(ActionNotAllowed, "sell_trade", g.stateMachine.CurrentStateName())
 	}
 	for corp, amount := range sell {
 		if amount > 0 && g.CurrentPlayer().Shares(corp) == 0 {

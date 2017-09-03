@@ -1,7 +1,7 @@
 package acquire
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/svera/acquire/interfaces"
 )
@@ -11,7 +11,7 @@ import (
 // stock market bank at current prices. Stock in a corporation that is not on the board is worthless."
 func (g *Game) finish() error {
 	if g.stateMachine.CurrentStateName() != interfaces.EndGameStateName {
-		return errors.New(ActionNotAllowed)
+		return fmt.Errorf(ActionNotAllowed, "finish", g.stateMachine.CurrentStateName())
 	}
 	for _, corp := range g.activeCorporations() {
 		g.payBonuses(corp)
