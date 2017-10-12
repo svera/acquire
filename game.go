@@ -266,7 +266,7 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 
 func (g *Game) checkTile(tl interfaces.Tile) error {
 	if g.stateMachine.CurrentStateName() != interfaces.PlayTileStateName {
-		return fmt.Errorf(ActionNotAllowed, "play_tile")
+		return fmt.Errorf(ActionNotAllowed, "play_tile", g.stateMachine.CurrentStateName())
 	}
 	if g.isTileTemporarilyUnplayable(tl) {
 		return errors.New(TileTemporarilyUnplayable)
