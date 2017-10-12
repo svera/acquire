@@ -257,9 +257,7 @@ func (g *Game) PlayTile(tl interfaces.Tile) error {
 		g.growCorporation(corp, tiles)
 		g.stateMachine.ToBuyStock()
 	} else {
-		if err := g.putUnincorporatedTile(tl); err != nil {
-			return err
-		}
+		return g.putUnincorporatedTile(tl)
 	}
 	return nil
 }
@@ -437,9 +435,10 @@ func (g *Game) IsLastRound() bool {
 func (g *Game) drawTile() error {
 	var tile interfaces.Tile
 	var err error
-	if tile, err = g.tileset.Draw(); err == nil {
-		g.CurrentPlayer().PickTile(tile)
+	if tile, err = g.tileset.Draw(); err != nil {
+		return err
 	}
+	g.CurrentPlayer().PickTile(tile)
 
 	if err = g.replaceUnplayableTiles(); err != nil {
 		return err
