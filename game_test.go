@@ -1,6 +1,7 @@
 package acquire
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/svera/acquire/interfaces"
@@ -68,6 +69,22 @@ func TestAreEndConditionsReached(t *testing.T) {
 		t.Errorf("End game conditions reached but not detected (corporation 1 is bigger than 40 tiles)")
 	}
 
+}
+
+func TestGameEndsIfCurrentPlayerDoesntHaveTilesToPlay(t *testing.T) {
+	players, optional := setup()
+	tileToPlay := &mocks.Tile{FakeNumber: 5, FakeLetter: "A"}
+
+	game, _ := New(players, optional)
+	players[0].(*mocks.Player).FakeHasTile = true
+	players[1].(*mocks.Player).FakeTiles = []interfaces.Tile{}
+
+	game.setCurrentPlayer(players[0])
+	game.PlayTile(tileToPlay)
+
+	if game.stateMachine.(*mocks.StateMachine).TimesCalled["ToEndGame"] != 1 {
+		t.Errorf("Game must change its state to EndGame")
+	}
 }
 
 func TestPlayTileFoundCorporation(t *testing.T) {
@@ -364,6 +381,23 @@ func TestSellTradeTurnPassing(t *testing.T) {
 	}
 }
 
+func TestSellTradeTurnPassesEvenWhenThereAreNoTilesLeftToDraw(t *testing.T) {
+	players, optional := setupNoTilesAvailable()
+	tileToPlay := &mocks.Tile{FakeNumber: 6, FakeLetter: "E"}
+
+	game, _ := New(players, optional)
+	game.setCurrentPlayer(players[0])
+	players[0].(*mocks.Player).FakeHasTile = true
+
+	if err := game.PlayTile(tileToPlay); err.Error() != "no_tiles_available" {
+		t.Errorf("Wrong error status, expected %s, got %s", "no_tiles_available", err.Error())
+	}
+
+	if game.CurrentPlayer() != players[1] {
+		t.Errorf("Wrong active player, expected %d, got %d", 1, game.CurrentPlayer().Number())
+	}
+}
+
 func TestSellTradeCheckAmount(t *testing.T) {
 	players, optional := setup()
 
@@ -598,6 +632,24 @@ func setup() (map[int]interfaces.Player, Optional) {
 		Corporations: corporations,
 		Tileset:      tileset,
 		StateMachine: &mocks.StateMachine{FakeStateName: interfaces.PlayTileStateName, TimesCalled: map[string]int{}},
+	}
+
+	return players, optional
+}
+
+func setupNoTilesAvailable() (map[int]interfaces.Player, Optional) {
+	players := make(map[int]interfaces.Player, 3)
+
+	players[0] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 0, TimesCalled: map[string]int{}}
+	players[1] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 1, TimesCalled: map[string]int{}}
+	players[2] = &mocks.Player{FakeShares: map[interfaces.Corporation]int{}, FakeCash: 6000, FakeNumber: 2, TimesCalled: map[string]int{}}
+
+	board := &mocks.Board{TimesCalled: map[string]int{}}
+	tileset := &mocks.Tileset{FakeTile: &mocks.Tile{}, FakeError: fmt.Errorf("no_tiles_available"), TimesCalled: map[string]int{}}
+
+	optional := Optional{
+		Board:   board,
+		Tileset: tileset,
 	}
 
 	return players, optional

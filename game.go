@@ -399,15 +399,18 @@ func (g *Game) GameStateName() string {
 }
 
 func (g *Game) endTurn() error {
+	var err error
+
 	if g.isLastRound {
 		g.stateMachine.ToEndGame()
 		return g.finish()
 	}
-	if err := g.drawTile(); err != nil {
-		return err
+
+	if err = g.drawTile(); err == nil || err.Error() == tileset.NoTilesAvailable {
+		g.nextPlayer()
 	}
-	g.nextPlayer()
-	return nil
+
+	return err
 }
 
 // Passes the turn to the next player
@@ -419,6 +422,12 @@ func (g *Game) nextPlayer() {
 		g.round++
 	}
 	g.players = g.players.Next()
+
+	if len(g.CurrentPlayer().Tiles()) == 0 {
+		g.stateMachine.ToEndGame()
+		g.finish()
+	}
+
 	if g.isHandUnplayable() {
 		g.replaceWholeHand()
 	}
