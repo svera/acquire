@@ -42,6 +42,14 @@ func TestPlayTileToInsufficientPlayers(t *testing.T) {
 	}
 }
 
+func TestPlayTileToEndGame(t *testing.T) {
+	state := &playTile{}
+
+	if state.ToEndGame().Name() != interfaces.EndGameStateName {
+		t.Errorf("Transition from PlayTile to EndGame must be valid")
+	}
+}
+
 func TestPlayTileToPlayTile(t *testing.T) {
 	state := &playTile{}
 

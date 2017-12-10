@@ -39,6 +39,11 @@ func (s *playTile) ToInsufficientPlayers() interfaces.State {
 	return &insufficientPlayers{}
 }
 
+// ToEndGame returns an EndGame instance because it's an allowed state transition
+func (s *playTile) ToEndGame() interfaces.State {
+	return &endGame{}
+}
+
 // ToPlayTile returns self because machine is already in that state
 // Although it may make no sense, this is to avoid the machine to go to errorState
 func (s *playTile) ToPlayTile() interfaces.State {
